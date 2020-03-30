@@ -6,16 +6,20 @@ class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./tokens", True)
         self.client = hangups.Client(self.cookies)
+        self.recentConvo = None
         self.imgs = {
-                    "/gay": open("images/math.jpg", "rb"),
-                    "/math": open("images/math.jpg", "rb"),
-                    "/praise": open("images/praise.jpg", "rb"),
-                    "/goddammit": open("images/goddammit.jpg", "rb")
+                    "/gay": "images/math.jpg",
+                    "/math": "images/math.jpg",
+                    "/praise": "images/praise.jpg",
+                    "/goddammit": "images/goddammit.jpg",
+                    "/heymister": "images/sprite.png"
         }
         self.keywords = {
                 "good bot": "nyaa, thanku~~",
                 "bad bot": "nuu dun pweese~~ >.<",
-                "bot": "ok"
+                "headpat": "uwu thanku",
+                "ping": "pong",
+                "rickroll": "https://youtu.be/dQw4w9WgXcQ"
         }
 
     def run(self):
@@ -33,20 +37,27 @@ class Bot:
             print(get_conv_name(c))
 
     async def _on_disconnect(self):
-        print("bye")
+        print("ded")
+        await self.recentConvo.send_message(hangups.ChatMessageSegment.from_str("I'M DEAD"))
+
 
     async def _on_event(self, event):
         conv_id = event.conversation_id
         conv = self._convo_list.get(conv_id)
+        user_id = event.user_id
+        user = conv.get_user(user_id)
+        self.recentConvo = conv
         
-        if isinstance(event, hangups.ChatMessageEvent):
+        if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             text = event.text.strip().lower()
-            print(text + " " + conv.get_user(event.user_id).full_name)
+            print(user.full_name + ": " + text)
 
             if text in self.keywords:
                 await conv.send_message(hangups.ChatMessageSegment.from_str(self.keywords[text]))
+
             elif text in self.imgs:
-                await conv.send_message(hangups.ChatMessageSegment.from_str(""), self.imgs[text])
+                await conv.send_message(hangups.ChatMessageSegment.from_str(""), open(self.imgs[text], "rb"))
+
             elif text == "/help":
                 help_text = "**Keywords:**\n"
                 for x in self.keywords:
