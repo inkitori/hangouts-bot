@@ -44,7 +44,7 @@ class Handler:
 
     async def say(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 2):
+        if self.cooldown(user, event, 3):
             return
 
         try:
