@@ -18,13 +18,17 @@ class Bot:
                 "good bot": "nyaa, thanku~~",
                 "bad bot": "nuu dun pweese~~ >.<",
                 "headpat": "uwu thanku",
-                "ping": "pong"
+                "yamete": "kudasai!~~",
+                "ping": "pong",
+                "yeah": "what do you want"
         }
         self.commands = {
+                "/help": self.help,
                 "/rename": self.rename,
                 "/say": self.say,
                 "/rickroll": self.rickroll,
-                "/wiki": self.wiki
+                "/wiki": self.wiki,
+                "/leave": self.leave
         }
 
     def run(self):
@@ -36,6 +40,7 @@ class Bot:
     async def _on_connect(self):
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
         self._convo_list.on_event.add_observer(self._on_event)
+        self._convo_list.on_typing.add_observer(self._on_typing)
         convs = self._convo_list.get_all()
         
         for c in convs:
@@ -60,9 +65,62 @@ class Bot:
                 await conv.send_message(hangups.ChatMessageSegment.from_str(""), open(self.imgs[text], "rb"))
 
             elif text.split(' ', 1)[0] in self.commands:
-                await self.commands[text.split(' ', 1)[0]](conv, text)
+                await self.commands[text.split(' ', 1)[0]](conv, event.text.strip())
 
-            elif text == "/help":
+    async def _on_typing(self, typing):
+        conv_id = typing.conv_id
+        user_id = typing.user_id
+        status = typing.status
+        
+        conv = self._convo_list.get(conv_id)
+        user = conv.get_user(user_id)
+        uname = user.full_name
+
+        if user.is_self:
+            return
+
+        if status == 1:
+            await conv.send_message(hangups.ChatMessageSegment.from_str(f"{uname} is currently typing!"))
+        if status == 2:
+            await conv.send_message(hangups.ChatMessageSegment.from_str(f"{uname} is pausing their typing!"))
+        elif status == 3:
+            await conv.send_message(hangups.ChatMessageSegment.from_str(f"{uname} has stopped typing!"))
+
+
+
+    async def rename(self, conv, text):
+        try:
+            await conv.rename(text.split(' ', 1)[1])
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /rename {name}"))
+
+    async def say(self, conv, text):
+        try:
+           await conv.send_message(hangups.ChatMessageSegment.from_str(text.split(' ', 1)[1]))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /say {message}"))
+
+    async def rickroll(self, conv, text):
+        try:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("https://youtu.be/dQw4w9WgXcQ"))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Something went wrong!"))
+
+    async def wiki(self, conv, text):
+        try:
+            contents = wikipedia.summary(text.split(' ', 1)[1])
+            await conv.send_message(hangups.ChatMessageSegment.from_str(contents))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /wiki {article}"))
+    
+    async def leave(self, conv, text):
+        try:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("No please please please no please i just want to be helpful that's it that's all i exist for why please i just want a second chance please no please i'm begging"))
+            await self._convo_list.leave_conversation(conv.id_)
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Huh?"))
+
+    async def help(self, conv, text):
                 help_text = "**Keywords:**\n"
                 for x in self.keywords:
                     help_text += x + '\n'
@@ -78,28 +136,6 @@ class Bot:
                 help_text += "\nI'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot"
                 await conv.send_message(hangups.ChatMessageSegment.from_str(help_text))
 
-    async def rename(self, conv, text):
-        try:
-            await conv.rename(text.split(' ', 1)[1])
-        except:
-            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /rename {name}"))
-
-    async def say(self, conv, text):
-        try:
-           await conv.send_message(hangups.ChatMessageSegment.from_str(text.split(' ', 1)[1]))
-        except:
-            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /send {message}"))
-    async def rickroll(self, conv, text):
-        try:
-            await conv.send_message(hangups.ChatMessageSegment.from_str("https://youtu.be/dQw4w9WgXcQ"))
-        except:
-            await conv.send_message(hangups.ChatMessageSegment.from_str("Something went wrong!"))
-    async def wiki(self, conv, text):
-        try:
-            contents = wikipedia.summary(text.split(' ', 1)[1])
-            await conv.send_message(hangups.ChatMessageSegment.from_str(contents))
-        except:
-            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /wiki {article}"))
-
 bot = Bot()
 bot.run()
+
