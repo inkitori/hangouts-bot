@@ -2,6 +2,9 @@ import hangups
 import asyncio
 import random
 from text_2048 import play_game
+from collections import defaultdict
+
+
 
 class Handler:
     def __init__(self):
@@ -26,11 +29,14 @@ class Handler:
                 "/goddammit": "images/goddammit.jpg",
                 #"/heymister": "images/heymister.png"
             }
-        self.admins = [] # fill in yourself
+        self.users = defaultdict(dict) 
+        self.admins = ["yelloweywatermelons@gmail.com", "mskikotang@gmail.com"] # fill in yourself
 
     async def rename(self, bot, event):
         user, conv = getUserConv(bot, event)
-
+        if self.cooldown(user, event, 3):
+            return
+        
         try:
             await conv.rename(event.text.split(' ', 1)[1])
         except:
@@ -38,6 +44,8 @@ class Handler:
 
     async def say(self, bot, event):
         user, conv = getUserConv(bot, event)
+        if self.cooldown(user, event, 2):
+            return
 
         try:
             await conv.send_message(hangups.ChatMessageSegment.from_str(event.text.split(' ', 1)[1]))
@@ -46,6 +54,8 @@ class Handler:
 
     async def rickroll(self, bot, event):
         user, conv = getUserConv(bot, event)
+        if self.cooldown(user, event, 2):
+            return
 
         try:
             await conv.send_message(hangups.ChatMessageSegment.from_str("https://youtu.be/dQw4w9WgXcQ"))
@@ -54,7 +64,6 @@ class Handler:
 
     async def quit(self, bot, event):
         user, conv = getUserConv(bot, event)
-        print(type(str(user.emails).strip().lower()[2:-2]))
 
         try:
             if str(user.emails).strip().lower()[2:-2] in self.admins:
@@ -67,22 +76,32 @@ class Handler:
 
     async def help(self, bot, event):
         user, conv = getUserConv(bot, event)
+        if self.cooldown(user, event, 10):
+            return
 
-        help_text = "**Keywords:**\n"
-        for x in self.keywords:
-            help_text += x + '\n'
+        f = open("help.txt", 'r')
+        contents = f.read()
+        await conv.send_message(hangups.ChatMessageSegment.from_str(contents))
+        f.close()
 
-        help_text += "\n**Commands:**\n"
-        for x in self.commands:
-            help_text += x + '\n'
-        for x in self.images:
-            help_text += x + '\n'
+    def cooldown(self, user, event, cooldown):
+        text = event.text.lower()
 
-        help_text += "\nI'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot"
-        await conv.send_message(hangups.ChatMessageSegment.from_str(help_text))
+        if user in self.users and text.split()[0] in self.users[user]:
+            if (event.timestamp - self.users[user][text.split()[0]]).seconds < cooldown:
+                print(cooldown - (event.timestamp - self.users[user][text.split()[0]]).seconds)
+                return 1
+            else:
+                self.users[user][text.split()[0]] = event.timestamp
+                return 0
+        else:
+            self.users[user][text.split()[0]] = event.timestamp
+            print("bruh")
+            return 0
 
 def getUserConv(bot, event):
     conv = bot._convo_list.get(event.conversation_id)
     user = conv.get_user(event.user_id)
 
     return user, conv
+
