@@ -1,14 +1,14 @@
 import hangups
 from hangups.ui.utils import get_conv_name
 import asyncio
+import wikipedia
 
 class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./tokens", True)
         self.client = hangups.Client(self.cookies)
-        self.recentConvo = None
         self.imgs = {
-                    "/gay": "images/math.jpg",
+                    "/gay": "images/gay.jpg",
                     "/math": "images/math.jpg",
                     "/praise": "images/praise.jpg",
                     "/goddammit": "images/goddammit.jpg",
@@ -18,8 +18,13 @@ class Bot:
                 "good bot": "nyaa, thanku~~",
                 "bad bot": "nuu dun pweese~~ >.<",
                 "headpat": "uwu thanku",
-                "ping": "pong",
-                "rickroll": "https://youtu.be/dQw4w9WgXcQ"
+                "ping": "pong"
+        }
+        self.commands = {
+                "/rename": self.rename,
+                "/say": self.say,
+                "/rickroll": self.rickroll,
+                "/wiki": self.wiki
         }
 
     def run(self):
@@ -38,19 +43,15 @@ class Bot:
 
     async def _on_disconnect(self):
         print("ded")
-        await self.recentConvo.send_message(hangups.ChatMessageSegment.from_str("I'M DEAD"))
-
 
     async def _on_event(self, event):
         conv_id = event.conversation_id
         conv = self._convo_list.get(conv_id)
         user_id = event.user_id
         user = conv.get_user(user_id)
-        self.recentConvo = conv
         
         if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             text = event.text.strip().lower()
-            print(user.full_name + ": " + text)
 
             if text in self.keywords:
                 await conv.send_message(hangups.ChatMessageSegment.from_str(self.keywords[text]))
@@ -58,15 +59,47 @@ class Bot:
             elif text in self.imgs:
                 await conv.send_message(hangups.ChatMessageSegment.from_str(""), open(self.imgs[text], "rb"))
 
+            elif text.split(' ', 1)[0] in self.commands:
+                await self.commands[text.split(' ', 1)[0]](conv, text)
+
             elif text == "/help":
                 help_text = "**Keywords:**\n"
                 for x in self.keywords:
                     help_text += x + '\n'
+
                 help_text += "\n**Images:**\n"
                 for x in self.imgs:
                     help_text += x + '\n'
+
+                help_text += "\n**Commands:**\n"
+                for x in self.commands:
+                    help_text += x + '\n'
+
+                help_text += "\nI'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot"
                 await conv.send_message(hangups.ChatMessageSegment.from_str(help_text))
+
+    async def rename(self, conv, text):
+        try:
+            await conv.rename(text.split(' ', 1)[1])
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /rename {name}"))
+
+    async def say(self, conv, text):
+        try:
+           await conv.send_message(hangups.ChatMessageSegment.from_str(text.split(' ', 1)[1]))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /send {message}"))
+    async def rickroll(self, conv, text):
+        try:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("https://youtu.be/dQw4w9WgXcQ"))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Something went wrong!"))
+    async def wiki(self, conv, text):
+        try:
+            contents = wikipedia.summary(text.split(' ', 1)[1])
+            await conv.send_message(hangups.ChatMessageSegment.from_str(contents))
+        except:
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /wiki {article}"))
 
 bot = Bot()
 bot.run()
-
