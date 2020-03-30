@@ -1,6 +1,7 @@
 import hangups
 import asyncio
 import random
+from text_2048 import play_game
 
 class Handler:
     def __init__(self):
@@ -23,7 +24,7 @@ class Handler:
                 "/math": "images/math.jpg",
                 "/praise": "images/praise.jpg",
                 "/goddammit": "images/goddammit.jpg",
-                "/heymister": "images/heymister.png"
+                #"/heymister": "images/heymister.png"
             }
         self.admins = [] # fill in yourself
 
@@ -39,7 +40,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
 
         try:
-           await conv.send_message(hangups.ChatMessageSegment.from_str(event.text.split(' ', 1)[1]))
+            await conv.send_message(hangups.ChatMessageSegment.from_str(event.text.split(' ', 1)[1]))
         except:
             await conv.send_message(hangups.ChatMessageSegment.from_str("Format: /say {message}"))
 

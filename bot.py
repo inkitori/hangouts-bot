@@ -4,9 +4,10 @@ import asyncio
 import random
 from handler import Handler
 
+
 class Bot:
     def __init__(self):
-        self.cookies = hangups.get_auth_stdin("./tokens", True)
+        self.cookies = hangups.get_auth_stdin("/home/chendi/.cache/hangups/refresh_token.txt", True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
 
