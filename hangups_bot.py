@@ -10,11 +10,6 @@ chendi_responses = (
     "Sarah,\nno", "wdym"
 )
 
-sarah_responses = (
-    "no", "maybe", "i wonder", "later", "MEEP", "BLACK TEST", "nag later",
-    "BLOODY MURDER"
-)
-
 
 class Bot:
 
@@ -25,14 +20,11 @@ class Bot:
     def chendi(self):
         return random.choice(chendi_responses)
 
-    def sarah(self):
-        return random.choice(sarah_responses)
 
     def set_property(self, bot_property):
         property = bot_property[1]
         if property in self.properties:
             self.properties[property] = bot_property[2][0].lower() == "t"
-            print(self.properties[property], bot_property[2])
         return self.properties[property]
     set_property.need_to_await = False
 
@@ -48,7 +40,6 @@ class Bot:
 
     responses = {
         "say_something": chendi,
-        "chendi": sarah
     }
 
     commands = {
