@@ -1,22 +1,13 @@
 import random
-# import shelve
-import pygame
-import pygame.freetype
-pygame.init()
 
 
-class Cell(pygame.Rect):
+class Cell():
     offset = 10
 
-    def __init__(self, position, mode, value=0):
+    def __init__(self, value=0):
+        self.length = 1
         self.value = value
-        self.position = position
         self.has_merged = False
-        super().__init__(x, y, width, height)
-
-    def draw_value(self, font_size):
-        """Draws the value of the block"""
-        # print value
 
 
 class Board():
@@ -25,7 +16,7 @@ class Board():
         self.size = mode.size
         self.number_of_cells = self.size ** 2
         # creates empty board and adds 2 random blocks
-        self.cells = [Cell(i, mode) for i in range(self.number_of_cells)]
+        self.cells = [Cell() for i in range(self.number_of_cells)]
         self.make_new_block(mode)
         self.make_new_block(mode)
 
@@ -103,18 +94,22 @@ class Board():
 
     def draw_board(self, game):
         """Draws the board"""
-        # dont forget to draw lines
-
+        max_length = 0
         for cell in self.cells:
-            if cell.value > 0:
-                # add cell
+            cell.length = len(str(cell.value))
+            max_length = cell.length if cell.length > max_length else max_length
+        for row in range(game.mode.size):
+            for column in range(game.mode.size):
+                cell = game.board.cells[row * 4 + column]
+                game.text += " " * (max_length - cell.length) + str(cell.value) + " " * (max_length - cell.length)
+            game.text += "\n"
 
 
 class GameMode():
 
     def __init__(
         self, mode, start_value=2, increase_type="normal",
-        size=4, win_value=None, values=None
+        size=4, win_value=None, values=None, colors=Cell.colors
             ):
         self.size = size
         self.number_of_cells = size ** 2
@@ -150,78 +145,81 @@ class GameMode():
         return points
 
 
-class Menu():
-
-    def __init__(self, button_list):
-        self.buttons = []
-        # create each button
-        for button in button_list:
-            self.buttons.append(button)
-            print buttons if command lsit options
-
-
 class Game():
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
     modes = {
-        "Normal": GameMode("Normal"),
+        "normal": GameMode("normal"),
         "65536": GameMode("65536", size=5, win_value=65536),
         str(2 ** 20): GameMode(str(2 ** 20), size=6, win_value=2 ** 20),
-        "Eleven": GameMode("Eleven", 1, "plus one"),
-        "Twenty": GameMode("Twenty", 1, "plus one", win_value=20),
-        "Confusion": GameMode("Confusion", 1, "random", values=shuffled)
+        "eleven": GameMode("eleven", 1, "plus one"),
+        "twenty": GameMode("twenty", 1, "plus one", win_value=20),
+        "confusion": GameMode("confusion", 1, "random", values=shuffled)
     }
-    buttons = ("Restart", "Menu", "Quit")
-
+    commands = ["restart", "menu", "quit", "help"]
 
     def __init__(self):
         self.score = 0
-        self.mode = self.modes["Normal"]
-        self.state = "Menu"
+        self.text = ""
+        self.mode = self.modes["normal"]
+        self.state = "menu"
         self.board = Board(self.mode)
-        self.main_menu = Menu(self.modes)
-        self.game_menu = Menu(self.buttons)
-        self.font.render_to(self.main_menu.surface, (300, 50), "2048", size=100)
-        self.draw_end()
 
-    def draw_end(self):
-        end_text = ("Thanks for playing!\nMade by Chendi")
-        # print end text to hangouts
     def update(self):
         """Draws based on current state"""
-        wait = False
-        if self.state == "Playing":
+        if self.state == "playing":
             self.draw_game()
-        elif self.state == "Menu":
-            self.window.blit(self.main_menu.surface, self.main_menu.window_position)
+        elif self.state == "menu":
+            self.text = "menutexthere"
 
-        elif self.state == "Won" or self.state == "Lost":
-            won = self.state == "Won"
+        elif self.state == "won":
             self.draw_game()
-            text = "You won!" if won else "You lost"
-            # print text to hangouts
-            if won:
-                self.state = "Playing"
+            self.text += "You won! Use command move to continue playing."
+            self.state = "playing"
 
-        elif self.state == "Restart":
+        elif self.state == "lost":
+            self.text = "You lost. Use command restart to restart, or command menu to change modes"
+
+        elif self.state == "restart":
             self.restart()
+        elif self.state == "help":
+            self.text = (
+                "How to Play:\n" +
+                "Move the tiles. When 2 with the same value touch, they merge.\
+                Try to get the highest value posible without filling up the board\n\n" +
 
-        elif self.state == "Quit":
-            # print smth to hangouts
+                "prefix all commands with 2048 all commands must be spelled correctly and are case-sensitive" +
+                "help - prints this help text\n\n" +
+                "quit - ends the game and exits 2048 (high-scores will not be saved)\n\n" +
+
+                "Play Mode Commands:\n" +
+                "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)\n" +
+                "restart - restarts the game in the current gamemode\n" +
+                "menu - go back to the menu (Changes mode to Menu)\n" +
+
+
+                "Menu Commands:\n" +
+                "note that these all refer to gamemodes and start a new game upon selection" +
+                "normal - normal 2048\n" +
+                "65536 - normal 2048 with a 5x5 board and higher win condition" +
+                "eleven - instead of doubling, the blocks increase by 1 when merging" +
+                "twenty - the rules of eleven and the board of 65536" +
+                "confusion - randomly generated block sequences and colors"
+            )
+        elif self.state == "quit":
+            self.text = "Thanks for playing!\nMade by Chendi"
 
     def draw_game(self):
         """Draws board and scores"""
+        self.text += "Score: " + str(self.score) + "\nHigh Score: " + self.mode.high_score + "\n"
         self.board.draw_board(self)
-        # prnt score
-        # print high score
-        # print game
 
     def restart(self, mode=None):
         """Resets the game"""
         self.mode = mode if mode else self.mode
         self.score = 0
-        self.state = "Playing"
-        if self.mode == Game.modes["Confusion"]:
+        self.state = "playing"
+        if self.mode == Game.modes["confusion"]:
             self.setup_confusion()
         self.board = Board(self.mode)
 
@@ -238,59 +236,68 @@ class Game():
         if self.score > self.mode.high_score:
             self.mode.high_score = self.score
         if not self.board.check_can_move():
-            self.state = "Lost"
-        if self.state != "Won":
+            self.state = "lost"
+        if self.state != "won":
             self.check_win()
 
     def check_win(self):
         for block in self.board.cells:
             if block.value == self.mode.win_value:
-                self.state = "Won"
+                self.state = "won"
 
     def setup_confusion(self):
-        random.shuffle(Cell.shuffled_colors)
         random.shuffle(self.shuffled)
-        Game.modes["Confusion"].win_value = Game.modes["Confusion"].values[10]
+        Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
 
-def play_game(text):
+
+def play_game(command_list):
 
     game = Game()
 
     # main game loop
-    while game.state != "Quit":
+    while game.state != "quit":
 
-        # event loop
-            # check for quit
+        game.text = ""
 
-                game.state = "Quit"
-                break
-
-            # check player movement
-            if game.state == "Playing":
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
+        command = command_list[0]
+        # check player movement
+        if game.state == "playing":
+            if command in ("move", "m"):
+                command = command_list[1]
+                if command in ("up", "u"):
                     x = False
                     positive = False
-                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                elif command in ("left", "l"):
                     x = True
                     positive = False
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                elif command in ("down", "d"):
                     x = False
                     positive = True
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                elif command in ("right", "r"):
                     x = True
                     positive = True
                 else:
-                    continue
+                    game.text = "Invalid move"
                 game.move(x, positive)
+            elif command in Game.commands:
+                game.state = command
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                main_menu = game.state == "Menu"
-                menu = game.main_menu if main_menu else game.game_menu
-                for button in menu.buttons:
-                    if command matches
-                        if main_menu:
-                            game.restart(Game.modes[button])
-                        else:
-                            game.state = button
+            else:
+                game.text = "Invalid command. You are in Play Mode. Use help to learn more"
 
-        yield game.update()
+        elif game.state == "menu":
+            if command in game.modes.keys:
+                game.restart(Game.modes[command])
+            elif command in ("help", "quit"):
+                game.state = command
+
+        game.update()
+        yield game.text
+
+
+if __name__ == "__main__":
+    while True:
+        text = input().lower().split()
+        if text[0] == "break":
+            break
+        play_game(text)

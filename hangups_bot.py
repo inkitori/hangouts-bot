@@ -20,11 +20,9 @@ class Bot:
     def chendi(self):
         return random.choice(chendi_responses)
 
-
     def set_property(self, bot_property):
         property = bot_property[1]
-        if property in self.properties:
-            self.properties[property] = bot_property[2][0].lower() == "t"
+        self.properties[property] = bot_property[2][0].lower() == "t"
         return self.properties[property]
     set_property.need_to_await = False
 
@@ -97,9 +95,9 @@ class Bot:
             text = event.text.strip().lower().split()
             text_1 = text[0]
 
-            if text_1 in self.text_responses:
+            if text_1 in self.text_responses and not self.properties["quiet"]:
                 await conv.send_message(hangups.ChatMessageSegment.from_str(self.text_responses[text_1]))
-            elif text_1 in self.responses:
+            elif text_1 in self.responses and not self.properties["quiet"]:
                 message = self.responses[text_1](self)
                 await conv.send_message(hangups.ChatMessageSegment.from_str(message))
             elif text_1 in self.commands:

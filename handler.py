@@ -1,42 +1,47 @@
 import hangups
 import asyncio
 import random
-from text_2048 import play_game
+# from text_2048 import play_game
 from collections import defaultdict
-
 
 
 class Handler:
     def __init__(self):
         self.keywords = {
-                "good bot": "nyaa, thanku~~",
-                "bad bot": "nuu dun pweese~~ >.<",
-                "headpat": "uwu thanku",
-                "yamete": "kudasai!~~",
-                "ping": "pong"
+            "good bot": "nyaa, thanku~~",
+            "bad bot": "nuu dun pweese~~ >.<",
+            "headpat": "uwu thanku",
+            "yamete": "kudasai!~~",
+            "ping": "pong"
         }
         self.commands = {
-                "/help": self.help,
-                "/rename": self.rename,
-                "/say": self.say,
-                "/rickroll": self.rickroll,
-                "/quit": self.quit
+            "/help": self.help,
+            "/rename": self.rename,
+            "/say": self.say,
+            "/rickroll": self.rickroll,
+            "/quit": self.quit
         }
         self.images = {
-                "/gay": "images/gay.jpg",
-                "/math": "images/math.jpg",
-                "/praise": "images/praise.jpg",
-                "/goddammit": "images/goddammit.jpg",
-                #"/heymister": "images/heymister.png"
-            }
-        self.users = defaultdict(dict) 
-        self.admins = ["yelloweywatermelons@gmail.com", "mskikotang@gmail.com"] # fill in yourself
+            "/gay": "images/gay.jpg",
+            "/math": "images/math.jpg",
+            "/praise": "images/praise.jpg",
+            "/goddammit": "images/goddammit.jpg",
+            # "/heymister": "images/heymister.png"
+        }
+        self.users = defaultdict(dict)
+        self.admins = [
+            "yelloweywatermelons@gmail.com",
+            "mskikotang@gmail.com",
+            "chendi.luo@gmail.com",
+            "creonalia@gmail.com",
+            "galaxiesgirls2000@gmail.com"
+        ]
 
     async def rename(self, bot, event):
         user, conv = getUserConv(bot, event)
         if self.cooldown(user, event, 3):
             return
-        
+
         try:
             await conv.rename(event.text.split(' ', 1)[1])
         except:
@@ -72,7 +77,7 @@ class Handler:
             else:
                 await conv.send_message(hangups.ChatMessageSegment.from_str("bro wtf u can't use that"))
         except:
-                await conv.send_message(hangups.ChatMessageSegment.from_str("Something went wrong!"))
+            await conv.send_message(hangups.ChatMessageSegment.from_str("Something went wrong!"))
 
     async def help(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -99,9 +104,9 @@ class Handler:
             print("bruh")
             return 0
 
+
 def getUserConv(bot, event):
     conv = bot._convo_list.get(event.conversation_id)
     user = conv.get_user(event.user_id)
 
     return user, conv
-

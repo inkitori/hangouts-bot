@@ -1,7 +1,6 @@
 import hangups
 from hangups.ui.utils import get_conv_name
 import asyncio
-import random
 from handler import Handler
 
 
@@ -24,16 +23,16 @@ class Bot:
 
         for c in convs:
             print(get_conv_name(c))
-        
+
     async def _on_disconnect(self):
         print("ded")
-    
+
     async def _on_event(self, event):
         conv_id = event.conversation_id
         conv = self._convo_list.get(conv_id)
         user_id = event.user_id
         user = conv.get_user(user_id)
-        
+
         if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             strippedText = event.text.strip().lower()
 
