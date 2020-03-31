@@ -3,11 +3,11 @@ from hangups.ui.utils import get_conv_name
 import asyncio
 import random
 from handler import Handler
-
+from utils import *
 
 class Bot:
     def __init__(self):
-        self.cookies = hangups.get_auth_stdin("/home/chendi/.cache/hangups/refresh_token.txt", True)
+        self.cookies = hangups.get_auth_stdin("./tokens", True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
 
@@ -29,10 +29,7 @@ class Bot:
         print("ded")
     
     async def _on_event(self, event):
-        conv_id = event.conversation_id
-        conv = self._convo_list.get(conv_id)
-        user_id = event.user_id
-        user = conv.get_user(user_id)
+        user, conv = getUserConv(self, event)
         
         if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             strippedText = event.text.strip().lower()
@@ -41,6 +38,8 @@ class Bot:
                 await conv.send_message(toSeg(self.handler.keywords[strippedText]))
 
             elif strippedText.split()[0] in self.handler.images:
+                if self.handler.cooldown(user, event, 5):
+                    return
                 f = open(self.handler.images[strippedText.split()[0]], "rb")
                 await conv.send_message(toSeg(""), f)
                 f.close()
@@ -53,9 +52,6 @@ class Bot:
                 await conv.send_message(toSeg("Saber in!"))
 
 
-def toSeg(text):
-    return hangups.ChatMessageSegment.from_str(text)
-
-
 bot = Bot()
 bot.run()
+
