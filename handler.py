@@ -1,12 +1,14 @@
 import hangups
 from hangups import hangouts_pb2 
 from hangups.hangouts_pb2 import ParticipantId
+
 import asyncio
 import random
-from text_2048 import play_game
 from collections import defaultdict
 from datetime import datetime, tzinfo
+
 from utils import *
+#from text_2048 import play_game
 
 class Handler:
     def __init__(self):

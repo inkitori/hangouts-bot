@@ -7,7 +7,7 @@ from utils import *
 
 class Bot:
     def __init__(self):
-        self.cookies = hangups.get_auth_stdin("./tokens", True)
+        self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
 
