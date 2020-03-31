@@ -1,5 +1,6 @@
 **[PICKS]**
 
+Buy a pick with "/buy pick {pick name}!"
 Tin Pick - 100 Saber Dollars
 Iron Pick - 300 Saber Dollars
 Lead Pick - 500 Saber Dollars

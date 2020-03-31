@@ -32,10 +32,13 @@ class Handler:
                 "/id": self.id,
                 "/kick": self.kick,
                 "/register": self.register,
-                "/money": self.money,
+                "/balance": self.balance,
                 "/mine": self.mine,
                 "/save": self.save,
-                "/shop": self.shop
+                "/shop": self.shop,
+                "/buy": self.buy,
+                "/give": self.give,
+                "/id_give": self.id_give
         }
         self.images = {
                 "/gay": "images/gay.jpg",
@@ -44,13 +47,14 @@ class Handler:
                 "/goddammit": "images/goddammit.jpg",
                 "/heymister": "images/heymister.png"
             }
+
         self.cooldowns = defaultdict(dict) 
         self.admins = [114207595761187114730] # fill in yourself (store as int)
         random.seed(datetime.now())
 
-        with open("stats.json") as f:
-            self.stats = json.load(f)
-        print(self.stats)
+        with open("data.json") as f:
+            self.data = json.load(f)
+        print(self.data)
 
     # utility
     async def help(self, bot, event):
@@ -133,40 +137,42 @@ class Handler:
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         
-        if userID in self.stats:
+        if userID in self.data["users"]:
             await conv.send_message(toSeg("You are already registered!"))
             return
 
         try:
-            self.stats[userID] = user; self.stats[userID] = {}
-            self.stats[userID]["money"] = 0
+            self.data["users"][userID] = user; self.data["users"][userID] = {}
+            self.data["users"][userID]["balance"] = 0
+            self.data["users"][userID]["pick"] = "Copper Pick"
+
             await conv.send_message(toSeg("Successfully registered!"))
-            with open("stats.json", "w") as f:
-                json.dump(self.stats, f)
+            with open("data.json", "w") as f:
+                json.dump(self.data, f)
         except Exception as e:
             await conv.send_message(toSeg("Failed to register!"))
             print(e)
 
-    async def money(self, bot, event):
+    async def balance(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
-        if not userID in self.stats:
+        if not userID in self.data["users"]:
             await conv.send_message(toSeg("You are not registered! Use /register"))
             return
 
         try:
-            money = self.stats[userID]["money"]
-            await conv.send_message(toSeg(user.full_name + ", you currently have " + str(money) + " Saber Dollars!"))
+            balance = self.data["users"][userID]["balance"]
+            await conv.send_message(toSeg(user.full_name + ", you currently have " + str(balance) + " Saber Dollars!"))
         except Exception as e:
-            await conv.send_message(toSeg("Failed to retrieve money info!"))
+            await conv.send_message(toSeg("Failed to retrieve balance info!"))
             print(e)
 
     async def mine(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
-        if not userID in self.stats:
+        if not userID in self.data["users"]:
             await conv.send_message(toSeg("You are not registered! Use /register"))
             return
 
@@ -176,13 +182,15 @@ class Handler:
             return
 
         try:
-            mined_amt = random.randint(10, 20)
-            self.stats[userID]["money"] += mined_amt
+            playerPick = self.data["shop"]["pick"][self.data["users"][userID]["pick"]]
+            mined_amt = random.randint(playerPick["range"][0], playerPick["range"][1])
+
+            self.data["users"][userID]["balance"] += mined_amt
             await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
-            with open("stats.json", "w") as f:
-                json.dump(self.stats, f)
+            with open("data.json", "w") as f:
+                json.dump(self.data, f)
         except Exception as e:
-            await conv.send_message(toSeg("Failed to retrieve money info!"))
+            await conv.send_message(toSeg("Failed to retrieve balance info!"))
             print(e)
 
     async def shop(self, bot, event):
@@ -191,12 +199,126 @@ class Handler:
         if self.cooldown(user, event, 20):
             return
 
+        try:
+            with open("text/shop.txt", "r") as f:
+                s = f.read()
+                await conv.send_message(toSeg(s))
+        except:
+            await conv.send_message(toSeg("Failed to retrieve shop!"))
+    
+    async def buy(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+        try:
+            arg1 = event.text.split()[1].lower()
+            arg2 = event.text.split(' ', 2)[2].lower().title()
+
+            if not userID in self.data["users"]:
+                await conv.send_message(toSeg("You are not registered!  Use /register"))
+                return
+            
+            if arg1 not in self.data["shop"] or arg2 not in self.data["shop"][arg1]:
+                await conv.send_message(toSeg("That item doesn't exist!"))
+                return
+            else:
+                if self.data["users"][userID]["balance"] < self.data["shop"][arg1][arg2]["price"]:
+                    await conv.send_message(toSeg("You don't have enough money for that!"))
+                    return
+                elif self.data["shop"][arg1][self.data["users"][userID][arg1]]["value"] == self.data["shop"][arg1][arg2]["value"]:
+                    await conv.send_message(toSeg("You already have that pick!"))
+                    return
+                elif self.data["shop"][arg1][self.data["users"][userID][arg1]]["value"] > self.data["shop"][arg1][arg2]["value"]:
+                    await conv.send_message(toSeg("You already have a pick better than that!"))
+                    return
+                else:
+                    self.data["users"][userID][arg1] = self.data["shop"][arg1][arg2]["name"]
+                    self.data["users"][userID]["balance"] -= self.data["shop"][arg1][arg2]["price"]
+                    await conv.send_message(toSeg("Purchase successful!"))
+                    with open("data.json", "w") as f:
+                        json.dump(self.data, f)
+                    return
+        except:
+            await conv.send_message(toSeg("Format: /buy {type} {item}"))
+    
+    async def give(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        users = conv.users
+        userID = user.id_[0]
+        give_users = []
+
+        try:
+            arg1 = event.text.split(' ', 1)[1]
+            arg1 = arg1.rsplit(' ', 1)[0]
+
+            arg2 = int(event.text.split()[-1])
+            
+            for u in users:
+                if arg1 in u.full_name:
+                    give_users.append(u)
+
+            if userID not in self.data["users"]:
+                await conv.send_message(toSeg("You are not registered! Use /register"))
+                return
+
+            elif len(give_users) != 1:
+                await conv.send_message(toSeg("Error finding that user! Try /id_give instead."))
+                return
+            
+            elif give_users[0].id_[0] not in self.data["users"]:
+                await conv.send_message(toSeg("That user has not registered!"))
+                return
+
+            elif give_users[0].id_[0] == user.id_[0]:
+                await conv.send_message(toSeg("That user is you!"))
+                return
+
+            elif self.data["users"][userID]["balance"] < arg2:
+                await conv.send_message(toSeg("You don't have enough money to do that!"))
+                return
+            
+            else:
+                self.data["users"][userID]["balance"] -= arg2
+                self.data["users"][give_users[0].id_[0]]["balance"] += arg2
+                await conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
+                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_users[0].id_[0]]["balance"]) + " Saber Dollars"))
+
+        except:
+            await conv.send_message(toSeg("Format: /give {user} {money}"))
+
+    async def id_give(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+
         #try:
-        with open("text/shop.txt", "r") as f:
-            s = f.read()
-            await conv.send_message(toSeg(s))
+        give_user = event.text.split()[1]
+        give_money = int(event.text.split()[-1])
+        print(give_money)
+
+        if userID not in self.data["users"]:
+            await conv.send_message(toSeg("You are not registered! Use /register"))
+            return
+
+        elif give_user not in self.data["users"]:
+            await conv.send_message(toSeg("That user has not registered!"))
+            print(give_user)
+            return
+        
+        elif userID == give_user:
+            await conv.send_message(toSeg("That user is you!"))
+            return
+
+        elif self.data["users"][userID]["balance"] < give_money:
+            await conv.send_message(toSeg("You don't have enough money to do that!"))
+            return
+
+        else:
+            self.data["users"][userID]["balance"] -= give_money
+            self.data["users"][give_user]["balance"] += give_money
+            await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
+            await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
         #except:
-                #await conv.send_message(toSeg("Failed to retrieve shop!"))
+            #await conv.send_message(toSeg("Format: /id_give {id} {money}"))
+
 
 
     # config 
@@ -234,8 +356,8 @@ class Handler:
 
         try:
             if self.isAdmin(user):
-                with open("stats.json", "w") as f:
-                    json.dump(self.stats, f)
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
                 await conv.send_message(toSeg("Successfully saved!"))
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))

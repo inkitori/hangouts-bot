@@ -24,6 +24,10 @@ ping
 /register
 /money
 /mine
+/shop
+/buy
+/give
+/id_give
 
 **Configuration**
 /quit
