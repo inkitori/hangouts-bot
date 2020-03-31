@@ -34,7 +34,8 @@ class Handler:
                 "/register": self.register,
                 "/money": self.money,
                 "/mine": self.mine,
-                "/save": self.save
+                "/save": self.save,
+                "/shop": self.shop
         }
         self.images = {
                 "/gay": "images/gay.jpg",
@@ -57,7 +58,7 @@ class Handler:
         if self.cooldown(user, event, 10):
             return
 
-        f = open("help.txt", 'r')
+        f = open("text/help.txt", 'r')
         contents = f.read()
         await conv.send_message(toSeg(contents))
         f.close()
@@ -98,24 +99,24 @@ class Handler:
         ids = []
         kick_users = []
 
-        #try:
-        for user in users:
-            if arg1 in user.full_name.lower():
-                kick_users.append(user)
+        try:
+            for user in users:
+                if arg1 in user.full_name.lower():
+                    kick_users.append(user)
 
-        if not kick_users:
-            await conv.send_message(toSeg("Nobody in this conversation goes by that name"))
-            return
-        # only reason i figured this out was because of hangupsbot, so thank you so much https://github.com/xmikos/hangupsbot/blob/master/hangupsbot/commands/conversations.py
+            if not kick_users:
+                await conv.send_message(toSeg("Nobody in this conversation goes by that name"))
+                return
+            # only reason i figured this out was because of hangupsbot, so thank you so much https://github.com/xmikos/hangupsbot/blob/master/hangupsbot/commands/conversations.py
 
-        ids = [ParticipantId(gaia_id = user.id_.gaia_id, chat_id = conv.id_) for user in kick_users]
+            ids = [ParticipantId(gaia_id = user.id_.gaia_id, chat_id = conv.id_) for user in kick_users]
 
-        for kick_id in ids:
-            request = hangouts_pb2.RemoveUserRequest(request_header = bot.client.get_request_header(), participant_id = kick_id, event_request_header = conv._get_event_request_header())
-            res = await bot.client.remove_user(request)
-            conv.add_event(res.created_event)
-        #except:
-            #await conv.send_message(toSeg("Yeah don't use this command lol"))
+            for kick_id in ids:
+                request = hangouts_pb2.RemoveUserRequest(request_header = bot.client.get_request_header(), participant_id = kick_id, event_request_header = conv._get_event_request_header())
+                res = await bot.client.remove_user(request)
+                conv.add_event(res.created_event)
+        except:
+            await conv.send_message(toSeg("Yeah don't use this command lol"))
 
     # fun
     async def rickroll(self, bot, event):
@@ -183,6 +184,20 @@ class Handler:
         except Exception as e:
             await conv.send_message(toSeg("Failed to retrieve money info!"))
             print(e)
+
+    async def shop(self, bot, event):
+        user, conv = getUserConv(bot, event)
+
+        if self.cooldown(user, event, 20):
+            return
+
+        #try:
+        with open("text/shop.txt", "r") as f:
+            s = f.read()
+            await conv.send_message(toSeg(s))
+        #except:
+                #await conv.send_message(toSeg("Failed to retrieve shop!"))
+
 
     # config 
     async def quit(self, bot, event):
