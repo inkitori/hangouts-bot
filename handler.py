@@ -1,6 +1,6 @@
 import hangups
 import asyncio
-import random
+# import random
 # from text_2048 import play_game
 from collections import defaultdict
 

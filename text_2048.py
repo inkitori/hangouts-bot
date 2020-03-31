@@ -109,7 +109,7 @@ class GameMode():
 
     def __init__(
         self, mode, start_value=2, increase_type="normal",
-        size=4, win_value=None, values=None, colors=Cell.colors
+        size=4, win_value=None, values=None
             ):
         self.size = size
         self.number_of_cells = size ** 2
@@ -170,7 +170,8 @@ class Game():
         if self.state == "playing":
             self.draw_game()
         elif self.state == "menu":
-            self.text = "menutexthere"
+            for mode in self.modes.keys():
+                self.text += mode + "\n"
 
         elif self.state == "won":
             self.draw_game()
@@ -295,9 +296,12 @@ def play_game(command_list):
         yield game.text
 
 
+# testing via console
 if __name__ == "__main__":
+    game = play_game("help")
     while True:
-        text = input().lower().split()
+        text = input("Enter a command: ").lower().split()
         if text[0] == "break":
             break
-        play_game(text)
+        game_text = play_game(text)
+        print(game_text)
