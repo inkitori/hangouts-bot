@@ -1,0 +1,27 @@
+**Keywords**
+good bot
+bad bot
+headpat
+yamete
+ping
+
+**Utility**
+/help
+/rename
+/say
+/id
+/kick
+
+**Fun**
+/rickroll
+/gay
+/math
+/praise
+/goddammit
+/heymister
+
+**Configuration**
+/quit
+/reset
+
+I'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot
