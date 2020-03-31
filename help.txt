@@ -10,7 +10,7 @@ ping
 /rename
 /say
 /id
-/kick
+/kick (needs work)
 
 **Fun**
 /rickroll
@@ -20,8 +20,14 @@ ping
 /goddammit
 /heymister
 
+**Economy**
+/register
+/money
+/mine
+
 **Configuration**
 /quit
 /reset
+/save
 
 I'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot

@@ -6,6 +6,7 @@ import asyncio
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
+import json
 
 from utils import *
 #from text_2048 import play_game
@@ -29,7 +30,11 @@ class Handler:
                 "/quit": self.quit,
                 "/reset": self.reset,
                 "/id": self.id,
-                "/kick": self.kick
+                "/kick": self.kick,
+                "/register": self.register,
+                "/money": self.money,
+                "/mine": self.mine,
+                "/save": self.save
         }
         self.images = {
                 "/gay": "images/gay.jpg",
@@ -38,8 +43,13 @@ class Handler:
                 "/goddammit": "images/goddammit.jpg",
                 "/heymister": "images/heymister.png"
             }
-        self.users = defaultdict(dict) 
-        self.admins = [] # fill in yourself (store as int)
+        self.cooldowns = defaultdict(dict) 
+        self.admins = [114207595761187114730] # fill in yourself (store as int)
+        random.seed(datetime.now())
+
+        with open("stats.json") as f:
+            self.stats = json.load(f)
+        print(self.stats)
 
     # utility
     async def help(self, bot, event):
@@ -118,6 +128,62 @@ class Handler:
         except:
             await conv.send_message(toSeg("Something went wrong!"))
 
+    async def register(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+        
+        if userID in self.stats:
+            await conv.send_message(toSeg("You are already registered!"))
+            return
+
+        try:
+            self.stats[userID] = user; self.stats[userID] = {}
+            self.stats[userID]["money"] = 0
+            await conv.send_message(toSeg("Successfully registered!"))
+            with open("stats.json", "w") as f:
+                json.dump(self.stats, f)
+        except Exception as e:
+            await conv.send_message(toSeg("Failed to register!"))
+            print(e)
+
+    async def money(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+
+        if not userID in self.stats:
+            await conv.send_message(toSeg("You are not registered! Use /register"))
+            return
+
+        try:
+            money = self.stats[userID]["money"]
+            await conv.send_message(toSeg(user.full_name + ", you currently have " + str(money) + " Saber Dollars!"))
+        except Exception as e:
+            await conv.send_message(toSeg("Failed to retrieve money info!"))
+            print(e)
+
+    async def mine(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+
+        if not userID in self.stats:
+            await conv.send_message(toSeg("You are not registered! Use /register"))
+            return
+
+        i = self.cooldown(user, event, 5)
+        if i:
+            await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
+            return
+
+        try:
+            mined_amt = random.randint(10, 20)
+            self.stats[userID]["money"] += mined_amt
+            await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
+            with open("stats.json", "w") as f:
+                json.dump(self.stats, f)
+        except Exception as e:
+            await conv.send_message(toSeg("Failed to retrieve money info!"))
+            print(e)
+
     # config 
     async def quit(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -139,28 +205,40 @@ class Handler:
         try:
             arg1 = '/' + event.text.lower().split()[1]
             if self.isAdmin(user):
-                if arg1 in self.users[user]:
-                    self.users[user][arg1] = datetime.min.replace(tzinfo=None)
+                if arg1 in self.cooldowns[user]:
+                    self.cooldowns[user][arg1] = datetime.min.replace(tzinfo=None)
                 else:
                     await conv.send_message(toSeg("Format: /reset {command}"))
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         except:
             await conv.send_message(toSeg("Format: /reset {command}"))
+    
+    async def save(self, bot, event):
+        user, conv = getUserConv(bot, event)
+
+        try:
+            if self.isAdmin(user):
+                with open("stats.json", "w") as f:
+                    json.dump(self.stats, f)
+                await conv.send_message(toSeg("Successfully saved!"))
+            else:
+                await conv.send_message(toSeg("bro wtf u can't use that"))
+        except:
+                await conv.send_message(toSeg("Something went wrong!"))
 
     # helpers
     def cooldown(self, user, event, cooldown):
         text = event.text.lower()
         strippedTime = event.timestamp.replace(tzinfo=None)
 
-        if user in self.users and text.split()[0] in self.users[user]:
-            if (strippedTime - self.users[user][text.split()[0]]).seconds < cooldown:
-                print(cooldown - (strippedTime - self.users[user][text.split()[0]]).seconds)
-                return 1
+        if user in self.cooldowns and text.split()[0] in self.cooldowns[user]:
+            if (strippedTime - self.cooldowns[user][text.split()[0]]).seconds < cooldown:
+                return cooldown - (strippedTime - self.cooldowns[user][text.split()[0]]).seconds
             else:
-                self.users[user][text.split()[0]] = strippedTime 
+                self.cooldowns[user][text.split()[0]] = strippedTime 
         else:
-            self.users[user][text.split()[0]] = strippedTime
+            self.cooldowns[user][text.split()[0]] = strippedTime
 
     def isAdmin(self, user):
         print(type(user.id_[0]))

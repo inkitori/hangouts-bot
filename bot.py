@@ -5,6 +5,8 @@ import random
 from handler import Handler
 from utils import *
 
+import signal
+
 class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
@@ -14,8 +16,10 @@ class Bot:
     def run(self):
         self.client.on_connect.add_observer(self._on_connect)
         self.client.on_disconnect.add_observer(self._on_disconnect)
+
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.client.connect())
+        sys.exit(0)
 
     async def _on_connect(self):
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
@@ -50,7 +54,6 @@ class Bot:
         elif isinstance(event, hangups.MembershipChangeEvent):
             if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
                 await conv.send_message(toSeg("Saber in!"))
-
 
 bot = Bot()
 bot.run()
