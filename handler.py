@@ -236,7 +236,6 @@ class Handler:
                     await conv.send_message(toSeg("Purchase successful!"))
                     with open("data.json", "w") as f:
                         json.dump(self.data, f)
-                    return
         except:
             await conv.send_message(toSeg("Format: /buy {type} {item}"))
     
@@ -281,6 +280,8 @@ class Handler:
                 self.data["users"][give_users[0].id_[0]]["balance"] += arg2
                 await conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
                 await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_users[0].id_[0]]["balance"]) + " Saber Dollars"))
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
 
         except:
             await conv.send_message(toSeg("Format: /give {user} {money}"))
@@ -289,35 +290,35 @@ class Handler:
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
-        #try:
-        give_user = event.text.split()[1]
-        give_money = int(event.text.split()[-1])
-        print(give_money)
+        try:
+            give_user = event.text.split()[1]
+            give_money = int(event.text.split()[-1])
 
-        if userID not in self.data["users"]:
-            await conv.send_message(toSeg("You are not registered! Use /register"))
-            return
+            if userID not in self.data["users"]:
+                await conv.send_message(toSeg("You are not registered! Use /register"))
+                return
 
-        elif give_user not in self.data["users"]:
-            await conv.send_message(toSeg("That user has not registered!"))
-            print(give_user)
-            return
-        
-        elif userID == give_user:
-            await conv.send_message(toSeg("That user is you!"))
-            return
+            elif give_user not in self.data["users"]:
+                await conv.send_message(toSeg("That user has not registered!"))
+                return
+            
+            elif userID == give_user:
+                await conv.send_message(toSeg("That user is you!"))
+                return
 
-        elif self.data["users"][userID]["balance"] < give_money:
-            await conv.send_message(toSeg("You don't have enough money to do that!"))
-            return
+            elif self.data["users"][userID]["balance"] < give_money:
+                await conv.send_message(toSeg("You don't have enough money to do that!"))
+                return
 
-        else:
-            self.data["users"][userID]["balance"] -= give_money
-            self.data["users"][give_user]["balance"] += give_money
-            await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
-            await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
-        #except:
-            #await conv.send_message(toSeg("Format: /id_give {id} {money}"))
+            else:
+                self.data["users"][userID]["balance"] -= give_money
+                self.data["users"][give_user]["balance"] += give_money
+                await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
+                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
+        except:
+            await conv.send_message(toSeg("Format: /id_give {id} {money}"))
 
 
 
