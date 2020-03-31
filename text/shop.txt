@@ -2,19 +2,19 @@
 
 Buy a pick with "/buy pick {pick name}!"
 Tin Pick - 100 Saber Dollars
-Iron Pick - 300 Saber Dollars
-Lead Pick - 500 Saber Dollars
-Silver Pick - 800 Saber Dollars
-Tungsten Pick - 1200 Saber Dollars
-Gold Pick - 1500 Saber Dollars
-Platinum Pick - 2000 Saber Dollars
-Molten Pick - 2700 Saber Dollars
-Cobalt Pick - 4000 Saber Dollars
-Palladium Pick - 5000 Saber Dollars
-Mythril Pick - 6400 Saber Dollars
-Orichalcum Pick - 8000 Saber Dollars
-Adamantite Pick - 10000 Saber Dollars
-Titanium Pick - 13000 Saber Dollars
-Chlorophyte Pick - 15000 Saber Dollars
-Spectre Pick - 20000 Saber Dollars
-Luminite Pick - 30000 Saber Dollars
+Iron Pick - 250 Saber Dollars
+Lead Pick - 625 Saber Dollars
+Silver Pick - 1565 Saber Dollars
+Tungsten Pick - 3910 Saber Dollars
+Gold Pick - 9775 Saber Dollars
+Platinum Pick - 24440 Saber Dollars
+Molten Pick - 61100 Saber Dollars
+Cobalt Pick - 152750 Saber Dollars
+Palladium Pick - 381875 Saber Dollars
+Mythril Pick - 954687 Saber Dollars
+Orichalcum Pick - 2386717 Saber Dollars
+Adamantite Pick - 5966792 Saber Dollars
+Titanium Pick - 14916980 Saber Dollars
+Chlorophyte Pick - 37292450 Saber Dollars
+Spectre Pick - 93231125 Saber Dollars
+Luminite Pick - 233077812 Saber Dollars

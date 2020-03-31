@@ -180,7 +180,7 @@ class Handler:
 
         i = self.cooldown(user, event, 5)
         if i:
-            await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
+            #await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
             return
 
         try:
