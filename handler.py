@@ -38,7 +38,9 @@ class Handler:
                 "/shop": self.shop,
                 "/buy": self.buy,
                 "/give": self.give,
-                "/id_give": self.id_give
+                "/id_give": self.id_give,
+                "/profile": self.profile,
+                "/leaderboard": self.leaderboard
         }
         self.images = {
                 "/gay": "images/gay.jpg",
@@ -54,7 +56,6 @@ class Handler:
 
         with open("data.json") as f:
             self.data = json.load(f)
-        print(self.data)
 
     # utility
     async def help(self, bot, event):
@@ -145,6 +146,7 @@ class Handler:
             self.data["users"][userID] = user; self.data["users"][userID] = {}
             self.data["users"][userID]["balance"] = 0
             self.data["users"][userID]["pick"] = "Copper Pick"
+            self.data["users"][userID]["name"] = user.full_name
 
             await conv.send_message(toSeg("Successfully registered!"))
             with open("data.json", "w") as f:
@@ -319,7 +321,70 @@ class Handler:
                     json.dump(self.data, f)
         except:
             await conv.send_message(toSeg("Format: /id_give {id} {money}"))
+            
+    async def profile(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        dataUsers = self.data["users"]
 
+        try:
+            if len(event.text.split()) > 1:
+                name = event.text.split(' ', 1)[1]
+                possible_users = []
+
+                for user in self.data["users"]:
+                    if name in self.data["users"][user]["name"]:
+                        possible_users.append(user)
+                
+                if len(possible_users) == 0:
+                    await conv.send_message(toSeg("No users go by that name!"))
+                    return
+
+                elif len(possible_users) > 1:
+                    await conv.send_message(toSeg(str(len(possible_users)) + " possible user(s) go by that name:\n"))
+
+                    for user in possible_users:
+                        await conv.send_message(toSeg("**Name:** " + dataUsers[user]["name"] + '\n' + # multiple users
+                                                    "**Balance:** " + str(dataUsers[user]["balance"]) + '\n' + 
+                                                    "**Pick:** " + dataUsers[user]["pick"] + '\n' + 
+                                                    "**ID:** " + user + '\n\n'))
+                else:
+                        await conv.send_message(toSeg("**Name:** " + dataUsers[possible_users[0]]["name"] + '\n' + # single user
+                                                    "**Balance:** " + str(dataUsers[possible_users[0]]["balance"]) + '\n' + 
+                                                    "**Pick:** " + dataUsers[possible_users[0]]["pick"] + '\n' + 
+                                                    "**ID:** " + possible_users[0]))
+
+            else:
+                if user.id_[0] in self.data["users"]:
+                    await conv.send_message(toSeg("**Name:** " + self.data["users"][user.id_[0]]["name"] + '\n' + # no args
+                                                "**Balance:** " + str(self.data["users"][user.id_[0]]["balance"]) + '\n' + 
+                                                "**Pick:** " + dataUsers[user.id_[0]]["pick"] + '\n' + 
+                                                "**ID:** " + user.id_[0]))
+        except Exception as e:
+                    await conv.send_message(toSeg("Failed to retrieve user info!"))
+                    await conv.send_message(toSeg(e))
+                    print(e)
+
+    async def leaderboard(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        users = {}
+        cnt = 1
+        leaderboard = ""
+
+        try:
+            for user in self.data["users"]:
+                users[self.data["users"][user]["name"]] = self.data["users"][user]["balance"]
+            
+            sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
+
+            for key, value in sorted_users.items():
+                if cnt == 6:
+                    break
+
+                leaderboard += str(cnt) + '. ' + key + ": " + str(value) + '\n'
+                cnt += 1
+            await conv.send_message(toSeg(leaderboard))
+        except:
+            await conv.send_message(toSeg("Failed retrieving leaderboard info!"))
 
 
     # config 

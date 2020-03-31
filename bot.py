@@ -25,10 +25,8 @@ class Bot:
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
         self._convo_list.on_event.add_observer(self._on_event)
         convs = self._convo_list.get_all()
+        print("Connected!")
 
-        for c in convs:
-            print(get_conv_name(c))
-        
     async def _on_disconnect(self):
         print("ded")
     
