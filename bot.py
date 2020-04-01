@@ -28,9 +28,6 @@ class Bot:
         convs = self._convo_list.get_all()
         print("Connected!")
 
-        for c in convs:
-            print(get_conv_name(c))
-
     async def _on_disconnect(self):
         print("ded")
 
