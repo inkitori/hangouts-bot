@@ -1,5 +1,8 @@
 import random
 
+games = dict()
+current_game = None
+
 
 def newline(text, number=1):
     return text.strip() + ("\n" * number)
@@ -267,9 +270,6 @@ def play_game(command_list, game):
     game.text = ""
     try:
         command = command_list[0]
-        if command == "2048":
-            command_list = command_list[1:]
-            command = command_list[0]
     except IndexError:
         command = None
     # check player movement
@@ -305,6 +305,31 @@ def play_game(command_list, game):
 
     game.update()
     return newline(game.text)
+
+
+def create_game(game_name):
+    current_game = games[game_name] = Game()
+    return Game()
+
+
+def run_game(commands):
+    """"""
+    # cleaning input
+    if type(commands) == str:
+        command_list = commands.lower().split()
+    elif type(commands) == list:
+        command_list = commands
+    else:
+        print("invalid input joseph wat r u doing")
+    command = command_list[0]
+    if command == "2048":
+        command_list = command_list[1:]
+        command = command_list[0]
+    # get game_name
+    if game_name in games:
+        return play_game(command_list, games[game_name])
+    else:
+        create_game(game_name)
 
 
 # testing via console
