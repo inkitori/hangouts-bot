@@ -32,6 +32,11 @@ class Bot:
     
     async def _on_event(self, event):
         user, conv = getUserConv(self, event)
+        userID = user.id_[0]
+        userData = self.handler.data["users"]
+
+        if userID in userData and event.text.strip().lower() != "/prestige_confirm":
+            userData[userID]["prestige_confirm"] = 0
         
         if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             strippedText = event.text.strip().lower()

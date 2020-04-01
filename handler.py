@@ -7,6 +7,7 @@ import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
 import json
+import math
 
 from utils import *
 #from text_2048 import play_game
@@ -40,7 +41,9 @@ class Handler:
                 "/give": self.give,
                 "/id_give": self.id_give,
                 "/profile": self.profile,
-                "/leaderboard": self.leaderboard
+                "/leaderboard": self.leaderboard,
+                "/prestige": self.prestige,
+                "/prestige_confirm": self.prestige_confirm
         }
         self.images = {
                 "/gay": "images/gay.jpg",
@@ -52,6 +55,7 @@ class Handler:
 
         self.cooldowns = defaultdict(dict) 
         self.admins = [114207595761187114730] # fill in yourself (store as int)
+        self.prestige_conversion = 100000
         random.seed(datetime.now())
 
         with open("data.json") as f:
@@ -134,6 +138,7 @@ class Handler:
         except:
             await conv.send_message(toSeg("Something went wrong!"))
 
+    # economy
     async def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
@@ -145,12 +150,15 @@ class Handler:
         try:
             self.data["users"][userID] = user; self.data["users"][userID] = {}
             self.data["users"][userID]["balance"] = 0
+            self.data["users"][userID]["total_balance"] = 0
+            self.data["users"][userID]["prestige"] = 0
             self.data["users"][userID]["pick"] = "Copper Pick"
             self.data["users"][userID]["name"] = user.full_name
 
-            await conv.send_message(toSeg("Successfully registered!"))
             with open("data.json", "w") as f:
                 json.dump(self.data, f)
+
+            await conv.send_message(toSeg("Successfully registered!"))
         except Exception as e:
             await conv.send_message(toSeg("Failed to register!"))
             print(e)
@@ -178,21 +186,26 @@ class Handler:
             await conv.send_message(toSeg("You are not registered! Use /register"))
             return
 
-        i = self.cooldown(user, event, 5)
+        i = self.cooldown(user, event, 4)
         if i:
-            #await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
+            await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
             return
 
         try:
             playerPick = self.data["shop"]["pick"][self.data["users"][userID]["pick"]]
             mined_amt = random.randint(playerPick["range"][0], playerPick["range"][1])
+            mined_amt += math.ceil(mined_amt * self.data["users"][userID]["prestige"]/100)
 
             self.data["users"][userID]["balance"] += mined_amt
-            await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
+            self.data["users"][userID]["total_balance"] += mined_amt
+
             with open("data.json", "w") as f:
                 json.dump(self.data, f)
+
+            await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
+
         except Exception as e:
-            await conv.send_message(toSeg("Failed to retrieve balance info!"))
+            await conv.send_message(toSeg("Failed to mine!"))
             print(e)
 
     async def shop(self, bot, event):
@@ -235,9 +248,11 @@ class Handler:
                 else:
                     self.data["users"][userID][arg1] = self.data["shop"][arg1][arg2]["name"]
                     self.data["users"][userID]["balance"] -= self.data["shop"][arg1][arg2]["price"]
-                    await conv.send_message(toSeg("Purchase successful!"))
+
                     with open("data.json", "w") as f:
                         json.dump(self.data, f)
+
+                    await conv.send_message(toSeg("Purchase successful!"))
         except:
             await conv.send_message(toSeg("Format: /buy {type} {item}"))
     
@@ -280,10 +295,13 @@ class Handler:
             else:
                 self.data["users"][userID]["balance"] -= arg2
                 self.data["users"][give_users[0].id_[0]]["balance"] += arg2
-                await conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
-                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_users[0].id_[0]]["balance"]) + " Saber Dollars"))
+                self.data["users"][give_users[0].id_[0]]["total_balance"] += arg2
+
                 with open("data.json", "w") as f:
                     json.dump(self.data, f)
+
+                await conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
+                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_users[0].id_[0]]["balance"]) + " Saber Dollars"))
 
         except:
             await conv.send_message(toSeg("Format: /give {user} {money}"))
@@ -315,10 +333,11 @@ class Handler:
             else:
                 self.data["users"][userID]["balance"] -= give_money
                 self.data["users"][give_user]["balance"] += give_money
-                await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
-                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
+                self.data["users"][give_user]["total_balance"] += give_money
                 with open("data.json", "w") as f:
                     json.dump(self.data, f)
+                await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
+                await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
         except:
             await conv.send_message(toSeg("Format: /id_give {id} {money}"))
             
@@ -346,11 +365,13 @@ class Handler:
                         await conv.send_message(toSeg("**Name:** " + dataUsers[user]["name"] + '\n' + # multiple users
                                                     "**Balance:** " + str(dataUsers[user]["balance"]) + '\n' + 
                                                     "**Pick:** " + dataUsers[user]["pick"] + '\n' + 
+                                                    "**Prestige:** " + str(dataUsers[user]["prestige"]) + '\n' +
                                                     "**ID:** " + user + '\n\n'))
                 else:
                         await conv.send_message(toSeg("**Name:** " + dataUsers[possible_users[0]]["name"] + '\n' + # single user
                                                     "**Balance:** " + str(dataUsers[possible_users[0]]["balance"]) + '\n' + 
                                                     "**Pick:** " + dataUsers[possible_users[0]]["pick"] + '\n' + 
+                                                    "**Prestige:** " + str(possible_users[0]["prestige"]) + '\n' +
                                                     "**ID:** " + possible_users[0]))
 
             else:
@@ -358,6 +379,7 @@ class Handler:
                     await conv.send_message(toSeg("**Name:** " + self.data["users"][user.id_[0]]["name"] + '\n' + # no args
                                                 "**Balance:** " + str(self.data["users"][user.id_[0]]["balance"]) + '\n' + 
                                                 "**Pick:** " + dataUsers[user.id_[0]]["pick"] + '\n' + 
+                                                "**Prestige:** " + str(dataUsers[user.id_[0]]["prestige"]) + '\n' + 
                                                 "**ID:** " + user.id_[0]))
         except Exception as e:
                     await conv.send_message(toSeg("Failed to retrieve user info!"))
@@ -386,6 +408,56 @@ class Handler:
         except:
             await conv.send_message(toSeg("Failed retrieving leaderboard info!"))
 
+    async def prestige(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+
+        try:
+            if userID not in self.data["users"]:
+                await conv.send_message(toSeg("You are not registered! Use /register"))
+                return
+
+            current_prestige = self.data["users"][userID]["prestige"]
+            earned_prestige = math.trunc(self.data["users"][userID]["total_balance"]/self.prestige_conversion)
+
+            await conv.send_message(toSeg("You currently have " + str(current_prestige) + " prestige point(s). If you prestige, you will earn " + 
+                                        str(earned_prestige) + " more prestige point(s), or a " + str(earned_prestige) + "% bonus, but will lose all your money."))
+            await conv.send_message(toSeg('Type "/prestige_confirm" if you really do wish to prestige.'))
+
+            self.data["users"][userID]["prestige_confirm"] = 1
+
+        except:
+            await conv.send_message(toSeg("Something went wrong!"))
+
+    async def prestige_confirm(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+        userData = self.data["users"]
+
+        try:
+            if userID not in userData:
+                await conv.send_message(toSeg("You are not registered! Use /register"))
+                return
+
+            elif not userData[userID]["prestige_confirm"]:
+                await conv.send_message(toSeg('You have to use "/prestige" before using this command!'))
+                return
+
+            else:
+                await conv.send_message(toSeg("Prestiging"))
+                userData[userID]["balance"] = 0
+                userData[userID]["prestige"] = math.trunc(userData[userID]["total_balance"]/self.prestige_conversion)
+                userData[userID]["prestige_confirm"] = 0
+                userData[userID]["total_balance"] = 0
+                userData[userID]["pick"] = "Copper Pick" 
+
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
+
+                await conv.send_message(toSeg("Successfully prestiged"))
+
+        except:
+            await conv.send_message(toSeg("Something went wrong!"))
 
     # config 
     async def quit(self, bot, event):
