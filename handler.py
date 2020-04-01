@@ -47,7 +47,8 @@ class Handler:
             "/leaderboard": self.leaderboard,
             "/prestige": self.prestige,
             "/prestige_confirm": self.prestige_confirm,
-            "/sync": self.sync
+            "/sync": self.sync,
+            "/2048": self.play_2048
         }
         self.images = {
             "/gay": "images/gay.jpg",
@@ -150,6 +151,10 @@ class Handler:
             await conv.send_message(toSeg("https://youtu.be/dQw4w9WgXcQ"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
+
+    async def play_2048(self, bot, event):
+        game_text = run_game(event.text)
+        await conv.send_message(toSeg(game_text))
 
     # economy
     async def register(self, bot, event):

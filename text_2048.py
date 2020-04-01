@@ -202,7 +202,7 @@ class Game():
         "when 2 with the same value touch, they merge",
         "try to get the highest value posible without filling up the board",
         "commands:",
-        "prefix all commands with 2048",
+        "prefix all commands with /2048",
         "playing 2048 will not interfere with other bot commands",
         "all commands must be spelled correctly but are NOT case-sensitive",
         "note that the current game and highscores are reset when the bot resets",
@@ -354,6 +354,7 @@ def create_game(game_name):
 def run_game(commands):
     global games
     # cleaning input
+
     command_list = clean(commands)
     command = command_list[0]
 
