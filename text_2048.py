@@ -55,6 +55,16 @@ def trim(text, number=1, default=[""]):
         return["something is wrong"]
 
 
+def get_key(dictionary, item, *ignore):
+    for key in ignore:
+        try:
+            del dictionary[key]
+        except KeyError:
+            pass
+    key_index = list(dictionary.values()).index(item)
+    return list(dictionary.keys())[key_index]
+
+
 class Cell():
     """represents a cell in a board"""
 
@@ -217,7 +227,8 @@ class Game():
         "restart": "restarts the game in the current gamemode",
         "gamemodes": "lists the gamemodes",
         "help": "prints this help text",
-        "scores": "prints the highscore for each mode"
+        "scores": "prints the highscore for each mode",
+        "games": "prints all existing games, their mode and score"
     }
     help_text = (
         "this is a 2048 clone by chendi",
@@ -234,8 +245,8 @@ class Game():
     )
 
     extra_commands = {
-        "create <game_name>": "creates a new game with the given name",
-        "<game_name>": "loads the game named game_name",
+        "create <game_name>": "creates a new game with the given name (can be combined with other commands",
+        "<game_name>": "loads the game named game_name (can be combined with other commands)",
     }
 
     reserved_words = (
@@ -280,13 +291,20 @@ class Game():
             for mode_name, mode in self.modes.items():
                 self.text += f"{mode_name}: {mode.high_score}\n"
             self.state = None
+        elif self.state == "games":
+            for game_name, game in games:
+                if game_name != "current_game":
+                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} - {game.score}\n"
 
         self.text = newline(self.text, 2)
         self.draw_game()
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        self.text += "score: " + str(self.score) + "\nhigh score: " + str(self.mode.high_score) + "\n"
+        game_name = get_key(games, self, "current game")
+        mode_name = get_key(Game.modes, self.mode)
+        self.text += f"{game_name} - {mode_name}\n"
+        self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
 
     def restart(self, mode=None):
@@ -333,7 +351,6 @@ class Game():
 
     def play_game(self, command_list):
         """runs the main game loop once"""
-
         self.text = ""
         command = get_item_safe(command_list)
 
@@ -404,7 +421,7 @@ def run_game(commands):
         command_list = trim(command_list)
     else:
         game_name = "current game"
-
+    print(games)
     if type(games[game_name]) == Game:
         return games[game_name].play_game(command_list)
     else:
