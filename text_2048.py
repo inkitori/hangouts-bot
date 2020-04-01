@@ -230,7 +230,8 @@ class Game():
         "gamemodes": "lists the gamemodes",
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
-        "games": "prints all existing games, their mode and score"
+        "games": "prints all existing games, their mode and score",
+        "reserved": "prints reserved words"
     }
     help_text = (
         "this is a 2048 clone by chendi",
@@ -294,6 +295,8 @@ class Game():
             for mode_name, mode in self.modes.items():
                 self.text += f"{mode_name}: {mode.high_score}\n"
             self.state = None
+        elif self.state == "reserved":
+            self.text += ", ".join(Game.reserved_words)
         elif self.state == "games":
             for game_name, game in games.items():
                 if game_name != "current game":
