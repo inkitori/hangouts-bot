@@ -1,6 +1,10 @@
 import random
 
 
+def newline(text):
+    return text.strip() + "\n"
+
+
 class Cell():
     offset = 10
 
@@ -17,8 +21,6 @@ class Board():
         self.number_of_cells = self.size ** 2
         # creates empty board and adds 2 random blocks
         self.cells = [Cell() for i in range(self.number_of_cells)]
-        self.make_new_block(mode)
-        self.make_new_block(mode)
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -98,10 +100,11 @@ class Board():
         for cell in self.cells:
             cell.length = len(str(cell.value))
             max_length = cell.length if cell.length > max_length else max_length
+        max_length += 1
         for row in range(game.mode.size):
             for column in range(game.mode.size):
                 cell = game.board.cells[row * 4 + column]
-                game.text += " " * (max_length - cell.length) + str(cell.value) + " " * (max_length - cell.length)
+                game.text += str(cell.value).ljust(max_length)
             game.text += "\n"
 
 
@@ -156,7 +159,7 @@ class Game():
         "twenty": GameMode("twenty", 1, "plus one", win_value=20),
         "confusion": GameMode("confusion", 1, "random", values=shuffled)
     }
-    commands = ["restart", "menu", "quit", "help"]
+    commands = ["restart", "menu", "quit", "help", "scores"]
 
     def __init__(self):
         self.score = 0
@@ -167,65 +170,81 @@ class Game():
 
     def update(self):
         """Draws based on current state"""
-        if self.state == "playing":
+        """
+        if self.state == "reload":
+            filled_cells = [cell for cell in self.board.cells if cell.value]
+            if filled_cells:
+                self.state = "playing"
+            else:
+                self.text += "no game saved (game is deleted when the bot quits)\n"
+                self.state = "menu"
+        """
+
+        if self.state == "help":
+            self.text = (
+                "how to play:\n" +
+                "move the tiles\n" +
+                "when 2 with the same value touch, they merge\n" +
+                "try to get the highest value posible without filling up the board\n" +
+                "\n" +
+                "commands:"
+                "prefix all commands with 2048. playing 2048 will not interfere with other bot commands\n" +
+                "all commands must be spelled correctly but are NOT case-sensitive\n" +
+                "\n" +
+                "help - prints this help text\n" +
+                "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)\n" +
+                "restart - restarts the game in the current gamemode\n" +
+                "menu - lists gamemodes\n" +
+                "\n" +
+                "gamemodes:\n" +
+                "note that these all start a new game upon selection" +
+                "normal - normal 2048\n" +
+                "65536 - normal 2048 with a 5x5 board and higher win condition\n" +
+                "eleven - instead of doubling, the blocks increase by 1 when merging\n" +
+                "twenty - the rules of eleven and the board of 65536\n" +
+                "confusion - randomly generated block sequences and colors\n"
+            )
+
+        if self.state == "won":
             self.draw_game()
+            self.text += "you won, use move to continue playing"
+            # self.state = "playing"
+        elif self.state == "lost":
+            self.text = "you lost, use restart to restart, or menu to get a list of gamemodes"
+        elif self.state == "restart":
+            self.restart()
         elif self.state == "menu":
+            self.text += "pick a gamemode or continue playing\n"
             for mode in self.modes.keys():
                 self.text += mode + "\n"
 
-        elif self.state == "won":
-            self.draw_game()
-            self.text += "You won! Use command move to continue playing."
-            self.state = "playing"
-
-        elif self.state == "lost":
-            self.text = "You lost. Use command restart to restart, or command menu to change modes"
-
-        elif self.state == "restart":
-            self.restart()
-        elif self.state == "help":
-            self.text = (
-                "How to Play:\n" +
-                "Move the tiles. When 2 with the same value touch, they merge.\
-                Try to get the highest value posible without filling up the board\n\n" +
-
-                "prefix all commands with 2048 all commands must be spelled correctly and are case-sensitive" +
-                "help - prints this help text\n\n" +
-                "quit - ends the game and exits 2048 (high-scores will not be saved)\n\n" +
-
-                "Play Mode Commands:\n" +
-                "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)\n" +
-                "restart - restarts the game in the current gamemode\n" +
-                "menu - go back to the menu (Changes mode to Menu)\n" +
-
-
-                "Menu Commands:\n" +
-                "note that these all refer to gamemodes and start a new game upon selection" +
-                "normal - normal 2048\n" +
-                "65536 - normal 2048 with a 5x5 board and higher win condition" +
-                "eleven - instead of doubling, the blocks increase by 1 when merging" +
-                "twenty - the rules of eleven and the board of 65536" +
-                "confusion - randomly generated block sequences and colors"
-            )
-        elif self.state == "quit":
-            self.text = "Thanks for playing!\nMade by Chendi"
+        elif self.state == "scores":
+            for mode_name, mode in self.modes.items():
+                self.text += f"{mode_name}: {mode.high_score}\n"
+        # if self.state == "playing":
+        self.text = newline(self.text)
+        self.draw_game()
 
     def draw_game(self):
         """Draws board and scores"""
-        self.text += "Score: " + str(self.score) + "\nHigh Score: " + self.mode.high_score + "\n"
+        self.text += "score: " + str(self.score) + "\nhigh score: " + str(self.mode.high_score) + "\n"
         self.board.draw_board(self)
 
     def restart(self, mode=None):
         """Resets the game"""
         self.mode = mode if mode else self.mode
         self.score = 0
-        self.state = "playing"
+        # self.state = "playing"
         if self.mode == Game.modes["confusion"]:
             self.setup_confusion()
         self.board = Board(self.mode)
+        for i in range(2):
+            self.board.make_new_block(self.mode)
 
     def move(self, x, positive):
         """Moves all blocks"""
+        if None in (x, positive):
+            return
         if self.board.check_can_move():
             old_board_values = [cell.value for cell in self.board.cells]
             self.board.move_blocks(x, positive, self)
@@ -251,57 +270,53 @@ class Game():
         Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
 
 
-def play_game(command_list):
+def play_game(command_list, game):
 
-    game = Game()
+    game.text = ""
 
-    # main game loop
-    while game.state != "quit":
+    command = command_list[0]
+    # check player movement
+    if command in ("move", "m"):
+        command = command_list[1]
+        x = None
+        positive = None
+        if command in ("up", "u"):
+            x = False
+            positive = False
+        elif command in ("left", "l"):
+            x = True
+            positive = False
+        elif command in ("down", "d"):
+            x = False
+            positive = True
+        elif command in ("right", "r"):
+            x = True
+            positive = True
+        else:
+            game.text = "invalid move\n"
+        game.move(x, positive)
 
-        game.text = ""
+    if command in game.modes.keys():
+        game.restart(Game.modes[command])
+    elif command in game.commands:
+        game.state = command
+    else:
+        game.text += "invalid command, use help to see commands\n"
 
-        command = command_list[0]
-        # check player movement
-        if game.state == "playing":
-            if command in ("move", "m"):
-                command = command_list[1]
-                if command in ("up", "u"):
-                    x = False
-                    positive = False
-                elif command in ("left", "l"):
-                    x = True
-                    positive = False
-                elif command in ("down", "d"):
-                    x = False
-                    positive = True
-                elif command in ("right", "r"):
-                    x = True
-                    positive = True
-                else:
-                    game.text = "Invalid move"
-                game.move(x, positive)
-            elif command in Game.commands:
-                game.state = command
-
-            else:
-                game.text = "Invalid command. You are in Play Mode. Use help to learn more"
-
-        elif game.state == "menu":
-            if command in game.modes.keys:
-                game.restart(Game.modes[command])
-            elif command in ("help", "quit"):
-                game.state = command
-
-        game.update()
-        yield game.text
+    game.update()
+    return newline(game.text)
 
 
 # testing via console
 if __name__ == "__main__":
-    game = play_game("help")
+    game = Game()
+    game_text = play_game(["menu"], game)
+    print(game_text)
     while True:
-        text = input("Enter a command: ").lower().split()
+        text = input("enter a command: ").lower().split()
+        if not text:
+            continue
         if text[0] == "break":
             break
-        game_text = play_game(text)
+        game_text = play_game(text, game)
         print(game_text)
