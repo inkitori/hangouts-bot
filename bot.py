@@ -1,11 +1,11 @@
 import hangups
 from hangups.ui.utils import get_conv_name
 import asyncio
-import random
 from handler import Handler
 from utils import *
 
 import signal
+
 
 class Bot:
     def __init__(self):
@@ -27,10 +27,17 @@ class Bot:
         convs = self._convo_list.get_all()
         print("Connected!")
 
+        for c in convs:
+            print(get_conv_name(c))
+
     async def _on_disconnect(self):
         print("ded")
-    
+
     async def _on_event(self, event):
+        conv_id = event.conversation_id
+        conv = self._convo_list.get(conv_id)
+        user_id = event.user_id
+        user = conv.get_user(user_id)
         user, conv = getUserConv(self, event)
         userID = user.id_[0]
         userData = self.handler.data["users"]
@@ -38,7 +45,7 @@ class Bot:
         if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
             if userID in userData and event.text.strip().lower() != "/prestige_confirm":
                 userData[userID]["prestige_confirm"] = 0
-        
+
             strippedText = event.text.strip().lower()
 
             if strippedText in self.handler.keywords:
@@ -58,6 +65,6 @@ class Bot:
             if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
                 await conv.send_message(toSeg("Saber in!"))
 
+
 bot = Bot()
 bot.run()
-
