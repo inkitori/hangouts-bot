@@ -56,6 +56,7 @@ def trim(text, number=1, default=[""]):
 
 
 def get_key(dictionary, item, *ignore):
+    dictionary = dictionary.copy()
     for key in ignore:
         try:
             del dictionary[key]
@@ -292,9 +293,9 @@ class Game():
                 self.text += f"{mode_name}: {mode.high_score}\n"
             self.state = None
         elif self.state == "games":
-            for game_name, game in games:
-                if game_name != "current_game":
-                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} - {game.score}\n"
+            for game_name, game in games.items():
+                if game_name != "current game":
+                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} Score: {game.score}\n"
 
         self.text = newline(self.text, 2)
         self.draw_game()
@@ -421,6 +422,7 @@ def run_game(commands):
         command_list = trim(command_list)
     else:
         game_name = "current game"
+    print(games, games["current game"])
     if type(games[game_name]) == Game:
         return games[game_name].play_game(command_list)
     else:
