@@ -438,7 +438,7 @@ class Handler:
             earned_prestige = math.trunc(self.data["users"][userID]["total_balance"]/self.prestige_conversion)
 
             await conv.send_message(toSeg("You currently have " + str(current_prestige) + " prestige point(s). If you prestige, you will earn " + 
-                                        str(earned_prestige) + " more prestige point(s), or a " + str(earned_prestige) + "% bonus, but will lose all your money."))
+                                        str(earned_prestige) + " more prestige point(s), or a " + str(earned_prestige) + "% bonus, but will lose all your money and items."))
             await conv.send_message(toSeg('Type "/prestige_confirm" if you really do wish to prestige.'))
 
             self.data["users"][userID]["prestige_confirm"] = 1
