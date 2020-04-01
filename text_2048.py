@@ -1,7 +1,6 @@
 import random
 
-games = dict()
-current_game = None
+games = {"current game": None}
 
 
 def newline(text, number=1):
@@ -187,7 +186,7 @@ class Game():
         self.score = 0
         self.text = ""
         self.mode = self.modes["normal"]
-        self.state = "help"
+        self.state = None
         self.board = Board(self.mode)
         for i in range(2):
             self.board.make_new_block(self.mode)
@@ -199,6 +198,7 @@ class Game():
             self.text += newline("\n".join(self.help_text))
             for command, description in self.commands.items():
                 self.text += f"{command} - {description}\n"
+            self.state = None
 
         if self.state == "won":
             self.draw_game()
@@ -264,82 +264,94 @@ class Game():
         random.shuffle(GameMode.shuffled)
         Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
 
+    def play_game(self, command_list):
 
-def play_game(command_list, game):
-
-    game.text = ""
-    try:
-        command = command_list[0]
-    except IndexError:
-        command = None
-    # check player movement
-    if command in ("move", "m"):
+        self.text = ""
         try:
-            command = command_list[1]
+            command = command_list[0]
         except IndexError:
             command = None
-        x = None
-        positive = None
-        if command in ("up", "u"):
-            x = False
-            positive = False
-        elif command in ("left", "l"):
-            x = True
-            positive = False
-        elif command in ("down", "d"):
-            x = False
-            positive = True
-        elif command in ("right", "r"):
-            x = True
-            positive = True
+        # check player movement
+        if command in ("move", "m"):
+            try:
+                command = command_list[1]
+            except IndexError:
+                command = None
+            x = None
+            positive = None
+            if command in ("up", "u"):
+                x = False
+                positive = False
+            elif command in ("left", "l"):
+                x = True
+                positive = False
+            elif command in ("down", "d"):
+                x = False
+                positive = True
+            elif command in ("right", "r"):
+                x = True
+                positive = True
+            else:
+                self.text += "invalid move\n"
+            self.move(x, positive)
+
+        elif command in self.modes.keys():
+            self.restart(Game.modes[command])
+        elif command in self.commands.keys():
+            self.state = command
         else:
-            game.text += "invalid move\n"
-        game.move(x, positive)
+            self.text += "invalid command, use help to see commands\n"
+            self.state = None
 
-    elif command in game.modes.keys():
-        game.restart(Game.modes[command])
-    elif command in game.commands.keys():
-        game.state = command
-    else:
-        game.text += "invalid command, use help to see commands\n"
-
-    game.update()
-    return newline(game.text)
+        self.update()
+        return newline(self.text)
 
 
 def create_game(game_name):
-    current_game = games[game_name] = Game()
-    return Game()
+    games["current game"] = games[game_name] = Game()
+    return games["current game"]
 
 
 def run_game(commands):
-    """"""
     # cleaning input
     if type(commands) == str:
         command_list = commands.lower().split()
     elif type(commands) == list:
         command_list = commands
     else:
-        print("invalid input joseph wat r u doing")
+        print("invalid input joseph")
     command = command_list[0]
+
+    # processing commands
     if command == "2048":
         command_list = command_list[1:]
         command = command_list[0]
-    # get game_name
-    if game_name in games:
-        return play_game(command_list, games[game_name])
-    else:
+    if command == "create":
+        game_name = command_list[1]
         create_game(game_name)
+    elif command == "switch":
+        game_name = command_list[1]
+        if game_name not in games.keys():
+            return "that game does not exist, use create to make a new game"
+        games["current game"] = games[game_name]
+    else:
+        game_name = "current game"
+    if games["current game"] is None:
+        return "no games exist, use create to make a game"
+    if game_name in games.keys():
+        return games[game_name].play_game(command_list)
+    else:
+        return "something went very wrong"
 
 
 # testing via console
 if __name__ == "__main__":
     game = Game()
-    game_text = play_game([""], game)
+    game_text = game.play_game([""])
     print(game_text)
     while True:
         text = input("enter a command: ").lower().split()
         if text and text[0] == "break":
             break
-        game_text = play_game(text, game)
+        game_text = run_game(text)
         print(game_text)
