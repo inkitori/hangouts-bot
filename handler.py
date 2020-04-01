@@ -21,7 +21,8 @@ class Handler:
                 "yamete": "kudasai!~~",
                 "ping": "pong",
                 "pong": "ping",
-                "saber": "hi"
+                "saber": "hi",
+                "spank": "kyaa!~~"
         }
         self.commands = {
                 "/help": self.help,
@@ -56,7 +57,7 @@ class Handler:
         self.cooldowns = defaultdict(dict) 
         self.admins = [114207595761187114730] # fill in yourself (store as int)
         self.ignore = [105849946242372037157]
-        self.prestige_conversion = 20000
+        self.prestige_conversion = 100000
         random.seed(datetime.now())
 
         with open("data.json") as f:
@@ -420,20 +421,22 @@ class Handler:
         user, conv = getUserConv(bot, event)
         users = {}
         cnt = 1
-        leaderboard = ""
 
         if cooldown(self.cooldowns, user, event, 10):
             return
 
         try:
-            for user in self.data["users"]:
-                users[user] = (self.data["users"][user]["balance"])
-
-            print(users)
+            ranking = event.text.split(' ', 1)[1].lower()
+            leaderboard = "Ranking by: " + ranking + '\n'
             
-            sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
+            for user in self.data["users"]:
+                if ranking not in self.data["users"][user]:
+                    await conv.send_message(toSeg("That's not a valid ranking!"))
+                    return
 
-            print(sorted_users)
+                users[user] = (self.data["users"][user][ranking])
+
+            sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
 
             for key, value in sorted_users.items():
                 if cnt == 6:
@@ -443,7 +446,7 @@ class Handler:
                 cnt += 1
             await conv.send_message(toSeg(leaderboard))
         except:
-            await conv.send_message(toSeg("Failed retrieving leaderboard info!"))
+            await conv.send_message(toSeg("Format: /leaderboard {ranking}"))
 
     async def prestige(self, bot, event):
         user, conv = getUserConv(bot, event)
