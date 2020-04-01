@@ -55,7 +55,7 @@ class Handler:
 
         self.cooldowns = defaultdict(dict) 
         self.admins = [114207595761187114730] # fill in yourself (store as int)
-        self.prestige_conversion = 100000
+        self.prestige_conversion = 20000
         random.seed(datetime.now())
 
         with open("data.json") as f:
@@ -288,6 +288,10 @@ class Handler:
                 await conv.send_message(toSeg("That user is you!"))
                 return
 
+            elif arg2 < 0:
+                await conv.send_message(toSeg("You can't give negative money!"))
+                return
+
             elif self.data["users"][userID]["balance"] < arg2:
                 await conv.send_message(toSeg("You don't have enough money to do that!"))
                 return
@@ -328,6 +332,10 @@ class Handler:
 
             elif self.data["users"][userID]["balance"] < give_money:
                 await conv.send_message(toSeg("You don't have enough money to do that!"))
+                return
+
+            elif give_money < 0:
+                await conv.send_message(toSeg("You can't give negative money!"))
                 return
 
             else:
@@ -371,7 +379,7 @@ class Handler:
                         await conv.send_message(toSeg("**Name:** " + dataUsers[possible_users[0]]["name"] + '\n' + # single user
                                                     "**Balance:** " + str(dataUsers[possible_users[0]]["balance"]) + '\n' + 
                                                     "**Pick:** " + dataUsers[possible_users[0]]["pick"] + '\n' + 
-                                                    "**Prestige:** " + str(possible_users[0]["prestige"]) + '\n' +
+                                                    "**Prestige:** " + str(dataUsers[possible_users[0]]["prestige"]) + '\n' +
                                                     "**ID:** " + possible_users[0]))
 
             else:
@@ -383,7 +391,6 @@ class Handler:
                                                 "**ID:** " + user.id_[0]))
         except Exception as e:
                     await conv.send_message(toSeg("Failed to retrieve user info!"))
-                    await conv.send_message(toSeg(e))
                     print(e)
 
     async def leaderboard(self, bot, event):

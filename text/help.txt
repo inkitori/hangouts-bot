@@ -28,10 +28,11 @@ ping
 /buy
 /give
 /id_give
+/prestige
 
 **Configuration**
 /quit
 /reset
 /save
 
-I'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot
+I'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT
