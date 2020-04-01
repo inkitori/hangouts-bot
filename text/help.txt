@@ -1,0 +1,38 @@
+**Keywords**
+good bot
+bad bot
+headpat
+yamete
+ping
+
+**Utility**
+/help
+/rename
+/say
+/id
+/kick (needs work)
+
+**Fun**
+/rickroll
+/gay
+/math
+/praise
+/goddammit
+/heymister
+
+**Economy**
+/register
+/money
+/mine
+/shop
+/buy
+/give
+/id_give
+/prestige
+
+**Configuration**
+/quit
+/reset
+/save
+
+I'm a bot by Yeah. You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT
