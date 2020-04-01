@@ -427,15 +427,19 @@ class Handler:
 
         try:
             for user in self.data["users"]:
-                users[self.data["users"][user]["name"]] = self.data["users"][user]["balance"]
+                users[user] = (self.data["users"][user]["balance"])
+
+            print(users)
             
             sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
+
+            print(sorted_users)
 
             for key, value in sorted_users.items():
                 if cnt == 6:
                     break
 
-                leaderboard += str(cnt) + '. ' + key + ": " + str(value) + '\n'
+                leaderboard += str(cnt) + '. ' + self.data["users"][key]["name"] + ": " + str(value) + '\n'
                 cnt += 1
             await conv.send_message(toSeg(leaderboard))
         except:
