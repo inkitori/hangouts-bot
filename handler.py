@@ -55,6 +55,7 @@ class Handler:
 
         self.cooldowns = defaultdict(dict) 
         self.admins = [114207595761187114730] # fill in yourself (store as int)
+        self.ignore = [105849946242372037157]
         self.prestige_conversion = 20000
         random.seed(datetime.now())
 
@@ -64,7 +65,7 @@ class Handler:
     # utility
     async def help(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 10):
+        if cooldown(self.cooldowns, user, event, 10):
             return
 
         f = open("text/help.txt", 'r')
@@ -74,7 +75,7 @@ class Handler:
 
     async def rename(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 3):
+        if cooldown(self.cooldowns, user, event, 3):
             return
         
         try:
@@ -84,16 +85,17 @@ class Handler:
 
     async def say(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 3):
+        if cooldown(self.cooldowns, user, event, 3):
             return
 
         try:
            await conv.send_message(toSeg(event.text.split(' ', 1)[1]))
         except:
             await conv.send_message(toSeg("Format: /say {message}"))
+
     async def id(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 10):
+        if cooldown(self.cooldowns, user, event, 10):
             return
 
         try:
@@ -130,7 +132,7 @@ class Handler:
     # fun
     async def rickroll(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 3):
+        if cooldown(self.cooldowns, user, event, 3):
             return
 
         try:
@@ -186,7 +188,7 @@ class Handler:
             await conv.send_message(toSeg("You are not registered! Use /register"))
             return
 
-        i = self.cooldown(user, event, 4)
+        i = cooldown(self.cooldowns, user, event, 4)
         if i:
             await conv.send_message(toSeg("On cooldown. Please wait " + str(i) + " second(s)."))
             return
@@ -211,7 +213,7 @@ class Handler:
     async def shop(self, bot, event):
         user, conv = getUserConv(bot, event)
 
-        if self.cooldown(user, event, 20):
+        if cooldown(self.cooldowns, user, event, 20):
             return
 
         try:
@@ -268,6 +270,10 @@ class Handler:
 
             arg2 = int(event.text.split()[-1])
             
+            if isIn(self.ignore, user):
+                await conv.send_message(toSeg("You are an ignored user!"))
+                return
+
             for u in users:
                 if arg1 in u.full_name:
                     give_users.append(u)
@@ -317,6 +323,10 @@ class Handler:
         try:
             give_user = event.text.split()[1]
             give_money = int(event.text.split()[-1])
+
+            if isIn(self.ignore, user):
+                await conv.send_message(toSeg("You are an ignored user!"))
+                return
 
             if userID not in self.data["users"]:
                 await conv.send_message(toSeg("You are not registered! Use /register"))
@@ -469,11 +479,11 @@ class Handler:
     # config 
     async def quit(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if self.cooldown(user, event, 30):
+        if cooldown(self.cooldowns, user, event, 30):
             return
 
         try:
-            if self.isAdmin(user):
+            if isIn(self.admins, user):
                 await conv.send_message(toSeg("Saber out!"))
                 await bot.client.disconnect()
             else:
@@ -486,7 +496,7 @@ class Handler:
 
         try:
             arg1 = '/' + event.text.lower().split()[1]
-            if self.isAdmin(user):
+            if isIn(self.admins, user):
                 if arg1 in self.cooldowns[user]:
                     self.cooldowns[user][arg1] = datetime.min.replace(tzinfo=None)
                 else:
@@ -500,7 +510,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
 
         try:
-            if self.isAdmin(user):
+            if isIn(self.admins, user):
                 with open("data.json", "w") as f:
                     json.dump(self.data, f)
                 await conv.send_message(toSeg("Successfully saved!"))
@@ -508,21 +518,3 @@ class Handler:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         except:
                 await conv.send_message(toSeg("Something went wrong!"))
-
-    # helpers
-    def cooldown(self, user, event, cooldown):
-        text = event.text.lower()
-        strippedTime = event.timestamp.replace(tzinfo=None)
-
-        if user in self.cooldowns and text.split()[0] in self.cooldowns[user]:
-            if (strippedTime - self.cooldowns[user][text.split()[0]]).seconds < cooldown:
-                return cooldown - (strippedTime - self.cooldowns[user][text.split()[0]]).seconds
-            else:
-                self.cooldowns[user][text.split()[0]] = strippedTime 
-        else:
-            self.cooldowns[user][text.split()[0]] = strippedTime
-
-    def isAdmin(self, user):
-        print(type(user.id_[0]))
-        if int(user.id_[0]) in self.admins:
-            return True
