@@ -7,17 +7,22 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
+def get_item_safe(sequence, index=0, default=""):
+    try:
+        item = sequence[index]
+    except IndexError:
+        item = default
+    return item
+
+
 def clean(text):
-    if type(text) == str:
-        if text:
+    if text:
+        if type(text) == str:
             return text.strip().lower().split()
-        else:
-            return [""]
-    elif type(text) == list:
-        if text:
+        elif type(text) == list:
             return text
-        else:
-            return [""]
+    else:
+        return [""]
 
 
 def trim(text, number=1):
@@ -347,6 +352,7 @@ class Game():
 
 def create_game(game_name):
     global games
+    print("Creating")
     games["current game"] = games[game_name] = Game()
     return games["current game"]
 
@@ -356,18 +362,21 @@ def run_game(commands):
     # cleaning input
 
     command_list = clean(commands)
-    command = command_list[0]
+    command = get_item_safe(command_list)
 
     # processing commands
-    if command == "2048":
+    if command == "/2048":
         command_list = trim(command_list)
-        command = command_list[0]
+        command = get_item_safe(command_list)
     if command == "create":
-        game_name = command_list[1]
+        command_list = trim(command_list)
+        game_name = get_item_safe(command_list)
         if game_name in Game.reserved_words:
             return "game names cannot be reserved words"
+        elif not game_name:
+            return "games must have names"
         create_game(game_name)
-        command_list = trim(command_list, 2)
+        command_list = trim(command_list)
     elif command in games.keys():
         game_name = command
         games["current game"] = games[game_name]
@@ -375,7 +384,8 @@ def run_game(commands):
     else:
         game_name = "current game"
 
-    if games[game_name]:
+    if type(games[game_name]) == Game:
+        print("it worked")
         return games[game_name].play_game(command_list)
     else:
         return "no game selected"
@@ -387,8 +397,8 @@ if __name__ == "__main__":
     game_text = run_game([""])
     print(game_text)
     while True:
-        text = input("enter a command: ").lower().split()
-        if text and text[0] == "break":
+        text = clean(input("enter a command: "))
+        if get_item_safe(text) == "break":
             break
         game_text = run_game(text)
         print(game_text)

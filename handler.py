@@ -153,6 +153,7 @@ class Handler:
             await conv.send_message(toSeg("Something went wrong!"))
 
     async def play_2048(self, bot, event):
+        user, conv = getUserConv(bot, event)
         game_text = run_game(event.text)
         await conv.send_message(toSeg(game_text))
 
