@@ -22,7 +22,9 @@ class Handler:
             "yamete": "kudasai!~~",
             "ping": "pong",
             "pong": "ping",
-            "saber": "hi"
+            "saber": "hi",
+            "yes": "no",
+            "no": "yes"
         }
         self.commands = {
             "/help": self.help,
