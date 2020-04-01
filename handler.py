@@ -52,7 +52,8 @@ class Handler:
             "/2048": self.play_2048,
             "/prestige_upgrade": self.prestige_upgrade,
             "/prestige_upgrade_info": self.prestige_upgrade_info,
-            "/remove": self.remove
+            "/remove": self.remove,
+            "/set": self.set
         }
         self.images = {
             "/gay": "images/gay.jpg",
@@ -179,6 +180,7 @@ class Handler:
             self.data["users"][userID] = {}
             self.data["users"][userID]["balance"] = 0
             self.data["users"][userID]["total_balance"] = 0
+            self.data["users"][userID]["lifetime_balance"] = 0
             self.data["users"][userID]["prestige"] = 0
             self.data["users"][userID]["pick"] = "Copper Pick"
             self.data["users"][userID]["name"] = user.full_name
@@ -207,7 +209,7 @@ class Handler:
 
         try:
             balance = self.data["users"][userID]["balance"]
-            await conv.send_message(toSeg(user.full_name + ", you currently have " + str(balance) + " Saber Dollars!"))
+            await conv.send_message(toSeg(user.full_name + ", you currently have " + str(scientific(balance)) + " Saber Dollars!"))
         except Exception as e:
             await conv.send_message(toSeg("Failed to retrieve balance info!"))
             print(e)
@@ -233,8 +235,9 @@ class Handler:
 
             self.data["users"][userID]["balance"] += mined_amt
             self.data["users"][userID]["total_balance"] += mined_amt
+            self.data["users"][userID]["lifetime_balance"] += mined_amt
 
-            await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
+            await conv.send_message(toSeg(user.full_name + ", you mined " + str(scientific(mined_amt)) + " Saber Dollars!"))
 
             with open("data.json", "w") as f:
                 json.dump(self.data, f)
@@ -375,6 +378,7 @@ class Handler:
                 self.data["users"][userID]["balance"] -= arg2
                 self.data["users"][give_users[0].id_[0]]["balance"] += arg2
                 self.data["users"][give_users[0].id_[0]]["total_balance"] += arg2
+                self.data["users"][give_users[0].id_[0]]["lifetime_balance"] += arg2
 
                 with open("data.json", "w") as f:
                     json.dump(self.data, f)
@@ -421,6 +425,8 @@ class Handler:
                 self.data["users"][userID]["balance"] -= give_money
                 self.data["users"][give_user]["balance"] += give_money
                 self.data["users"][give_user]["total_balance"] += give_money
+                self.data["users"][give_user]["lifetime_balance"] += give_money
+
                 with open("data.json", "w") as f:
                     json.dump(self.data, f)
                 await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
@@ -454,18 +460,18 @@ class Handler:
                     for user in possible_users:
                         await conv.send_message(toSeg(
                             "**Name:** " + dataUsers[user]["name"] + '\n' +  # multiple users
-                            "**Balance:** " + str(dataUsers[user]["balance"]) + '\n' +
+                            "**Balance:** " + str(scientific(dataUsers[user]["balance"])) + '\n' +
                             "**Pick:** " + dataUsers[user]["pick"] + '\n' +
-                            "**Prestige:** " + str(dataUsers[user]["prestige"]) + '\n' +
+                            "**Prestige:** " + str(scientific(dataUsers[user]["prestige"])) + '\n' +
                             "**Prestige Level:** " + str(dataUsers[user]["prestige_upgrade"]) + '\n' +
                             "**ID:** " + user + '\n\n')
                         )
                 else:
                     await conv.send_message(toSeg(
                         "**Name:** " + dataUsers[possible_users[0]]["name"] + '\n' +  # single user
-                        "**Balance:** " + str(dataUsers[possible_users[0]]["balance"]) + '\n' +
+                        "**Balance:** " + str(scientific(dataUsers[possible_users[0]]["balance"])) + '\n' +
                         "**Pick:** " + dataUsers[possible_users[0]]["pick"] + '\n' +
-                        "**Prestige:** " + str(dataUsers[possible_users[0]]["prestige"]) + '\n' +
+                        "**Prestige:** " + str(scientific(dataUsers[possible_users[0]]["prestige"])) + '\n' +
                         "**Prestige Level:** " + str(dataUsers[possible_users[0]]["prestige_upgrade"]) + '\n' +
                         "**ID:** " + possible_users[0])
                     )
@@ -474,9 +480,9 @@ class Handler:
                 if user.id_[0] in self.data["users"]:
                     await conv.send_message(toSeg(
                         "**Name:** " + self.data["users"][user.id_[0]]["name"] + '\n' +  # no args
-                        "**Balance:** " + str(self.data["users"][user.id_[0]]["balance"]) + '\n' +
+                        "**Balance:** " + str(scientific(self.data["users"][user.id_[0]]["balance"])) + '\n' +
                         "**Pick:** " + dataUsers[user.id_[0]]["pick"] + '\n' +
-                        "**Prestige:** " + str(dataUsers[user.id_[0]]["prestige"]) + '\n' +
+                        "**Prestige:** " + str(scientific(dataUsers[user.id_[0]]["prestige"])) + '\n' +
                         "**Prestige Level:** " + str(dataUsers[user.id_[0]]["prestige_upgrade"]) + '\n' +
                         "**ID:** " + user.id_[0])
                     )
@@ -495,7 +501,7 @@ class Handler:
 
         try:
             for user in self.data["users"]:
-                users[user] = (self.data["users"][user]["total_balance"])
+                users[user] = (self.data["users"][user]["lifetime_balance"])
 
             sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
 
@@ -503,12 +509,13 @@ class Handler:
                 if cnt == 6:
                     break
 
-                leaderboard += str(cnt) + '. ' + self.data["users"][key]["name"] + ": " + str(value) + '\n'
+                leaderboard += str(cnt) + '. ' + self.data["users"][key]["name"] + ": " + str(scientific(value)) + '\n'
                 cnt += 1
             await conv.send_message(toSeg(leaderboard))
 
-        except:
+        except Exception as e:
             await conv.send_message(toSeg("Failed retrieving leaderboard info!"))
+            print(e)
 
     async def prestige(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -526,10 +533,8 @@ class Handler:
             earned_prestige = math.trunc(self.data["users"][userID]["total_balance"] / self.prestige_conversion)
 
             await conv.send_message(toSeg(
-                "You currently have " + str(current_prestige) + " prestige point(s). If you prestige, you will earn " +
-                str(earned_prestige) + " more prestige point(s), or a " +
-                str(earned_prestige) + "% bonus, but will lose all your money and items.")
-                )
+                "You currently have " + str(scientific(current_prestige)) + " prestige point(s). If you prestige, you will earn " +
+                str(scientific(earned_prestige)) + " more prestige point(s), but will lose all your money and items. (1 PP = 1% Bonus per mine)"))
             await conv.send_message(toSeg('Type "/prestige_confirm" if you really do wish to prestige.'))
 
             self.data["users"][userID]["prestige_confirm"] = 1
@@ -577,7 +582,7 @@ class Handler:
                 return
 
             prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** userData[userID]["prestige_upgrade"])
-            await conv.send_message(toSeg("By prestiging, you will lose " + str(prestige_upgrade_cost) + " prestige."))
+            await conv.send_message(toSeg("By prestiging, you will lose " + str(scientific(prestige_upgrade_cost)) + " prestige."))
 
     async def prestige_upgrade(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -594,13 +599,12 @@ class Handler:
                 prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** userData[userID]["prestige_upgrade"])
 
                 if userData[userID]["prestige"] < prestige_upgrade_cost:
-                    await conv.send_message(toSeg("That costs " + str(prestige_upgrade_cost) + " prestige, which you don't have enough of!"))
+                    await conv.send_message(toSeg("That costs " + str(scientific(prestige_upgrade_cost)) + " prestige, which you don't have enough of!"))
                     return
 
                 else:
                     userData[userID]["prestige_upgrade"] += 1
                     userData[userID]["prestige"] -= prestige_upgrade_cost
-                    self.data["users"][userID]["prestige_upgrade_confirm"] = 0
 
                     with open("data.json", "w") as f:
                         json.dump(self.data, f)
@@ -668,11 +672,11 @@ class Handler:
                 for user in self.data["users"]:
                     self.data["users"][user][key] = value
 
-                    with open("data.json", "w") as f:
-                        json.dump(self.data, f)
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
 
-                    await conv.send_message(toSeg("Synced all values!"))
-                    return
+                await conv.send_message(toSeg("Synced all values!"))
+                return
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         
@@ -689,14 +693,45 @@ class Handler:
                 for user in self.data["users"]:
                     self.data["users"][user].pop(key, None)
 
-                    with open("data.json", "w") as f:
-                        json.dump(self.data, f)
+                with open("data.json", "w") as f:
+                    json.dump(self.data, f)
 
-                    await conv.send_message(toSeg("Removed key!"))
-                    return
+                await conv.send_message(toSeg("Removed key!"))
+                return
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
 
         except Exception as e:
             await conv.send_message(toSeg("Something went wrong!"))
+            print(e)
+
+    async def set(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        userData = self.data["users"]
+        userID = event.text.split()[1]
+        key = event.text.lower().split()[2]
+        value = event.text.split(' ', 3)[3]
+
+        if value.isdigit():
+            value = int(value)
+
+        try:
+            if isIn(self.admins, user):
+                if userID in userData:
+                    userData[userID][key] = value
+
+                    with open("data.json", "w") as f:
+                        json.dump(self.data, f)
+
+                    await conv.send_message(toSeg("Set value!"))
+                    return
+                else:
+                    await conv.send_message(toSeg("That user isn't registered!"))
+                    return
+
+            else:
+                await conv.send_message(toSeg("bro wtf u can't use that"))
+
+        except Exception as e:
+            await conv.send_message(toSeg("Format: /set {userID} {key} {value}"))
             print(e)

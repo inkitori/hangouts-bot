@@ -27,16 +27,11 @@ class Bot:
         self._convo_list.on_event.add_observer(self._on_event)
         convs = self._convo_list.get_all()
         print("Connected!")
-        await conv.send_message(toSeg("Saber in!"))
 
     async def _on_disconnect(self):
         print("ded")
 
     async def _on_event(self, event):
-        conv_id = event.conversation_id
-        conv = self._convo_list.get(conv_id)
-        user_id = event.user_id
-        user = conv.get_user(user_id)
         user, conv = getUserConv(self, event)
         userID = user.id_[0]
         userData = self.handler.data["users"]

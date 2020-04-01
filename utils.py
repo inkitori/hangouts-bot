@@ -28,3 +28,6 @@ def cooldown(cooldowns, user, event, cooldown):
 def isIn(userList, user):
     if int(user.id_[0]) in userList:
         return True
+
+def scientific(number):
+    return "{:.2e}".format(number)
