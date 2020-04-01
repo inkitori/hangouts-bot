@@ -1,13 +1,23 @@
+"""
+A text=based clone of 2048
+Made by Chendi
+"""
+
 import random
 
 games = {"current game": None}
 
 
 def newline(text, number=1):
+    """adds number newlines to the end of text"""
     return text.strip() + ("\n" * number)
 
 
 def get_item_safe(sequence, index=0, default=""):
+    """
+    Retrives the item at index in sequence
+    defaults to default if the item des not exist
+    """
     try:
         item = sequence[index]
     except IndexError:
@@ -16,6 +26,7 @@ def get_item_safe(sequence, index=0, default=""):
 
 
 def clean(text):
+    """cleans user input and returns as a list"""
     if text:
         if type(text) == str:
             return text.strip().lower().split()
@@ -25,7 +36,11 @@ def clean(text):
         return [""]
 
 
-def trim(text, number=1):
+def trim(text, number=1, default=[""]):
+    """
+    trims the front of a sequence by number
+    returns default if number is greater than len(sequence)
+    """
     if type(text) == str:
         text = clean(text)
     if type(text) == list:
@@ -33,7 +48,7 @@ def trim(text, number=1):
             try:
                 text = text[number:]
             except IndexError:
-                text = [""]
+                text = default
                 break
         return text
     else:
@@ -41,6 +56,7 @@ def trim(text, number=1):
 
 
 class Cell():
+    """represents a cell in a board"""
 
     def __init__(self, value=0):
         self.length = 1
@@ -49,7 +65,7 @@ class Cell():
 
 
 class Board():
-
+    """represents a board for 2048"""
     def __init__(self, mode):
         self.size = mode.size
         self.number_of_cells = self.size ** 2
@@ -129,7 +145,7 @@ class Board():
         empty_cell.value = value
 
     def draw_board(self, game):
-        """Draws the board"""
+        """appends the board to self.text"""
         max_length = 0
         for cell in self.cells:
             cell.length = len(str(cell.value))
@@ -143,6 +159,7 @@ class Board():
 
 
 class GameMode():
+    """class to represent different gamemodes"""
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
 
@@ -175,6 +192,7 @@ class GameMode():
         return next_value
 
     def increase_score(self, value):
+        """increases score based on gamemode"""
         if self.increase_type == "normal":
             points = value
         elif self.increase_type == "plus one":
@@ -186,6 +204,7 @@ class GameMode():
 
 
 class Game():
+    """class to represent each game of 2048"""
     modes = {
         "normal": GameMode(description="normal 2048"),
         "65536": GameMode(size=5, win_value=65536, description="5x5 board and higher win condition"),
@@ -230,12 +249,13 @@ class Game():
         self.text = ""
         self.mode = self.modes["normal"]
         self.state = None
+        self.has_won = False
         self.board = Board(self.mode)
         for i in range(2):
             self.board.make_new_block(self.mode)
 
     def update(self):
-        """Draws based on current state"""
+        """appends text based on current state"""
 
         if self.state == "help":
             self.text += newline("\n".join(self.help_text))
@@ -244,6 +264,7 @@ class Game():
             self.state = None
 
         if self.state == "won":
+            self.has_won = True
             self.draw_game()
             self.text += "you won, use move to continue playing"
         elif self.state == "lost":
@@ -264,7 +285,7 @@ class Game():
         self.draw_game()
 
     def draw_game(self):
-        """Draws board and scores"""
+        """appends board and scores to self.text"""
         self.text += "score: " + str(self.score) + "\nhigh score: " + str(self.mode.high_score) + "\n"
         self.board.draw_board(self)
 
@@ -278,6 +299,7 @@ class Game():
         for i in range(2):
             self.board.make_new_block(self.mode)
         self.state = None
+        self.has_won = False
 
     def move(self, x, positive):
         """Moves all blocks"""
@@ -299,15 +321,18 @@ class Game():
             self.check_win()
 
     def check_win(self):
+        """checks if the player has won"""
         for block in self.board.cells:
-            if block.value == self.mode.win_value:
+            if block.value == self.mode.win_value and not self.has_won:
                 self.state = "won"
 
     def setup_confusion(self):
+        """shuffled the values for conffusion mode"""
         random.shuffle(GameMode.shuffled)
         Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
 
     def play_game(self, command_list):
+        """runs the main game loop once"""
 
         self.text = ""
         command = get_item_safe(command_list)
@@ -347,15 +372,16 @@ class Game():
 
 
 def create_game(game_name):
+    """creates a new game in games dict"""
     global games
     games["current game"] = games[game_name] = Game()
     return games["current game"]
 
 
 def run_game(commands):
-    global games
-    # cleaning input
+    """runs the game based on commands"""
 
+    global games
     command_list = clean(commands)
     command = get_item_safe(command_list)
 
