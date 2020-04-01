@@ -44,7 +44,8 @@ class Handler:
             "/profile": self.profile,
             "/leaderboard": self.leaderboard,
             "/prestige": self.prestige,
-            "/prestige_confirm": self.prestige_confirm
+            "/prestige_confirm": self.prestige_confirm,
+            "/sync": self.sync
         }
         self.images = {
             "/gay": "images/gay.jpg",
@@ -243,36 +244,68 @@ class Handler:
             return
 
         try:
-            arg1 = event.text.split()[1].lower()
-            arg2 = event.text.split(' ', 2)[2].lower().title()
+            item_type = event.text.split()[1].lower()
+            item = event.text.split(' ', 2)[2].strip().lower().title()
 
             if userID not in self.data["users"]:
                 await conv.send_message(toSeg("You are not registered!  Use /register"))
                 return
 
-            if arg1 not in self.data["shop"] or arg2 not in self.data["shop"][arg1]:
+            elif item == "Top":
+                if item_type not in self.data["shop"]:
+                    await conv.send_message(toSeg("That class doesn't exist!"))
+                    return
+
+                else:
+                    shopData = self.data["shop"][item_type]
+                    userData = self.data["users"][userID]
+                    possible_items = []
+
+                    for possible_item in shopData:
+                        if shopData[possible_item]["value"] > shopData[userData["pick"]]["value"] and shopData[possible_item]["price"] <= userData["balance"]:
+                            possible_items.append(possible_item)
+
+                    if len(possible_items) == 0:
+                        await conv.send_message(toSeg("No possible item of that class you can purchase!"))
+                        print("test")
+                        return
+
+                    else:
+                        purchase = possible_items[-1]
+                        userData[item_type] = shopData[purchase]["name"]
+                        userData["balance"] -= shopData[purchase]["price"]
+
+                        with open("data.json", "w") as f:
+                            json.dump(self.data, f)
+
+                        await conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
+                        return
+
+                    
+            elif item_type not in self.data["shop"] or item not in self.data["shop"][item_type]:
                 await conv.send_message(toSeg("That item doesn't exist!"))
                 return
             else:
-                if self.data["users"][userID]["balance"] < self.data["shop"][arg1][arg2]["price"]:
+                if self.data["users"][userID]["balance"] < self.data["shop"][item_type][item]["price"]:
                     await conv.send_message(toSeg("You don't have enough money for that!"))
                     return
-                elif self.data["shop"][arg1][self.data["users"][userID][arg1]]["value"] == self.data["shop"][arg1][arg2]["value"]:
+                elif self.data["shop"][item_type][self.data["users"][userID][item_type]]["value"] == self.data["shop"][item_type][item]["value"]:
                     await conv.send_message(toSeg("You already have that pick!"))
                     return
-                elif self.data["shop"][arg1][self.data["users"][userID][arg1]]["value"] > self.data["shop"][arg1][arg2]["value"]:
+                elif self.data["shop"][item_type][self.data["users"][userID][item_type]]["value"] > self.data["shop"][item_type][item]["value"]:
                     await conv.send_message(toSeg("You already have a pick better than that!"))
                     return
                 else:
-                    self.data["users"][userID][arg1] = self.data["shop"][arg1][arg2]["name"]
-                    self.data["users"][userID]["balance"] -= self.data["shop"][arg1][arg2]["price"]
+                    self.data["users"][userID][item_type] = self.data["shop"][item_type][item]["name"]
+                    self.data["users"][userID]["balance"] -= self.data["shop"][item_type][item]["price"]
 
                     with open("data.json", "w") as f:
                         json.dump(self.data, f)
 
                     await conv.send_message(toSeg("Purchase successful!"))
-        except:
+        except Exception as e:
             await conv.send_message(toSeg("Format: /buy {type} {item}"))
+            print(e)
 
     async def give(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -432,14 +465,14 @@ class Handler:
         user, conv = getUserConv(bot, event)
         users = {}
         cnt = 1
-        leaderboard = ""
+        leaderboard = "Ranking by balanced earned in this lifetime:\n"
 
         if cooldown(self.cooldowns, user, event, 10):
             return
 
         try:
             for user in self.data["users"]:
-                users[user] = (self.data["users"][user]["balance"])
+                users[user] = (self.data["users"][user]["total_balance"])
 
             sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
 
@@ -553,3 +586,27 @@ class Handler:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
+    
+    async def sync(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        key = event.text.lower().split()[1]
+        value = event.text.lower().split(' ', 2)[2]
+
+        if value.isdigit():
+            value = int(value)
+
+        try:
+            if isIn(self.admins, user):
+                for user in self.data["users"]:
+                    self.data["users"][user][key] = value
+
+                    with open("data.json", "w") as f:
+                        json.dump(self.data, f)
+
+                    await conv.send_message(toSeg("Synced all values!"))
+            else:
+                await conv.send_message(toSeg("bro wtf u can't use that"))
+        
+        except Exception as e:
+            await conv.send_message(toSeg("Something went wrong!"))
+            print(e)
