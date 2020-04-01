@@ -45,7 +45,7 @@ class Bot:
                 await conv.send_message(toSeg(self.handler.keywords[strippedText]))
 
             elif strippedText.split()[0] in self.handler.images:
-                if self.handler.cooldown(user, event, 5):
+                if cooldown(self.handler.cooldowns, user, event, 5):
                     return
                 f = open(self.handler.images[strippedText.split()[0]], "rb")
                 await conv.send_message(toSeg(""), f)

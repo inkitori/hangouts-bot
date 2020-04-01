@@ -144,6 +144,9 @@ class Handler:
     async def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
+
+        if cooldown(self.cooldowns, user, event, 5):
+            return
         
         if userID in self.data["users"]:
             await conv.send_message(toSeg("You are already registered!"))
@@ -168,6 +171,9 @@ class Handler:
     async def balance(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
+
+        if cooldown(self.cooldowns, user, event, 5):
+            return
 
         if not userID in self.data["users"]:
             await conv.send_message(toSeg("You are not registered! Use /register"))
@@ -226,6 +232,10 @@ class Handler:
     async def buy(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
+
+        if cooldown(self.cooldowns, user, event, 10):
+            return
+
         try:
             arg1 = event.text.split()[1].lower()
             arg2 = event.text.split(' ', 2)[2].lower().title()
@@ -363,6 +373,9 @@ class Handler:
         user, conv = getUserConv(bot, event)
         dataUsers = self.data["users"]
 
+        if cooldown(self.cooldowns, user, event, 10):
+            return
+
         try:
             if len(event.text.split()) > 1:
                 name = event.text.split(' ', 1)[1]
@@ -409,6 +422,9 @@ class Handler:
         cnt = 1
         leaderboard = ""
 
+        if cooldown(self.cooldowns, user, event, 10):
+            return
+
         try:
             for user in self.data["users"]:
                 users[self.data["users"][user]["name"]] = self.data["users"][user]["balance"]
@@ -428,6 +444,9 @@ class Handler:
     async def prestige(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
+
+        if cooldown(self.cooldowns, user, event, 5):
+            return
 
         try:
             if userID not in self.data["users"]:
@@ -463,7 +482,7 @@ class Handler:
             else:
                 await conv.send_message(toSeg("Prestiging"))
                 userData[userID]["balance"] = 0
-                userData[userID]["prestige"] = math.trunc(userData[userID]["total_balance"]/self.prestige_conversion)
+                userData[userID]["prestige"] += math.trunc(userData[userID]["total_balance"]/self.prestige_conversion)
                 userData[userID]["prestige_confirm"] = 0
                 userData[userID]["total_balance"] = 0
                 userData[userID]["pick"] = "Copper Pick" 
