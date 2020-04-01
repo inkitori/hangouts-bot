@@ -209,6 +209,17 @@ class Game():
         "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)"
     )
 
+    extra_commands = {
+        "create <game_name>": "creates a new game with the given name",
+        "<game_name>": "loads the game named game_name",
+    }
+
+    reserved_words = (
+        list(commands.keys()) + list(modes.keys()) +
+        ["move", "m", "up", "u", "left", "l", "right", "r", "down", "d"] +
+        ["create", "2048"]
+    )
+
     def __init__(self):
         self.score = 0
         self.text = ""
@@ -223,7 +234,7 @@ class Game():
 
         if self.state == "help":
             self.text += newline("\n".join(self.help_text))
-            for command, description in self.commands.items():
+            for command, description in (self.commands.items() + self.extra_commands.items()):
                 self.text += f"{command} - {description}\n"
             self.state = None
 
@@ -297,7 +308,7 @@ class Game():
         try:
             command = command_list[0]
         except IndexError:
-            command = None
+            command = ""
         # check player movement
         if command in ("move", "m"):
             try:
@@ -326,9 +337,7 @@ class Game():
             self.restart(Game.modes[command])
         elif command in self.commands.keys():
             self.state = command
-        elif command == "":
-            pass
-        else:
+        elif command != "":
             self.text += "invalid command, use help to see commands\n"
             self.state = None
 
@@ -354,23 +363,21 @@ def run_game(commands):
         command = command_list[0]
     if command == "create":
         game_name = command_list[1]
+        if game_name in Game.reserved_words:
+            return "game names cannot be reserved words"
         create_game(game_name)
         command_list = trim(command_list, 2)
-    elif command == "switch":
-        game_name = command_list[1]
-        if game_name not in games.keys():
-            return "that game does not exist, use create to make a new game"
+    elif command in games.keys():
+        game_name = command
         games["current game"] = games[game_name]
-        command_list = trim(command_list, 2)
+        command_list = trim(command_list)
     else:
         game_name = "current game"
 
-    if games["current game"] is None:
-        return "no games exist, use create to make a game"
-    if game_name in games.keys():
+    if games[game_name]:
         return games[game_name].play_game(command_list)
     else:
-        return "something went very wrong"
+        return "no game selected"
 
 
 # testing via console
