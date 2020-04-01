@@ -239,7 +239,7 @@ class Game():
 
         if self.state == "help":
             self.text += newline("\n".join(self.help_text))
-            for command, description in (self.commands.items() + self.extra_commands.items()):
+            for command, description in list(self.commands.items()) + list(self.extra_commands.items()):
                 self.text += f"{command} - {description}\n"
             self.state = None
 
@@ -310,16 +310,12 @@ class Game():
     def play_game(self, command_list):
 
         self.text = ""
-        try:
-            command = command_list[0]
-        except IndexError:
-            command = ""
+        command = get_item_safe(command_list)
+
         # check player movement
         if command in ("move", "m"):
-            try:
-                command = command_list[1]
-            except IndexError:
-                command = None
+            command_list = trim(command_list)
+            command = get_item_safe(command_list)
             x = None
             positive = None
             if command in ("up", "u"):
@@ -352,7 +348,6 @@ class Game():
 
 def create_game(game_name):
     global games
-    print("Creating")
     games["current game"] = games[game_name] = Game()
     return games["current game"]
 
@@ -385,7 +380,6 @@ def run_game(commands):
         game_name = "current game"
 
     if type(games[game_name]) == Game:
-        print("it worked")
         return games[game_name].play_game(command_list)
     else:
         return "no game selected"
