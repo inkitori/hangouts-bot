@@ -165,7 +165,8 @@ class Board():
         for row in range(game.mode.size):
             for column in range(game.mode.size):
                 cell = game.board.cells[row * 4 + column]
-                game.text += str(cell.value).ljust(max_length)
+                spaces = (max_length - cell.length) * " "
+                game.text += spaces * 2 + str(cell.value)
             game.text += "\n"
 
 
