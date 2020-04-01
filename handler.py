@@ -55,7 +55,7 @@ class Handler:
         }
 
         self.cooldowns = defaultdict(dict)
-        self.admins = [114207595761187114730]  # fill in yourself (store as int)
+        self.admins = [114207595761187114730, 106637925595968853122]  # fill in yourself (store as int)
         self.ignore = [105849946242372037157]
         self.prestige_conversion = 100000
         random.seed(datetime.now())

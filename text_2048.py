@@ -7,8 +7,35 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
+def clean(text):
+    if type(text) == str:
+        if text:
+            return text.strip().lower().split()
+        else:
+            return [""]
+    elif type(text) == list:
+        if text:
+            return text
+        else:
+            return [""]
+
+
+def trim(text, number=1):
+    if type(text) == str:
+        text = clean(text)
+    if type(text) == list:
+        for i in range(number):
+            try:
+                text = text[number:]
+            except IndexError:
+                text = [""]
+                break
+        return text
+    else:
+        return["something is wrong"]
+
+
 class Cell():
-    offset = 10
 
     def __init__(self, value=0):
         self.length = 1
@@ -299,6 +326,8 @@ class Game():
             self.restart(Game.modes[command])
         elif command in self.commands.keys():
             self.state = command
+        elif command == "":
+            pass
         else:
             self.text += "invalid command, use help to see commands\n"
             self.state = None
@@ -308,34 +337,34 @@ class Game():
 
 
 def create_game(game_name):
+    global games
     games["current game"] = games[game_name] = Game()
     return games["current game"]
 
 
 def run_game(commands):
+    global games
     # cleaning input
-    if type(commands) == str:
-        command_list = commands.lower().split()
-    elif type(commands) == list:
-        command_list = commands
-    else:
-        print("invalid input joseph")
+    command_list = clean(commands)
     command = command_list[0]
 
     # processing commands
     if command == "2048":
-        command_list = command_list[1:]
+        command_list = trim(command_list)
         command = command_list[0]
     if command == "create":
         game_name = command_list[1]
         create_game(game_name)
+        command_list = trim(command_list, 2)
     elif command == "switch":
         game_name = command_list[1]
         if game_name not in games.keys():
             return "that game does not exist, use create to make a new game"
         games["current game"] = games[game_name]
+        command_list = trim(command_list, 2)
     else:
         game_name = "current game"
+
     if games["current game"] is None:
         return "no games exist, use create to make a game"
     if game_name in games.keys():
@@ -347,7 +376,7 @@ def run_game(commands):
 # testing via console
 if __name__ == "__main__":
     game = Game()
-    game_text = game.play_game([""])
+    game_text = run_game([""])
     print(game_text)
     while True:
         text = input("enter a command: ").lower().split()
