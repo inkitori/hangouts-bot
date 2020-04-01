@@ -23,7 +23,9 @@ class Handler:
             "yamete": "kudasai!~~",
             "ping": "pong",
             "pong": "ping",
-            "saber": "hi"
+            "saber": "hi",
+            "yes": "no",
+            "no": "yes"
         }
         self.commands = {
             "/help": self.help,
@@ -46,9 +48,10 @@ class Handler:
             "/leaderboard": self.leaderboard,
             "/prestige": self.prestige,
             "/prestige_confirm": self.prestige_confirm,
+            "/sync": self.sync,
+            "/2048": self.play_2048,
             "/prestige_upgrade": self.prestige_upgrade,
             "/prestige_upgrade_info": self.prestige_upgrade_info,
-            "/sync": self.sync,
             "/remove": self.remove
         }
         self.images = {
@@ -60,7 +63,10 @@ class Handler:
         }
 
         self.cooldowns = defaultdict(dict)
-        self.admins = [114207595761187114730]  # fill in yourself (store as int)
+        self.admins = [
+            114207595761187114730,  # joseph
+            106637925595968853122,  # chendi
+            ]
         self.ignore = [105849946242372037157]
         self.prestige_conversion = 100000
         self.prestige_upgrade_base = 2000
@@ -150,6 +156,11 @@ class Handler:
             await conv.send_message(toSeg("https://youtu.be/dQw4w9WgXcQ"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
+
+    async def play_2048(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        game_text = run_game(event.text)
+        await conv.send_message(toSeg(game_text))
 
     # economy
     async def register(self, bot, event):
@@ -291,7 +302,6 @@ class Handler:
                         await conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
                         return
 
-                    
             elif item_type not in self.data["shop"] or item not in self.data["shop"][item_type]:
                 await conv.send_message(toSeg("That item doesn't exist!"))
                 return
@@ -644,7 +654,7 @@ class Handler:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
-    
+
     async def sync(self, bot, event):
         user, conv = getUserConv(bot, event)
         key = event.text.lower().split()[1]
@@ -686,7 +696,7 @@ class Handler:
                     return
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
-        
+
         except Exception as e:
             await conv.send_message(toSeg("Something went wrong!"))
             print(e)

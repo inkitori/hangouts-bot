@@ -3,6 +3,7 @@ from hangups.ui.utils import get_conv_name
 import asyncio
 from handler import Handler
 from utils import *
+import sys
 
 import signal
 
@@ -26,9 +27,7 @@ class Bot:
         self._convo_list.on_event.add_observer(self._on_event)
         convs = self._convo_list.get_all()
         print("Connected!")
-
-        for c in convs:
-            print(get_conv_name(c))
+        await conv.send_message(toSeg("Saber in!"))
 
     async def _on_disconnect(self):
         print("ded")
