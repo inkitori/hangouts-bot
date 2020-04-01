@@ -422,7 +422,6 @@ def run_game(commands):
         command_list = trim(command_list)
     else:
         game_name = "current game"
-    print(games, games["current game"])
     if type(games[game_name]) == Game:
         return games[game_name].play_game(command_list)
     else:
