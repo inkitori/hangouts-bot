@@ -58,7 +58,10 @@ class Handler:
         }
 
         self.cooldowns = defaultdict(dict)
-        self.admins = [114207595761187114730, 106637925595968853122]  # fill in yourself (store as int)
+        self.admins = [
+            114207595761187114730,  # joseph
+            106637925595968853122,  # chendi
+            ]
         self.ignore = [105849946242372037157]
         self.prestige_conversion = 100000
         random.seed(datetime.now())
@@ -283,7 +286,6 @@ class Handler:
                         await conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
                         return
 
-                    
             elif item_type not in self.data["shop"] or item not in self.data["shop"][item_type]:
                 await conv.send_message(toSeg("That item doesn't exist!"))
                 return
@@ -588,7 +590,7 @@ class Handler:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
-    
+
     async def sync(self, bot, event):
         user, conv = getUserConv(bot, event)
         key = event.text.lower().split()[1]
@@ -608,7 +610,7 @@ class Handler:
                     await conv.send_message(toSeg("Synced all values!"))
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
-        
+
         except Exception as e:
             await conv.send_message(toSeg("Something went wrong!"))
             print(e)
