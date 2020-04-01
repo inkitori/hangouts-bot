@@ -1,8 +1,8 @@
 import random
 
 
-def newline(text):
-    return text.strip() + "\n"
+def newline(text, number=1):
+    return text.strip() + ("\n" * number)
 
 
 class Cell():
@@ -111,7 +111,7 @@ class Board():
 class GameMode():
 
     def __init__(
-        self, mode, start_value=2, increase_type="normal",
+        self, start_value=2, increase_type="normal",
         size=4, win_value=None, values=None
             ):
         self.size = size
@@ -152,42 +152,35 @@ class Game():
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
     modes = {
-        "normal": GameMode("normal"),
-        "65536": GameMode("65536", size=5, win_value=65536),
+        "normal": GameMode(),
+        "65536": GameMode(size=5, win_value=65536),
         str(2 ** 20): GameMode(str(2 ** 20), size=6, win_value=2 ** 20),
-        "eleven": GameMode("eleven", 1, "plus one"),
-        "twenty": GameMode("twenty", 1, "plus one", win_value=20),
-        "confusion": GameMode("confusion", 1, "random", values=shuffled)
+        "eleven": GameMode(1, "plus one"),
+        "twenty": GameMode(1, "plus one", win_value=20),
+        "confusion": GameMode(1, "random", values=shuffled)
     }
-    commands = ["restart", "menu", "quit", "help", "scores"]
+    commands = ["restart", "menu", "help", "scores"]
 
     def __init__(self):
         self.score = 0
         self.text = ""
         self.mode = self.modes["normal"]
-        self.state = "menu"
+        self.state = "help"
         self.board = Board(self.mode)
+        for i in range(2):
+            self.board.make_new_block(self.mode)
 
     def update(self):
         """Draws based on current state"""
-        """
-        if self.state == "reload":
-            filled_cells = [cell for cell in self.board.cells if cell.value]
-            if filled_cells:
-                self.state = "playing"
-            else:
-                self.text += "no game saved (game is deleted when the bot quits)\n"
-                self.state = "menu"
-        """
 
         if self.state == "help":
-            self.text = (
+            self.text += (
                 "how to play:\n" +
                 "move the tiles\n" +
                 "when 2 with the same value touch, they merge\n" +
                 "try to get the highest value posible without filling up the board\n" +
                 "\n" +
-                "commands:"
+                "commands:\n"
                 "prefix all commands with 2048. playing 2048 will not interfere with other bot commands\n" +
                 "all commands must be spelled correctly but are NOT case-sensitive\n" +
                 "\n" +
@@ -202,27 +195,28 @@ class Game():
                 "65536 - normal 2048 with a 5x5 board and higher win condition\n" +
                 "eleven - instead of doubling, the blocks increase by 1 when merging\n" +
                 "twenty - the rules of eleven and the board of 65536\n" +
-                "confusion - randomly generated block sequences and colors\n"
+                "confusion - randomly generated block sequences\n"
             )
+            self.state = None
 
         if self.state == "won":
             self.draw_game()
             self.text += "you won, use move to continue playing"
-            # self.state = "playing"
         elif self.state == "lost":
-            self.text = "you lost, use restart to restart, or menu to get a list of gamemodes"
+            self.text += "you lost, use restart to restart, or menu to get a list of gamemodes"
         elif self.state == "restart":
             self.restart()
         elif self.state == "menu":
             self.text += "pick a gamemode or continue playing\n"
             for mode in self.modes.keys():
                 self.text += mode + "\n"
-
+            self.state = None
         elif self.state == "scores":
             for mode_name, mode in self.modes.items():
                 self.text += f"{mode_name}: {mode.high_score}\n"
-        # if self.state == "playing":
-        self.text = newline(self.text)
+            self.state = None
+
+        self.text = newline(self.text, 2)
         self.draw_game()
 
     def draw_game(self):
@@ -234,12 +228,12 @@ class Game():
         """Resets the game"""
         self.mode = mode if mode else self.mode
         self.score = 0
-        # self.state = "playing"
         if self.mode == Game.modes["confusion"]:
             self.setup_confusion()
         self.board = Board(self.mode)
         for i in range(2):
             self.board.make_new_block(self.mode)
+        self.state = None
 
     def move(self, x, positive):
         """Moves all blocks"""
@@ -273,11 +267,16 @@ class Game():
 def play_game(command_list, game):
 
     game.text = ""
-
-    command = command_list[0]
+    try:
+        command = command_list[0]
+    except IndexError:
+        command = None
     # check player movement
     if command in ("move", "m"):
-        command = command_list[1]
+        try:
+            command = command_list[1]
+        except IndexError:
+            command = None
         x = None
         positive = None
         if command in ("up", "u"):
@@ -293,10 +292,10 @@ def play_game(command_list, game):
             x = True
             positive = True
         else:
-            game.text = "invalid move\n"
+            game.text += "invalid move\n"
         game.move(x, positive)
 
-    if command in game.modes.keys():
+    elif command in game.modes.keys():
         game.restart(Game.modes[command])
     elif command in game.commands:
         game.state = command
@@ -310,13 +309,11 @@ def play_game(command_list, game):
 # testing via console
 if __name__ == "__main__":
     game = Game()
-    game_text = play_game(["menu"], game)
+    game_text = play_game([""], game)
     print(game_text)
     while True:
         text = input("enter a command: ").lower().split()
-        if not text:
-            continue
-        if text[0] == "break":
+        if text and text[0] == "break":
             break
         game_text = play_game(text, game)
         print(game_text)
