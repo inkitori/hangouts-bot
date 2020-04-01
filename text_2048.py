@@ -249,12 +249,13 @@ class Game():
     extra_commands = {
         "create <game_name>": "creates a new game with the given name (can be combined with other commands",
         "<game_name>": "loads the game named game_name (can be combined with other commands)",
+        "rename <old_name> <new_name>": "renames a game from old_name to new_name"
     }
 
     reserved_words = (
         list(commands.keys()) + list(modes.keys()) +
         ["move", "m", "up", "u", "left", "l", "right", "r", "down", "d"] +
-        ["create", "2048"]
+        ["create", "2048", "/2048", "rename"]
     )
 
     def __init__(self):
@@ -296,7 +297,7 @@ class Game():
         elif self.state == "games":
             for game_name, game in games.items():
                 if game_name != "current game":
-                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} Score: {game.score}\n"
+                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} score: {game.score}\n"
 
         self.text = newline(self.text, 2)
         self.draw_game()
@@ -397,6 +398,17 @@ def create_game(game_name):
     return games["current game"]
 
 
+def verify_name(*names):
+    for name in names:
+        if name in Game.reserved_words:
+            return "game names cannot be reserved words"
+        elif not name:
+            return "games must have names"
+        elif name in games.keys():
+            return "names must be unique, note that names are NOT case-sensitive"
+    return "valid"
+
+
 def run_game(commands):
     """runs the game based on commands"""
 
@@ -411,12 +423,26 @@ def run_game(commands):
     if command == "create":
         command_list = trim(command_list)
         game_name = get_item_safe(command_list)
-        if game_name in Game.reserved_words:
-            return "game names cannot be reserved words"
-        elif not game_name:
-            return "games must have names"
+        valid = verify_name(game_name)
+        if valid != "valid":
+            return valid
         create_game(game_name)
         command_list = trim(command_list)
+    elif command == "rename":
+        command_list = trim(command_list)
+        old_name = get_item_safe(command_list)
+        command_list = trim(command_list)
+        new_name = get_item_safe(command_list)
+        command_list = trim(command_list)
+        valid = verify_name(new_name)
+        if valid != "valid":
+            return valid
+        if old_name not in games.keys():
+            return "that game does not exist"
+        games[new_name] = games.pop(old_name)
+        game_name = new_name
+        command_list = trim(command_list)
+
     elif command in games.keys():
         game_name = command
         games["current game"] = games[game_name]
