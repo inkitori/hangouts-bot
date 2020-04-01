@@ -109,22 +109,25 @@ class Board():
 
 
 class GameMode():
+    shuffled = [i for i in range(100)]
+    random.shuffle(shuffled)
 
     def __init__(
         self, start_value=2, increase_type="normal",
-        size=4, win_value=None, values=None
+        size=4, win_value=None, description="", shuffled=False
             ):
         self.size = size
         self.number_of_cells = size ** 2
         self.increase_type = increase_type
         self.high_score = 0
-        if values:
-            self.values = values
+        if shuffled:
+            self.values = GameMode.shuffled
         else:
             self.values = [start_value]
             for i in range(12):
                 self.values.append(self.increase(self.values[-1]))
         self.win_value = win_value if win_value else self.values[10]
+        self.description = description
 
     def increase(self, value):
         """Increases cell value based on game mode"""
@@ -149,17 +152,33 @@ class GameMode():
 
 
 class Game():
-    shuffled = [i for i in range(100)]
-    random.shuffle(shuffled)
     modes = {
-        "normal": GameMode(),
-        "65536": GameMode(size=5, win_value=65536),
-        str(2 ** 20): GameMode(str(2 ** 20), size=6, win_value=2 ** 20),
-        "eleven": GameMode(1, "plus one"),
-        "twenty": GameMode(1, "plus one", win_value=20),
-        "confusion": GameMode(1, "random", values=shuffled)
+        "normal": GameMode(description="normal 2048"),
+        "65536": GameMode(size=5, win_value=65536, description="5x5 board and higher win condition"),
+        str(2 ** 20): GameMode(size=6, win_value=2 ** 20, description="6x6 board and higher win condition"),
+        "eleven": GameMode(1, "plus one", description="blocks increase by 1 when merging"),
+        "twenty": GameMode(1, "plus one", win_value=20, description="eleven with a higher win condition"),
+        "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
-    commands = ["restart", "menu", "help", "scores"]
+    commands = {
+        "restart": "restarts the game in the current gamemode",
+        "gamemodes": "lists the gamemodes",
+        "help": "prints this help text",
+        "scores": "prints the highscore for each mode"
+    }
+    help_text = (
+        "this is a 2048 clone by chendi",
+        "how to play:",
+        "move the tiles",
+        "when 2 with the same value touch, they merge",
+        "try to get the highest value posible without filling up the board",
+        "commands:",
+        "prefix all commands with 2048",
+        "playing 2048 will not interfere with other bot commands",
+        "all commands must be spelled correctly but are NOT case-sensitive",
+        "note that the current game and highscores are reset when the bot resets",
+        "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)"
+    )
 
     def __init__(self):
         self.score = 0
@@ -174,42 +193,21 @@ class Game():
         """Draws based on current state"""
 
         if self.state == "help":
-            self.text += (
-                "how to play:\n" +
-                "move the tiles\n" +
-                "when 2 with the same value touch, they merge\n" +
-                "try to get the highest value posible without filling up the board\n" +
-                "\n" +
-                "commands:\n"
-                "prefix all commands with 2048. playing 2048 will not interfere with other bot commands\n" +
-                "all commands must be spelled correctly but are NOT case-sensitive\n" +
-                "\n" +
-                "help - prints this help text\n" +
-                "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)\n" +
-                "restart - restarts the game in the current gamemode\n" +
-                "menu - lists gamemodes\n" +
-                "\n" +
-                "gamemodes:\n" +
-                "note that these all start a new game upon selection" +
-                "normal - normal 2048\n" +
-                "65536 - normal 2048 with a 5x5 board and higher win condition\n" +
-                "eleven - instead of doubling, the blocks increase by 1 when merging\n" +
-                "twenty - the rules of eleven and the board of 65536\n" +
-                "confusion - randomly generated block sequences\n"
-            )
-            self.state = None
+            self.text += newline("\n".join(self.help_text))
+            for command, description in self.commands.items():
+                self.text += f"{command} - {description}\n"
 
         if self.state == "won":
             self.draw_game()
             self.text += "you won, use move to continue playing"
         elif self.state == "lost":
-            self.text += "you lost, use restart to restart, or menu to get a list of gamemodes"
+            self.text += "you lost, use restart to restart, or gamemodes to get a list of gamemodes"
         elif self.state == "restart":
             self.restart()
-        elif self.state == "menu":
+        elif self.state == "gamemodes":
             self.text += "pick a gamemode or continue playing\n"
-            for mode in self.modes.keys():
-                self.text += mode + "\n"
+            for mode_name, mode in self.modes.items():
+                self.text += f"{mode_name} - {mode.description}\n"
             self.state = None
         elif self.state == "scores":
             for mode_name, mode in self.modes.items():
@@ -260,7 +258,7 @@ class Game():
                 self.state = "won"
 
     def setup_confusion(self):
-        random.shuffle(self.shuffled)
+        random.shuffle(GameMode.shuffled)
         Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
 
 
@@ -269,6 +267,9 @@ def play_game(command_list, game):
     game.text = ""
     try:
         command = command_list[0]
+        if command == "2048":
+            command_list = command_list[1:]
+            command = command_list[0]
     except IndexError:
         command = None
     # check player movement
@@ -297,7 +298,7 @@ def play_game(command_list, game):
 
     elif command in game.modes.keys():
         game.restart(Game.modes[command])
-    elif command in game.commands:
+    elif command in game.commands.keys():
         game.state = command
     else:
         game.text += "invalid command, use help to see commands\n"
