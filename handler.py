@@ -24,8 +24,7 @@ class Handler:
         "ping": "pong",
         "pong": "ping",
         "saber": "hi",
-        "yes": "no",
-        "no": "yes"
+        "meep": "meep"
     }
     images = {
         "/gay": "images/gay.jpg",
@@ -62,7 +61,9 @@ class Handler:
             "/2048": self.play_2048,
             "/prestige_upgrade": self.prestige_upgrade,
             "/prestige_upgrade_info": self.prestige_upgrade_info,
-            "/remove": self.remove
+            "/remove": self.remove,
+            "yes": self.yes_no,
+            "no": self.yes_no,
         }
         self.cooldowns = defaultdict(dict)
         self.admins = [
@@ -163,6 +164,15 @@ class Handler:
         user, conv = getUserConv(bot, event)
         game_text = run_game(event.text)
         await conv.send_message(toSeg(game_text))
+
+    async def yes_no(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        text = event.text
+        if isIn(self.admins, user):
+            text = "yes" if text == "yes" else "no"
+        else:
+            text = "no" if text == "yes" else "yes"
+        await conv.send_message(toSeg(text))
 
     # economy
     async def register(self, bot, event):
@@ -618,15 +628,12 @@ class Handler:
         if cooldown(self.cooldowns, user, event, 30):
             return
 
-        #try:
         if isIn(self.admins, user):
             await conv.send_message(toSeg("Saber out!"))
             save_games()
             await bot.client.disconnect()
         else:
             await conv.send_message(toSeg("bro wtf u can't use that"))
-        # except:
-            # await conv.send_message(toSeg("Something went wrong!"))
 
     async def reset(self, bot, event):
         user, conv = getUserConv(bot, event)

@@ -4,6 +4,9 @@ bad bot
 headpat
 yamete
 ping
+yes
+no
+meep
 
 **Utility**
 /help
