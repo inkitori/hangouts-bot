@@ -253,13 +253,15 @@ class Game():
     extra_commands = {
         "create <game_name>": "creates a new game with the given name (can be combined with other commands",
         "<game_name>": "loads the game named game_name (can be combined with other commands)",
-        "rename <old_name> <new_name>": "renames a game from old_name to new_name"
+        "rename <old_name> <new_name>": "renames a game from old_name to new_name",
+        "delete <game_name>": "deletes the game named game_name"
     }
 
     reserved_words = (
         list(commands.keys()) + list(modes.keys()) +
         ["move", "m", "up", "u", "left", "l", "right", "r", "down", "d"] +
-        ["create", "2048", "/2048", "rename", "current game"]
+        list(extra_commands.keys()) +
+        ["2048", "/2048", "current game", "delete"]
     )
 
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
@@ -446,6 +448,16 @@ def run_game(commands):
         games[new_name] = games.pop(old_name)
         game_name = new_name
         command_list = trim(command_list)
+    elif command == "delete":
+        command_list = trim(command_list)
+        game_name = get_item_safe(command_list)
+        if not game_name:
+            return "you must give the name of the game"
+        elif game_name not in games.keys():
+            return "that game does not exist"
+        else:
+            del games[game_name]
+            return f"{game_name} deleted"
 
     elif command in games.keys():
         game_name = command
