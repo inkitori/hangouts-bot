@@ -84,7 +84,7 @@ class Board():
         self.number_of_cells = self.size ** 2
         if not values:
             values = [0 for i in range(self.number_of_cells)]
-        self.cells = [Cell[value] for value in values]
+        self.cells = [Cell(value) for value in values]
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -397,10 +397,10 @@ class Game():
         return newline(self.text)
 
 
-def create_game(game_name, games_dict):
+def create_game(game_name):
     """creates a new game in games dict"""
-    games_dict["current game"] = games_dict[game_name] = Game()
-    return games_dict["current game"]
+    games["current game"] = games[game_name] = Game()
+    return games["current game"]
 
 
 def verify_name(*names):
@@ -475,15 +475,15 @@ def save_games():
     global games
     games_dict = dict()
     for game_name, game in games.items():
-        if game_name == "current_game":
+        if game_name == "current game" or (game is None):
             continue
         games_dict[game_name] = {
-            "board": [cell.value for cell in game.board],
+            "board": [cell.value for cell in game.board.cells],
             "has won": game.has_won,
             "mode": get_key(Game.modes, game.mode),
             "score": game.score
         }
-    high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes}
+    high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
     data = json.dumps({"games": games_dict, "scores": high_scores})
     with open(save_file, "w") as save_data:
         save_data.write(data)

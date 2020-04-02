@@ -27,7 +27,6 @@ class Handler:
         "yes": "no",
         "no": "yes"
     }
-    
     images = {
         "/gay": "images/gay.jpg",
         "/math": "images/math.jpg",
@@ -38,7 +37,7 @@ class Handler:
 
     def __init__(self):
         load_games()
-        commands = {
+        self.commands = {
             "/help": self.help_,
             "/rename": self.rename,
             "/say": self.say,
@@ -619,15 +618,15 @@ class Handler:
         if cooldown(self.cooldowns, user, event, 30):
             return
 
-        try:
-            if isIn(self.admins, user):
-                await conv.send_message(toSeg("Saber out!"))
-                save_games()
-                await bot.client.disconnect()
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except:
-            await conv.send_message(toSeg("Something went wrong!"))
+        #try:
+        if isIn(self.admins, user):
+            await conv.send_message(toSeg("Saber out!"))
+            save_games()
+            await bot.client.disconnect()
+        else:
+            await conv.send_message(toSeg("bro wtf u can't use that"))
+        # except:
+            # await conv.send_message(toSeg("Something went wrong!"))
 
     async def reset(self, bot, event):
         user, conv = getUserConv(bot, event)
