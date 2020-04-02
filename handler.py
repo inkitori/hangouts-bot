@@ -3,64 +3,67 @@ from hangups import hangouts_pb2
 from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
-from text_2048 import run_game
+from text_2048 import run_game, save_games, load_games
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
 import json
 import math
-import sys
+# import sys
 
 from utils import *
 
 
 class Handler:
+
+    keywords = {
+        "good bot": "nyaa, thanku~~",
+        "bad bot": "nuu dun pweese~~ >.<",
+        "headpat": "uwu thanku",
+        "yamete": "kudasai!~~",
+        "ping": "pong",
+        "pong": "ping",
+        "saber": "hi",
+        "yes": "no",
+        "no": "yes"
+    }
+    commands = {
+        "/help": self.help,
+        "/rename": self.rename,
+        "/say": self.say,
+        "/rickroll": self.rickroll,
+        "/quit": self.quit,
+        "/reset": self.reset,
+        "/id": self.id,
+        "/kick": self.kick,
+        "/register": self.register,
+        "/balance": self.balance,
+        "/mine": self.mine,
+        "/save": self.save,
+        "/shop": self.shop,
+        "/buy": self.buy,
+        "/give": self.give,
+        "/id_give": self.id_give,
+        "/profile": self.profile,
+        "/leaderboard": self.leaderboard,
+        "/prestige": self.prestige,
+        "/prestige_confirm": self.prestige_confirm,
+        "/sync": self.sync,
+        "/2048": self.play_2048,
+        "/prestige_upgrade": self.prestige_upgrade,
+        "/prestige_upgrade_info": self.prestige_upgrade_info,
+        "/remove": self.remove
+    }
+    images = {
+        "/gay": "images/gay.jpg",
+        "/math": "images/math.jpg",
+        "/praise": "images/praise.jpg",
+        "/goddammit": "images/goddammit.jpg",
+        "/heymister": "images/heymister.png"
+    }
+
     def __init__(self):
-        self.keywords = {
-            "good bot": "nyaa, thanku~~",
-            "bad bot": "nuu dun pweese~~ >.<",
-            "headpat": "uwu thanku",
-            "yamete": "kudasai!~~",
-            "ping": "pong",
-            "pong": "ping",
-            "saber": "hi",
-            "yes": "no",
-            "no": "yes"
-        }
-        self.commands = {
-            "/help": self.help,
-            "/rename": self.rename,
-            "/say": self.say,
-            "/rickroll": self.rickroll,
-            "/quit": self.quit,
-            "/reset": self.reset,
-            "/id": self.id,
-            "/kick": self.kick,
-            "/register": self.register,
-            "/balance": self.balance,
-            "/mine": self.mine,
-            "/save": self.save,
-            "/shop": self.shop,
-            "/buy": self.buy,
-            "/give": self.give,
-            "/id_give": self.id_give,
-            "/profile": self.profile,
-            "/leaderboard": self.leaderboard,
-            "/prestige": self.prestige,
-            "/prestige_confirm": self.prestige_confirm,
-            "/sync": self.sync,
-            "/2048": self.play_2048,
-            "/prestige_upgrade": self.prestige_upgrade,
-            "/prestige_upgrade_info": self.prestige_upgrade_info,
-            "/remove": self.remove
-        }
-        self.images = {
-            "/gay": "images/gay.jpg",
-            "/math": "images/math.jpg",
-            "/praise": "images/praise.jpg",
-            "/goddammit": "images/goddammit.jpg",
-            "/heymister": "images/heymister.png"
-        }
+        load_games()
 
         self.cooldowns = defaultdict(dict)
         self.admins = [
@@ -185,7 +188,6 @@ class Handler:
             self.data["users"][userID]["prestige_confirm"] = 0
             self.data["users"][userID]["prestige_upgrade"] = 0
 
-
             with open("data.json", "w") as f:
                 json.dump(self.data, f)
 
@@ -238,7 +240,6 @@ class Handler:
 
             with open("data.json", "w") as f:
                 json.dump(self.data, f)
-
 
         except Exception as e:
             await conv.send_message(toSeg("Failed to mine!"))
@@ -534,7 +535,7 @@ class Handler:
 
             self.data["users"][userID]["prestige_confirm"] = 1
 
-        except Exception as e:
+        except Exception:
             await conv.send_message(toSeg("Something went wrong!"))
 
     async def prestige_confirm(self, bot, event):
@@ -568,22 +569,22 @@ class Handler:
             await conv.send_message(toSeg("Something went wrong!"))
 
     async def prestige_upgrade_info(self, bot, event):
-            user, conv = getUserConv(bot, event)
-            userData = self.data["users"]
-            userID = user.id_[0]
+        user, conv = getUserConv(bot, event)
+        userData = self.data["users"]
+        userID = user.id_[0]
 
-            if userID not in userData:
-                await conv.send_message(toSeg("You are not registered! Use /register"))
-                return
+        if userID not in userData:
+            await conv.send_message(toSeg("You are not registered! Use /register"))
+            return
 
-            prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** userData[userID]["prestige_upgrade"])
-            await conv.send_message(toSeg("By prestiging, you will lose " + str(prestige_upgrade_cost) + " prestige."))
+        prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** userData[userID]["prestige_upgrade"])
+        await conv.send_message(toSeg("By prestiging, you will lose " + str(prestige_upgrade_cost) + " prestige."))
 
     async def prestige_upgrade(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         userData = self.data["users"]
-        output_text = ""
+        output_text = ""  # joseph u never use this variable
 
         try:
             if userID not in userData:
@@ -611,8 +612,8 @@ class Handler:
             await conv.send_message(toSeg("Something went wrong!"))
             print(e)
 
-
     # config
+
     async def quit(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 30):
@@ -621,6 +622,7 @@ class Handler:
         try:
             if isIn(self.admins, user):
                 await conv.send_message(toSeg("Saber out!"))
+                save_games()
                 await bot.client.disconnect()
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
@@ -675,7 +677,7 @@ class Handler:
                     return
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
-        
+
         except Exception as e:
             await conv.send_message(toSeg("Something went wrong!"))
             print(e)

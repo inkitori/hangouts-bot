@@ -4,8 +4,10 @@ Made by Chendi
 """
 
 import random
+import json
 
 games = {"current game": None}
+save_file = "games_2048.json"
 
 
 def newline(text, number=1):
@@ -77,11 +79,12 @@ class Cell():
 
 class Board():
     """represents a board for 2048"""
-    def __init__(self, mode):
+    def __init__(self, mode, values=None):
         self.size = mode.size
         self.number_of_cells = self.size ** 2
-        # creates empty board and adds 2 random blocks
-        self.cells = [Cell() for i in range(self.number_of_cells)]
+        if not values:
+            values = [0 for i in range(self.number_of_cells)]
+        self.cells = [Cell[value] for value in values]
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -256,16 +259,16 @@ class Game():
     reserved_words = (
         list(commands.keys()) + list(modes.keys()) +
         ["move", "m", "up", "u", "left", "l", "right", "r", "down", "d"] +
-        ["create", "2048", "/2048", "rename"]
+        ["create", "2048", "/2048", "rename", "current game"]
     )
 
-    def __init__(self):
-        self.score = 0
+    def __init__(self, board=None, has_won=False, mode="normal", score=0):
+        self.score = score
         self.text = ""
-        self.mode = self.modes["normal"]
+        self.mode = self.modes[mode]
         self.state = None
-        self.has_won = False
-        self.board = Board(self.mode)
+        self.has_won = has_won
+        self.board = Board(self.mode, board)
         for i in range(2):
             self.board.make_new_block(self.mode)
 
@@ -394,11 +397,10 @@ class Game():
         return newline(self.text)
 
 
-def create_game(game_name):
+def create_game(game_name, games_dict):
     """creates a new game in games dict"""
-    global games
-    games["current game"] = games[game_name] = Game()
-    return games["current game"]
+    games_dict["current game"] = games_dict[game_name] = Game()
+    return games_dict["current game"]
 
 
 def verify_name(*names):
@@ -414,7 +416,6 @@ def verify_name(*names):
 
 def run_game(commands):
     """runs the game based on commands"""
-
     global games
     command_list = clean(commands)
     command = get_item_safe(command_list)
@@ -456,6 +457,36 @@ def run_game(commands):
         return games[game_name].play_game(command_list)
     else:
         return "no game selected"
+
+
+def load_games():
+    """loads games from a json file"""
+    global games
+    with open(save_file, "r") as save_data:
+        data = json.load(save_data)
+    for game_name, game_data in data["games"].items():
+        games[game_name] = Game(game_data["board"], game_data["has won"], game_data["mode"], game_data["score"])
+    for mode_name, mode in Game.modes.items():
+        mode.high_score = data["scores"][mode_name]
+
+
+def save_games():
+    """saves games to a json file"""
+    global games
+    games_dict = dict()
+    for game_name, game in games.items():
+        if game_name == "current_game":
+            continue
+        games_dict[game_name] = {
+            "board": [cell.value for cell in game.board],
+            "has won": game.has_won,
+            "mode": get_key(Game.modes, game.mode),
+            "score": game.score
+        }
+    high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes}
+    data = json.dumps({"games": games_dict, "scores": high_scores})
+    with open(save_file, "w") as save_data:
+        save_data.write(data)
 
 
 # testing via console
