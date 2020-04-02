@@ -22,6 +22,7 @@ meep
 /praise
 /goddammit
 /heymister
+/2048
 
 **Economy**
 /register
