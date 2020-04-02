@@ -27,33 +27,7 @@ class Handler:
         "yes": "no",
         "no": "yes"
     }
-    commands = {
-        "/help": help_,
-        "/rename": rename,
-        "/say": say,
-        "/rickroll": rickroll,
-        "/quit": quit_,
-        "/reset": reset,
-        "/id": id_,
-        "/kick": kick,
-        "/register": register,
-        "/balance": balance,
-        "/mine": mine,
-        "/save": save,
-        "/shop": shop,
-        "/buy": buy,
-        "/give": give,
-        "/id_give": id_give,
-        "/profile": profile,
-        "/leaderboard": leaderboard,
-        "/prestige": prestige,
-        "/prestige_confirm": prestige_confirm,
-        "/sync": sync,
-        "/2048": play_2048,
-        "/prestige_upgrade": prestige_upgrade,
-        "/prestige_upgrade_info": prestige_upgrade_info,
-        "/remove": remove
-    }
+    
     images = {
         "/gay": "images/gay.jpg",
         "/math": "images/math.jpg",
@@ -64,7 +38,33 @@ class Handler:
 
     def __init__(self):
         load_games()
-
+        commands = {
+            "/help": self.help_,
+            "/rename": self.rename,
+            "/say": self.say,
+            "/rickroll": self.rickroll,
+            "/quit": self.quit_,
+            "/reset": self.reset,
+            "/id": self.id_,
+            "/kick": self.kick,
+            "/register": self.register,
+            "/balance": self.balance,
+            "/mine": self.mine,
+            "/save": self.save,
+            "/shop": self.shop,
+            "/buy": self.buy,
+            "/give": self.give,
+            "/id_give": self.id_give,
+            "/profile": self.profile,
+            "/leaderboard": self.leaderboard,
+            "/prestige": self.prestige,
+            "/prestige_confirm": self.prestige_confirm,
+            "/sync": self.sync,
+            "/2048": self.play_2048,
+            "/prestige_upgrade": self.prestige_upgrade,
+            "/prestige_upgrade_info": self.prestige_upgrade_info,
+            "/remove": self.remove
+        }
         self.cooldowns = defaultdict(dict)
         self.admins = [
             114207595761187114730,  # joseph
