@@ -164,6 +164,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
         game_text = run_game(event.text)
         await conv.send_message(toSeg(game_text))
+        save_games()
 
     async def yes_no(self, bot, event):
         user, conv = getUserConv(bot, event)

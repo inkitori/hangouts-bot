@@ -117,7 +117,7 @@ class Board():
                                 current_cell.value == neighbor.value and not
                                 current_cell.has_merged and not neighbor.has_merged
                                 ):
-                            current_cell.value = game.mode.increase(current_cell.value)
+                            current_cell.value += 1
                             game.score += game.mode.increase_score(current_cell.value)
                             neighbor.value = 0
                             current_cell.has_merged = True
@@ -137,7 +137,7 @@ class Board():
                 for j in indexes:
                     if j is indexes[0]:
                         continue
-                    if self.cells[j].value == self.cells[indexes[indexes.index(j) - 1]].value:
+                    elif self.cells[j].value == self.cells[indexes[indexes.index(j) - 1]].value:
                         return True
         return False
 
@@ -150,26 +150,27 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
+        if self.check_full():
+            return
         empty_blocks = [cell for cell in self.cells if cell.value == 0]
         empty_cell = random.choice(empty_blocks)
+        value = 1
         if random.randint(0, 10) == 10:
-            value = mode.values[1]
-        else:
-            value = mode.values[0]
+            value = 2
         empty_cell.value = value
 
     def draw_board(self, game):
         """appends the board to self.text"""
         max_length = 0
         for cell in self.cells:
-            cell.length = len(str(cell.value))
+            cell.length = len(str(game.mode.values[cell.value]))
             max_length = cell.length if cell.length > max_length else max_length
         max_length += 1
         for row in range(game.mode.size):
             for column in range(game.mode.size):
-                cell = game.board.cells[row * 4 + column]
+                cell = game.board.cells[row * game.mode.size + column]
                 spaces = (max_length - cell.length) * " "
-                game.text += spaces * 2 + str(cell.value)
+                game.text += spaces * 2 + str(game.mode.values[cell.value])
             game.text += "\n"
 
 
@@ -180,19 +181,19 @@ class GameMode():
 
     def __init__(
         self, start_value=2, increase_type="normal",
-        size=4, win_value=None, description="", shuffled=False
+        size=4, win_value=11, description="", shuffled=False
             ):
         self.size = size
         self.number_of_cells = size ** 2
         self.increase_type = increase_type
         self.high_score = 0
         if shuffled:
-            self.values = GameMode.shuffled
+            self.values = [0] + GameMode.shuffled
         else:
-            self.values = [start_value]
-            for i in range(12):
+            self.values = [0, start_value]
+            for i in range(self.number_of_cells + 2):
                 self.values.append(self.increase(self.values[-1]))
-        self.win_value = win_value if win_value else self.values[10]
+        self.win_value = win_value
         self.description = description
 
     def increase(self, value):
@@ -201,31 +202,21 @@ class GameMode():
             next_value = value * 2
         elif self.increase_type == "plus one":
             next_value = value + 1
-        elif self.increase_type == "random":
-            next_value = self.values[self.values.index(value) + 1]
-
         return next_value
 
     def increase_score(self, value):
         """increases score based on gamemode"""
-        if self.increase_type == "normal":
-            points = value
-        elif self.increase_type == "plus one":
-            points = 2 ** value
-        elif self.increase_type == "random":
-            points = 2 ** (self.values.index(value) + 1)
-
-        return points
+        return 2 ** value
 
 
 class Game():
     """class to represent each game of 2048"""
     modes = {
         "normal": GameMode(description="normal 2048"),
-        "65536": GameMode(size=5, win_value=65536, description="5x5 board and higher win condition"),
-        str(2 ** 20): GameMode(size=6, win_value=2 ** 20, description="6x6 board and higher win condition"),
+        "65536": GameMode(size=5, win_value=16, description="5x5 board and higher win condition"),
+        str(2 ** 20): GameMode(size=6, win_value=20, description="6x6 board and higher win condition"),
         "eleven": GameMode(1, "plus one", description="blocks increase by 1 when merging"),
-        "twenty": GameMode(1, "plus one", win_value=20, description="eleven with a higher win condition"),
+        "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
     commands = {
@@ -234,7 +225,8 @@ class Game():
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
         "games": "prints all existing games, their mode and score",
-        "reserved": "prints reserved words"
+        "reserved": "prints reserved words",
+        "move": "prints valid <directions>"
     }
     help_text = (
         "this is a 2048 clone by chendi",
@@ -247,21 +239,25 @@ class Game():
         "playing 2048 will not interfere with other bot commands",
         "all commands must be spelled correctly but are NOT case-sensitive",
         "note that the current game and highscores are reset when the bot resets",
-        "move <direction> - move the tiles in the given direction (eg. move up) can be abbreviated (eg. m u)"
     )
 
     extra_commands = {
+        "<direction> - move the tiles in the given direction (use move to see valid <directions>)"
         "create <game_name>": "creates a new game with the given name (can be combined with other commands",
         "<game_name>": "loads the game named game_name (can be combined with other commands)",
         "rename <old_name> <new_name>": "renames a game from old_name to new_name",
         "delete <game_name>": "deletes the game named game_name"
     }
+    movement = {
+        "up": ("up", "u", "^"), "left": ("left", "l", "<"),
+        "down": ("down", "d", "v"), "right": ("right", "r", ">")
+    }
 
     reserved_words = (
         list(commands.keys()) + list(modes.keys()) +
-        ["move", "m", "up", "u", "left", "l", "right", "r", "down", "d"] +
+        [value for values in list(movement.values()) for value in values] +
         list(extra_commands.keys()) +
-        ["2048", "/2048", "current game", "delete"]
+        ["2048", "/2048", "current game"]
     )
 
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
@@ -295,17 +291,20 @@ class Game():
             self.text += "pick a gamemode or continue playing\n"
             for mode_name, mode in self.modes.items():
                 self.text += f"{mode_name} - {mode.description}\n"
-            self.state = None
         elif self.state == "scores":
             for mode_name, mode in self.modes.items():
                 self.text += f"{mode_name}: {mode.high_score}\n"
-            self.state = None
         elif self.state == "reserved":
             self.text += ", ".join(Game.reserved_words)
         elif self.state == "games":
             for game_name, game in games.items():
                 if game_name != "current game":
-                    self.text += f"{game_name} - {get_key(Game.modes, self.mode)} score: {game.score}\n"
+                    self.text += f"{game_name} - {get_key(Game.modes, game.mode)} score: {game.score}\n"
+        elif self.state == "move":
+            for direction, commands in Game.movement.items():
+                command = ", ".join(commands)
+                self.text += f"{direction} - {command}"
+        self.state = None
 
         self.text = newline(self.text, 2)
         self.draw_game()
@@ -332,7 +331,7 @@ class Game():
 
     def move(self, x, positive):
         """Moves all blocks"""
-        if None in (x, positive):
+        if (x, positive) == (None, None):
             return
         if self.board.check_can_move():
             old_board_values = [cell.value for cell in self.board.cells]
@@ -357,8 +356,10 @@ class Game():
 
     def setup_confusion(self):
         """shuffled the values for conffusion mode"""
+        GameMode.shuffled.remove(0)
         random.shuffle(GameMode.shuffled)
-        Game.modes["confusion"].win_value = Game.modes["confusion"].values[10]
+        GameMode.shuffled.insert(0, 0)
+        Game.modes["confusion"].values = GameMode.shuffled
 
     def play_game(self, command_list):
         """runs the main game loop once"""
@@ -366,34 +367,31 @@ class Game():
         command = get_item_safe(command_list)
 
         # check player movement
-        if command in ("move", "m"):
-            command_list = trim(command_list)
-            command = get_item_safe(command_list)
-            x = None
-            positive = None
-            if command in ("up", "u"):
-                x = False
-                positive = False
-            elif command in ("left", "l"):
-                x = True
-                positive = False
-            elif command in ("down", "d"):
-                x = False
-                positive = True
-            elif command in ("right", "r"):
-                x = True
-                positive = True
-            else:
-                self.text += "invalid move\n"
-            self.move(x, positive)
+        command = get_item_safe(command_list)
+        x = None
+        positive = None
+        if command in Game.movement["up"]:
+            x = False
+            positive = False
+        elif command in Game.movement["left"]:
+            x = True
+            positive = False
+        elif command in Game.movement["down"]:
+            x = False
+            positive = True
+        elif command in Game.movement["right"]:
+            x = True
+            positive = True
 
-        elif command in self.modes.keys():
-            self.restart(Game.modes[command])
-        elif command in self.commands.keys():
-            self.state = command
-        elif command != "":
-            self.text += "invalid command, use help to see commands\n"
-            self.state = None
+        self.move(x, positive)
+        if (x, positive) == (None, None):
+            if command in self.modes.keys():
+                self.restart(Game.modes[command])
+            elif command in self.commands.keys():
+                self.state = command
+            elif command != "":
+                self.text += "invalid command, use help to see commands\n"
+                self.state = None
 
         self.update()
         return newline(self.text)
@@ -455,9 +453,10 @@ def run_game(commands):
             return "you must give the name of the game"
         elif game_name not in games.keys():
             return "that game does not exist"
-        else:
-            del games[game_name]
-            return f"{game_name} deleted"
+        if games["current game"] == games[game_name]:
+            games["current game"] = None
+        del games[game_name]
+        return f"{game_name} deleted"
 
     elif command in games.keys():
         game_name = command
@@ -504,7 +503,7 @@ def save_games():
 # testing via console
 if __name__ == "__main__":
     game = Game()
-    game_text = run_game([""])
+    game_text = run_game("")
     print(game_text)
     while True:
         text = clean(input("enter a command: "))
