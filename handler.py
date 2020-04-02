@@ -28,31 +28,31 @@ class Handler:
         "no": "yes"
     }
     commands = {
-        "/help": self.help,
-        "/rename": self.rename,
-        "/say": self.say,
-        "/rickroll": self.rickroll,
-        "/quit": self.quit,
-        "/reset": self.reset,
-        "/id": self.id,
-        "/kick": self.kick,
-        "/register": self.register,
-        "/balance": self.balance,
-        "/mine": self.mine,
-        "/save": self.save,
-        "/shop": self.shop,
-        "/buy": self.buy,
-        "/give": self.give,
-        "/id_give": self.id_give,
-        "/profile": self.profile,
-        "/leaderboard": self.leaderboard,
-        "/prestige": self.prestige,
-        "/prestige_confirm": self.prestige_confirm,
-        "/sync": self.sync,
-        "/2048": self.play_2048,
-        "/prestige_upgrade": self.prestige_upgrade,
-        "/prestige_upgrade_info": self.prestige_upgrade_info,
-        "/remove": self.remove
+        "/help": help_,
+        "/rename": rename,
+        "/say": say,
+        "/rickroll": rickroll,
+        "/quit": quit_,
+        "/reset": reset,
+        "/id": id_,
+        "/kick": kick,
+        "/register": register,
+        "/balance": balance,
+        "/mine": mine,
+        "/save": save,
+        "/shop": shop,
+        "/buy": buy,
+        "/give": give,
+        "/id_give": id_give,
+        "/profile": profile,
+        "/leaderboard": leaderboard,
+        "/prestige": prestige,
+        "/prestige_confirm": prestige_confirm,
+        "/sync": sync,
+        "/2048": play_2048,
+        "/prestige_upgrade": prestige_upgrade,
+        "/prestige_upgrade_info": prestige_upgrade_info,
+        "/remove": remove
     }
     images = {
         "/gay": "images/gay.jpg",
@@ -79,7 +79,7 @@ class Handler:
             self.data = json.load(f)
 
     # utility
-    async def help(self, bot, event):
+    async def help_(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 10):
             return
@@ -109,7 +109,7 @@ class Handler:
         except:
             await conv.send_message(toSeg("Format: /say {message}"))
 
-    async def id(self, bot, event):
+    async def id_(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 10):
             return
@@ -614,7 +614,7 @@ class Handler:
 
     # config
 
-    async def quit(self, bot, event):
+    async def quit_(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 30):
             return
