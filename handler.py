@@ -64,6 +64,7 @@ class Handler:
             "/remove": self.remove,
             "yes": self.yes_no,
             "no": self.yes_no,
+            "say_something": self.say_something,
         }
         self.cooldowns = defaultdict(dict)
         self.admins = [
@@ -160,6 +161,7 @@ class Handler:
         except:
             await conv.send_message(toSeg("Something went wrong!"))
 
+    # chendi's stuff
     async def play_2048(self, bot, event):
         user, conv = getUserConv(bot, event)
         game_text = run_game(event.text)
@@ -174,6 +176,9 @@ class Handler:
         else:
             text = "no" if text == "yes" else "yes"
         await conv.send_message(toSeg(text))
+
+    async def say_something(self, bot, event):
+        pass
 
     # economy
     async def register(self, bot, event):
