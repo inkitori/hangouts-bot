@@ -5,6 +5,7 @@ specific things
         everything else should go through handler (see how i did 2048 for an example)
     - i left u a few comments about variables u never use, plz check if u actually need those
     - learn git (this is a nice website for basics, i can send u some ebooks too http://think-like-a-git.net/)
+    - user class in rpg
 
 coding style
     - write shorter functions where possible (RPGHandler.atk is too long)

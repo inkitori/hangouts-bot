@@ -114,8 +114,7 @@ class Manager:
             }
         high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
         data = json.dumps({"games": games_dict, "scores": high_scores})
-        with open(self.save_file, "w") as save_data:
-            save_data.write(data)
+        utils.save(self.save_file, data)
 
 
 # testing via console

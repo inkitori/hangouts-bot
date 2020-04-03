@@ -1,6 +1,3 @@
-import hangups
-
-import asyncio
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
@@ -8,24 +5,29 @@ import json
 import math
 from utils import *
 
+class User():
+
+    def __init__(self):
+        pass
 
 class RPGHandler:
+    self.commands = {
+        "help": self.help,
+        "remove": self.remove,
+        "sync": self.sync,
+        "save_data": self.save_data,
+        "set": self.set,
+        "register": self.register,
+        "inv": self.inv,
+        "warp": self.warp,
+        "equipped": self.equipped,
+        "stats": self.stats,
+        "rest": self.rest,
+        "fight": self.fight,
+        "atk": self.atk
+    }
+
     def __init__(self):
-        self.commands = {
-            "help": self.help,
-            "remove": self.remove,
-            "sync": self.sync,
-            "save_data": self.save_data,
-            "set": self.set,
-            "register": self.register,
-            "inv": self.inv,
-            "warp": self.warp,
-            "equipped": self.equipped,
-            "stats": self.stats,
-            "rest": self.rest,
-            "fight": self.fight,
-            "atk": self.atk
-        }
 
         self.cooldowns = defaultdict(dict)
 
@@ -36,7 +38,6 @@ class RPGHandler:
 
         random.seed(datetime.now())
 
-    # rpg
     def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
