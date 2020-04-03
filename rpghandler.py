@@ -37,68 +37,58 @@ class RPGHandler:
         random.seed(datetime.now())
 
     # rpg 
-    async def rpg_process(self, event):
+    def rpg_process(self, userID, event_text):
+        command = clean(event_text)[1]
+        full_command = event_text.lower().split().strip(' ', 1)[1]
+        
+        if command not in self.commands:
+            return "That command doesn't exist!"
 
-    async def register(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+        elif command == "register" and userID in self.userData:
+            return "You are already registered!"
+        
+        elif command != "register" and userID not in self.userData:
+            return "You are not registered! Use /register"
 
-        if cooldown(self.cooldowns, user, event, 5):
-            return
+        else:
+            self.commands[command](userID, full_command)
 
-        if userID in self.userData:
-            await conv.send_message(toSeg("You are already registered!"))
-            return
+    def register(self, userID, command)
+        self.userData[userID] = user
+        self.userData[userID] = {}
+        self.userData[userID]["balance"] = 0
+        self.userData[userID]["name"] = user.full_name
+        self.userData[userID]["lifetime_balance"] = 0
+        self.userData[userID]["vit"] = 100
+        self.userData[userID]["hp"] = 100
+        self.userData[userID]["atk"] = 5
+        self.userData[userID]["def"] = 5
+        self.userData[userID]["xp"] = 0
+        self.userData[userID]["lvl"] = 1
+        self.userData[userID]["room"] = "village" 
+        self.userData[userID]["equipped_armor"] = 0
+        self.userData[userID]["equipped_weapon"] = 1
+        self.userData[userID]["inventory_size"] = 8
+        self.userData[userID]["fighting"] = {}
+        self.userData[userID]["inventory"] = [
+            {"name": "Starter Armor", "type": "armor", "rarity": "common", "modifier": "boring"},
+            {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
+        ]
 
-        try:
-            self.userData[userID] = user
-            self.userData[userID] = {}
-            self.userData[userID]["balance"] = 0
-            self.userData[userID]["name"] = user.full_name
-            self.userData[userID]["lifetime_balance"] = 0
-            self.userData[userID]["vit"] = 100
-            self.userData[userID]["hp"] = 100
-            self.userData[userID]["atk"] = 5
-            self.userData[userID]["def"] = 5
-            self.userData[userID]["xp"] = 0
-            self.userData[userID]["lvl"] = 1
-            self.userData[userID]["room"] = "village" 
-            self.userData[userID]["equipped_armor"] = 0
-            self.userData[userID]["equipped_weapon"] = 1
-            self.userData[userID]["inventory_size"] = 8
-            self.userData[userID]["fighting"] = {}
-            self.userData[userID]["inventory"] = [
-                {"name": "Starter Armor", "type": "armor", "rarity": "common", "modifier": "boring"},
-                {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
-            ]
+        save("data.json", self.data)
 
-            save("data.json", self.data)
+        return "Successfully registered!"
 
-            await conv.send_message(toSeg("Successfully registered!"))
-        except Exception as e:
-            await conv.send_message(toSeg("Failed to register!"))
-            await conv.send_message(toSeg(str(e)))
-            print(e)
-
-    async def inv(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+    def inv(self, userID, command)
         inv = ""
-
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-            return
 
         for item in self.userData[userID]["inventory"]:
             inv += item["rarity"] + " " + item["modifier"] + " " + item["name"] + '\n'
-            inv = inv.title()
 
-        await conv.send_message(toSeg(inv))
+        inv = inv.title()
+        return inv
 
-    async def warp(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
-        inv = ""
+    def warp(self, userID, command)
         text = event.text.lower()
         rooms = self.data["rooms"]
         users = self.userData

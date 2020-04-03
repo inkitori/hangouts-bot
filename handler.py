@@ -169,7 +169,7 @@ class Handler:
 
     async def rpg(self, bot, event):
         user, conv = getUserConv(bot, event)
-        rpg_text = self.rpg_handler.rpg_process(event)
+        rpg_text = self.rpg_handler.rpg_process(user.id_[0], event.text)
 
         await conv.send_message(toSeg(rpg_text))
 
