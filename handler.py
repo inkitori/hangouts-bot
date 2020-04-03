@@ -4,7 +4,8 @@ from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
 from game_2048.manager_2048 import Manager as Manager2048
-from rpg.rpghandler import RPGHandler
+from rpghandler import RPGHandler
+from handler import Handler
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo  # joseph u never use tzinfo
@@ -58,12 +59,10 @@ class Handler:
             "/leaderboard": self.leaderboard,
             "/prestige": self.prestige,
             "/prestige_confirm": self.prestige_confirm,
-            "/sync": self.sync,
             "/2048": self.play_2048,
             "/rpg": self.rpg,
             "/prestige_upgrade": self.prestige_upgrade,
             "/prestige_upgrade_info": self.prestige_upgrade_info,
-            "/remove": self.remove,
             "yes": self.yes_no,
             "no": self.yes_no,
             "say_something": self.say_something,
@@ -652,77 +651,3 @@ class Handler:
             await bot.client.disconnect()
         else:
             await conv.send_message(toSeg("bro wtf u can't use that"))
-
-    async def reset(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
-        try:
-            arg1 = '/' + event.text.lower().split()[1]
-            if isIn(self.admins, user):
-                if arg1 in self.cooldowns[user]:
-                    self.cooldowns[user][arg1] = datetime.min.replace(tzinfo=None)
-                else:
-                    await conv.send_message(toSeg("Format: /reset {command}"))
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except:
-            await conv.send_message(toSeg("Format: /reset {command}"))
-
-    async def save(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
-        try:
-            if isIn(self.admins, user):
-                with open("data.json", "w") as f:
-                    json.dump(self.data, f)
-                await conv.send_message(toSeg("Successfully saved!"))
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except:
-            await conv.send_message(toSeg("Something went wrong!"))
-
-    async def sync(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        key = event.text.lower().split()[1]
-        value = event.text.lower().split(' ', 2)[2]
-
-        if value.isdigit():
-            value = int(value)
-
-        try:
-            if isIn(self.admins, user):
-                for user in self.data["users"]:
-                    self.data["users"][user][key] = value
-
-                    with open("data.json", "w") as f:
-                        json.dump(self.data, f)
-
-                    await conv.send_message(toSeg("Synced all values!"))
-                    return
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            print(e)
-
-    async def remove(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        key = event.text.lower().split()[1]
-
-        try:
-            if isIn(self.admins, user):
-                for user in self.data["users"]:
-                    self.data["users"][user].pop(key, None)
-
-                    with open("data.json", "w") as f:
-                        json.dump(self.data, f)
-
-                    await conv.send_message(toSeg("Removed key!"))
-                    return
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            print(e)

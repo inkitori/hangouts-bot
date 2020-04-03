@@ -1,6 +1,3 @@
-import hangups
-
-import asyncio
 import random
 from collections import defaultdict
 from datetime import datetime
@@ -8,11 +5,14 @@ import json
 import math
 from utils import *
 
+class User():
+
+    def __init__(self):
+        pass
 
 class RPGHandler:
     def __init__(self):
         self.commands = {
-            "help": self.help,
             "remove": self.remove,
             "sync": self.sync,
             "save_data": self.save_data,
@@ -26,6 +26,11 @@ class RPGHandler:
             "fight": self.fight,
             "atk": self.atk
         }
+
+        self.admins = [
+            114207595761187114730,  # joseph
+            106637925595968853122,  # chendi
+        ]
 
         self.cooldowns = defaultdict(dict)
 
@@ -53,7 +58,7 @@ class RPGHandler:
         else:
             self.commands[command](userID, full_command)
 
-    def register(self, userID, command)
+    def register(self, userID, command):
         self.userData[userID] = user
         self.userData[userID] = {}
         self.userData[userID]["balance"] = 0
@@ -87,7 +92,7 @@ class RPGHandler:
         inv = inv.title()
         return inv
 
-    def warp(self, userID, command)
+    def warp(self, userID, command):
         inv = ""
         text = event.text.lower()
         rooms = self.data["rooms"]
@@ -155,7 +160,7 @@ class RPGHandler:
         text = ""
 
         if not self.userData[userID]["fighting"]:
-            await conv.send_message(toSeg("You need to be in a fight!"))
+            return "You need to be in a fight!"
 
         else:
             enemy = self.userData[userID]["fighting"]
@@ -187,16 +192,14 @@ class RPGHandler:
                 gold_earned = round(self.data["enemies"][enemy["name"]]["vit"]/10) + random.randint(1, 10)
 
                 text += "You earned " + str(xp_earned) + " xp and " + str(gold_earned) + " gold!"
-                await conv.send_message(toSeg(text))
-
-                await self.give_xp(conv, userID, xp_earned)
+                text += self.give_xp(userID, xp_earned)
 
                 self.userData[userID]["balance"] += gold_earned
                 self.userData[userID]["lifetime_balance"] += gold_earned
 
                 self.userData[userID]["fighting"] = {}
                 save("data.json", self.data)
-                return
+                return text
 
             userArmor = self.userData[userID]["inventory"][self.userData[userID]["equipped_armor"]]
             baseDefense = self.data["items"]["armor"][userArmor["rarity"]][userArmor["name"]]["def"]
@@ -222,7 +225,7 @@ class RPGHandler:
                 self.userData[userID]["fighting"] = {}
                 self.userData[userID]["hp"] = self.userData[userID]["vit"]
 
-            await conv.send_message(toSeg(text))
+            return text
             save("data.json", self.data)
 
     def rest(self, userID, command):
@@ -242,98 +245,67 @@ class RPGHandler:
         userStats = self.userData[userID]
         return "HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
 
-    def save_data(self, bot, event):
-        user, conv = getUserConv(bot, event)
+    def save_data(self, userID, command):
+        if isIn(self.admins, user):
+            save("data.json", self.data)
 
-        try:
-            if isIn(self.admins, user):
-                save("data.json", self.data)
+            return "Successfully saved!"
+        else:
+            return "bro wtf u can't use that"
 
-                await conv.send_message(toSeg("Successfully saved!"))
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            await conv.send_message(toSeg(str(e)))
-
-    def sync(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        key = event.text.lower().split()[1]
-        value = event.text.split(' ', 2)[2]
+    def sync(self, userID, command):
+        key = command.split()[1]
+        value = command.split()[2]
 
         if value.isdigit():
             value = int(value)
 
-        try:
-            if isIn(self.admins, user):
-                for user in self.userData:
-                    self.userData[user][key] = value
+        if isIn(self.admins, user):
+            for user in self.userData:
+                self.userData[user][key] = value
+
+            save("data.json", self.data)
+
+            return "Synced all values!"
+        else:
+            return "bro wtf u can't use that"
+
+    def remove(self, userID, command):
+        key = command.split()[1]
+
+        if isIn(self.admins, user):
+            for user in self.userData:
+                self.userData[user].pop(key, None)
+
+            save("data.json", self.data)
+
+            return "Removed key!"
+        else:
+            return "bro wtf u can't use that"
+
+    def set(self, userID, command):
+        userID = command.split()[1]
+        key = command.split()[2]
+        value = command.split(' ', 3)[3]
+
+        if value.isdigit():
+            value = int(value)
+
+        if isIn(self.admins, user):
+            if userID in self.userData:
+                self.userData[userID][key] = value
 
                 save("data.json", self.data)
 
-                await conv.send_message(toSeg("Synced all values!"))
-                return
+                return "Set value!"
             else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
+                return "That user isn't registered!"
 
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            await conv.send_message(toSeg(str(e)))
-            print(e)
-
-    def remove(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        key = event.text.lower().split()[1]
-
-        try:
-            if isIn(self.admins, user):
-                for user in self.userData:
-                    self.userData[user].pop(key, None)
-
-                save("data.json", self.data)
-
-                await conv.send_message(toSeg("Removed key!"))
-                return
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            await conv.send_message(toSeg(str(e)))
-            print(e)
-
-    def set(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
-        try:
-            userID = event.text.split()[1]
-            key = event.text.lower().split()[2]
-            value = event.text.split(' ', 3)[3]
-
-            if value.isdigit():
-                value = int(value)
-
-            if isIn(self.admins, user):
-                if userID in self.userData:
-                    self.userData[userID][key] = value
-
-                    save("data.json", self.data)
-
-                    await conv.send_message(toSeg("Set value!"))
-                    return
-                else:
-                    await conv.send_message(toSeg("That user isn't registered!"))
-                    return
-
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-
-        except Exception as e:
-            await conv.send_message(toSeg("Format: /set {userID} {key} {value}"))
-            print(e)
-
+        else:
+            return "bro wtf u can't use that"
+            
     # not commands but also doesn't fit in utils
-    def give_xp(self, conv, userID, xp_earned):
+    def give_xp(self, userID, xp_earned):
         notify_level = 0
         self.userData[userID]["xp"] += xp_earned
 
@@ -350,6 +322,9 @@ class RPGHandler:
                 break
 
         if notify_level:
-            await conv.send_message(toSeg("You are now level " + str(self.userData[userID]["lvl"]) + "!"))
+            return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
+        
+        else:
+            return ""
 
         save("data.json", self.data)

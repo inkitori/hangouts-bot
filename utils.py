@@ -41,6 +41,11 @@ def save(file_name, contents):
         json.dump(contents, f, indent=4)
 
 
+def load(file_name):
+    with open(file_name, "r") as f:
+        return json.load(file_name)
+
+
 def newline(text, number=1):
     """adds number newlines to the end of text"""
     return text.strip() + ("\n" * number)
