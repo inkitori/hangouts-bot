@@ -414,7 +414,7 @@ def verify_name(*names):
     return "valid"
 
 
-def run_game(commands):
+def run_game(commands=""):
     """runs the game based on commands"""
     global games
     command_list = clean(commands)
@@ -502,12 +502,11 @@ def save_games():
 
 # testing via console
 if __name__ == "__main__":
-    game = Game()
-    game_text = run_game("")
-    print(game_text)
+    text = ""
     while True:
+        game_text = run_game(text)
+        print(game_text)
         text = clean(input("enter a command: "))
         if get_item_safe(text) == "break":
             break
-        game_text = run_game(text)
-        print(game_text)
+
