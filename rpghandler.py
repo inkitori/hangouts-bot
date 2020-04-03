@@ -39,7 +39,7 @@ class RPGHandler:
     # rpg 
     def rpg_process(self, userID, event_text):
         command = clean(event_text)[1]
-        full_command = event_text.lower().split().strip(' ', 1)[1]
+        full_command = clean(event_text, 1)[1]
         
         if command not in self.commands:
             return "That command doesn't exist!"
@@ -93,37 +93,28 @@ class RPGHandler:
         rooms = self.data["rooms"]
         users = self.userData
 
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-
-        elif len(text.split()) != 2:
-            await conv.send_message(toSeg("Invalid arguments! /warp {room}"))
+        if len(command.split()) != 2:
+            return "Invalid arguments! /warp {room}"
 
         elif self.userData[userID]["fighting"]:
-            await conv.send_message(toSeg("You can't warp while in a fight!"))
+            return "You can't warp while in a fight!"
 
-        elif text.split()[1] not in rooms:
-            await conv.send_message(toSeg("That room doesn't exist!"))
+        elif command.split()[1] not in rooms:
+            return "That room doesn't exist!"
 
-        elif rooms[text.split()[1]]["required_lvl"] > users[userID]["lvl"]:
-            await conv.send_message(toSeg("Your level is not high enough to warp there!"))
+        elif rooms[command.split()[1]]["required_lvl"] > users[userID]["lvl"]:
+            return "Your level is not high enough to warp there!"
 
-        elif text.split()[1] == users[userID]["room"]:
-            await conv.send_message(toSeg("You are already in that room!"))
+        elif command.split()[1] == users[userID]["room"]:
+            return "You are already in that room!"
 
         else:
-            users[userID]["room"] = text.split()[1]
+            users[userID]["room"] = command.split()[1]
             save("data.json", self.data)
-            await conv.send_message(toSeg("Successfully warped!"))
+            return "Successfully warped!"
 
-    def equipped(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+    def equipped(self, userID, command):
         equipped = ""
-
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-            return
 
         userInfo = self.userData[userID]
         userArmor = userInfo["inventory"][userInfo["equipped_armor"]]
@@ -132,44 +123,38 @@ class RPGHandler:
         equipped += "Weapon: " + (userWeapon["rarity"] + " " + userWeapon["modifier"] + " " + userWeapon["name"]).title() + '\n'
         equipped += "Armor: " + (userArmor["rarity"] + " " + userArmor["modifier"] + " " + userArmor["name"]).title()
 
-        await conv.send_message(toSeg(equipped))
+        return equipped
 
-    def fight(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+    def fight(self, userID, command):
         rooms = self.data["rooms"]
-
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
+        text = ""
 
         playerRoom = self.userData[userID]["room"]
 
         if playerRoom == "village":
-            await conv.send_message(toSeg("Don't fight in the village..."))
+            return "Don't fight in the village..."
 
         elif self.userData[userID]["fighting"]:
-            await conv.send_message(toSeg("You are already fighting " + self.userData[userID]["fighting"]["name"] + "!"))
+            return f"You are already fighting {self.userData[userID]['fighting']['name']}!"
 
         else:
             enemy = random.choice(rooms[playerRoom]["enemies"])
             enemyData = self.data["enemies"][enemy]
-            await conv.send_message(toSeg(enemy + " has approached to fight!"))
-            await conv.send_message(toSeg("Vit: " + str(enemyData["vit"]) + "\nAtk: " + str(enemyData["atk"]) + "\nDef: " + str(enemyData["def"])))
+
+            text += f"{enemy} has approached to fight!\n"
+            text += f"Vit: {enemyData['vit']}\nAtk: {enemyData['atk']}\nDef: {enemyData['def']}"
 
             self.userData[userID]["fighting"]["name"] = enemy
             self.userData[userID]["fighting"]["hp"] = enemyData["vit"]
-            save("data.json", self.data)
 
-    def atk(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+            save("data.json", self.data)
+            return text
+
+    def atk(self, userID, command):
         rooms = self.data["rooms"]
         text = ""
 
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-
-        elif not self.userData[userID]["fighting"]:
+        if not self.userData[userID]["fighting"]:
             await conv.send_message(toSeg("You need to be in a fight!"))
 
         else:
@@ -240,34 +225,22 @@ class RPGHandler:
             await conv.send_message(toSeg(text))
             save("data.json", self.data)
 
-    def rest(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
+    def rest(self, userID, command):
         text = ""
 
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-
-        elif self.userData[userID]["room"] != "village":
-            await conv.send_message(toSeg("You have to rest in the village!"))
+        if self.userData[userID]["room"] != "village":
+            return "You have to rest in the village!"
 
         else:
             self.userData[userID]["hp"] = self.userData[userID]["vit"]
             text += "You feel well rested...\n"
-            text += "Your health is back up to " + str(self.userData[userID]["vit"]) + "!"
+            text += "Your health is back up to {self.userData[userID]['vit']}!"
             save("data.json", self.data)
-            await conv.send_message(toSeg(text))
+            return text
 
-
-    def stats(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
-
-        if userID not in self.userData:
-            await conv.send_message(toSeg("You are not registered!"))
-
+    def stats(self, userID, command):
         userStats = self.userData[userID]
-        await conv.send_message(toSeg("HP: " + str(userStats["hp"]) + "\nVIT: " + str(userStats["vit"]) + "\nATK: " + str(userStats["atk"]) + "\nDEF: " + str(userStats["def"])))
+        return "HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
 
     def save_data(self, bot, event):
         user, conv = getUserConv(bot, event)
