@@ -3,7 +3,7 @@ import hangups
 import asyncio
 import random
 from collections import defaultdict
-from datetime import datetime, tzinfo
+from datetime import datetime
 import json
 import math
 
@@ -47,6 +47,8 @@ class RPGHandler:
         random.seed(datetime.now())
 
     # rpg 
+    async def rpg_process(self, event):
+
     async def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
@@ -199,10 +201,8 @@ class RPGHandler:
 
             damage_dealt = (baseDamage + baseDamage * modifierDamage) * (self.userData[userID]["atk"]/self.data["enemies"][enemy["name"]]["def"])
 
-            if random.randint(0, 1):
-                damage_dealt += math.sqrt(damage_dealt/2)
-            else:
-                damage_dealt -= math.sqrt(damage_dealt/2)
+            multiplier = random.choice((1, -1))
+            damage_dealt += multiplier * math.sqrt(damage_dealt/2)
 
             damage_dealt = round(damage_dealt, 1)
 

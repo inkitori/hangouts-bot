@@ -4,6 +4,7 @@ from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
 from game_2048.manager_2048 import Manager as Manager2048
+from rpg.rpghandler import RPGHandler
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo  # joseph u never use tzinfo
@@ -35,6 +36,7 @@ class Handler:
 
     def __init__(self):
         self.manager_2048 = Manager2048()
+        self.rpg_handler = RPGHandler()
         self.commands = {
             "/help": self.help_,
             "/rename": self.rename,
@@ -58,6 +60,7 @@ class Handler:
             "/prestige_confirm": self.prestige_confirm,
             "/sync": self.sync,
             "/2048": self.play_2048,
+            "/rpg": self.rpg,
             "/prestige_upgrade": self.prestige_upgrade,
             "/prestige_upgrade_info": self.prestige_upgrade_info,
             "/remove": self.remove,
@@ -159,6 +162,12 @@ class Handler:
             await conv.send_message(toSeg("https://youtu.be/dQw4w9WgXcQ"))
         except:
             await conv.send_message(toSeg("Something went wrong!"))
+
+    async def rpg(self, bot, event):
+        user, conv = getUserConv(bot, event)
+        rpg_text = self.rpg_handler.rpg_process(event)
+
+        await conv.send_message(toSeg(rpg_text))
 
     # chendi's stuff
     async def play_2048(self, bot, event):
