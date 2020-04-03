@@ -1,7 +1,7 @@
 import hangups
 from hangups.ui.utils import get_conv_name
 import asyncio
-from handler import Handler
+from rpghandler import RPGHandler
 from utils import *
 import sys
 
@@ -12,7 +12,7 @@ class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
-        self.handler = Handler()
+        self.handler = RPGHandler()
 
     def run(self):
         self.client.on_connect.add_observer(self._on_connect)
@@ -25,24 +25,18 @@ class Bot:
     async def _on_connect(self):
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
         self._convo_list.on_event.add_observer(self._on_event)
-        # convs = self._convo_list.get_all()
+        convs = self._convo_list.get_all()
         print("Connected!")
 
     async def _on_disconnect(self):
         print("ded")
 
     async def _on_event(self, event):
-        conv_id = event.conversation_id
-        conv = self._convo_list.get(conv_id)
-        user_id = event.user_id
-        user = conv.get_user(user_id)
         user, conv = getUserConv(self, event)
         userID = user.id_[0]
         userData = self.handler.data["users"]
 
-        if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
-            if userID in userData and event.text.strip().lower() != "/prestige_confirm":
-                userData[userID]["prestige_confirm"] = 0
+        if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
 
             strippedText = event.text.strip().lower()
 
