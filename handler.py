@@ -3,13 +3,12 @@ from hangups import hangouts_pb2
 from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
-from text_2048 import run_game, save_games, load_games
+from folder_2048.manager_2048 import Manager as Manager2048
 import random
 from collections import defaultdict
-from datetime import datetime, tzinfo
+from datetime import datetime, tzinfo  # joseph u never use tzinfo
 import json
 import math
-# import sys
 
 from utils import *
 
@@ -35,7 +34,7 @@ class Handler:
     }
 
     def __init__(self):
-        load_games()
+        self.manager_2048 = Manager2048()
         self.commands = {
             "/help": self.help_,
             "/rename": self.rename,
@@ -599,7 +598,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         userData = self.data["users"]
-        output_text = ""  # joseph u never use this variable
+        # output_text = ""  # joseph u never use this variable
 
         try:
             if userID not in userData:

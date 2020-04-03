@@ -1,71 +1,10 @@
 """
-A text=based clone of 2048
+A text based clone of 2048
 Made by Chendi
 """
 
 import random
-import json
-
-games = {"current game": None}
-save_file = "games_2048.json"
-
-
-def newline(text, number=1):
-    """adds number newlines to the end of text"""
-    return text.strip() + ("\n" * number)
-
-
-def get_item_safe(sequence, index=0, default=""):
-    """
-    Retrives the item at index in sequence
-    defaults to default if the item des not exist
-    """
-    try:
-        item = sequence[index]
-    except IndexError:
-        item = default
-    return item
-
-
-def clean(text):
-    """cleans user input and returns as a list"""
-    if text:
-        if type(text) == str:
-            return text.strip().lower().split()
-        elif type(text) == list:
-            return text
-    else:
-        return [""]
-
-
-def trim(text, number=1, default=[""]):
-    """
-    trims the front of a sequence by number
-    returns default if number is greater than len(sequence)
-    """
-    if type(text) == str:
-        text = clean(text)
-    if type(text) == list:
-        for i in range(number):
-            try:
-                text = text[number:]
-            except IndexError:
-                text = default
-                break
-        return text
-    else:
-        return["something is wrong"]
-
-
-def get_key(dictionary, item, *ignore):
-    dictionary = dictionary.copy()
-    for key in ignore:
-        try:
-            del dictionary[key]
-        except KeyError:
-            pass
-    key_index = list(dictionary.values()).index(item)
-    return list(dictionary.keys())[key_index]
+import utils
 
 
 class Cell():
@@ -224,7 +163,6 @@ class Game():
         "gamemodes": "lists the gamemodes",
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
-        "games": "prints all existing games, their mode and score",
         "reserved": "prints reserved words",
         "move": "prints valid <directions>"
     }
@@ -246,7 +184,8 @@ class Game():
         "create <game_name>": "creates a new game with the given name (can be combined with other commands",
         "<game_name>": "loads the game named game_name (can be combined with other commands)",
         "rename <old_name> <new_name>": "renames a game from old_name to new_name",
-        "delete <game_name>": "deletes the game named game_name"
+        "delete <game_name>": "deletes the game named game_name",
+        "games": "prints all existing games, their mode and score",
     }
     movement = {
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
@@ -274,7 +213,7 @@ class Game():
         """appends text based on current state"""
 
         if self.state == "help":
-            self.text += newline("\n".join(self.help_text))
+            self.text += utils.newline("\n".join(self.help_text))
             for command, description in list(self.commands.items()) + list(self.extra_commands.items()):
                 self.text += f"{command} - {description}\n"
             self.state = None
@@ -296,23 +235,19 @@ class Game():
                 self.text += f"{mode_name}: {mode.high_score}\n"
         elif self.state == "reserved":
             self.text += ", ".join(Game.reserved_words)
-        elif self.state == "games":
-            for game_name, game in games.items():
-                if game_name != "current game":
-                    self.text += f"{game_name} - {get_key(Game.modes, game.mode)} score: {game.score}\n"
         elif self.state == "move":
             for direction, commands in Game.movement.items():
                 command = ", ".join(commands)
                 self.text += f"{direction} - {command}"
         self.state = None
 
-        self.text = newline(self.text, 2)
+        self.text = utils.newline(self.text, 2)
         self.draw_game()
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        game_name = get_key(games, self, "current game")
-        mode_name = get_key(Game.modes, self.mode)
+        game_name = utils.get_key("placeholder", self, "current game")
+        mode_name = utils.get_key(Game.modes, self.mode)
         self.text += f"{game_name} - {mode_name}\n"
         self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
@@ -364,10 +299,10 @@ class Game():
     def play_game(self, command_list):
         """runs the main game loop once"""
         self.text = ""
-        command = get_item_safe(command_list)
+        command = utils.get_item_safe(command_list)
 
         # check player movement
-        command = get_item_safe(command_list)
+        command = utils.get_item_safe(command_list)
         x = None
         positive = None
         if command in Game.movement["up"]:
@@ -394,11 +329,12 @@ class Game():
                 self.state = None
 
         self.update()
-        return newline(self.text)
+        return utils.newline(self.text)
 
 
+"""
 def create_game(game_name):
-    """creates a new game in games dict"""
+    creates a new game in games dict"
     games["current game"] = games[game_name] = Game()
     return games["current game"]
 
@@ -415,18 +351,18 @@ def verify_name(*names):
 
 
 def run_game(commands=""):
-    """runs the game based on commands"""
+    runs the game based on commands"
     global games
     command_list = clean(commands)
-    command = get_item_safe(command_list)
+    command = utils.get_item_safe(command_list)
 
     # processing commands
     if command == "/2048":
         command_list = trim(command_list)
-        command = get_item_safe(command_list)
+        command = utils.get_item_safe(command_list)
     if command == "create":
         command_list = trim(command_list)
-        game_name = get_item_safe(command_list)
+        game_name = utils.get_item_safe(command_list)
         valid = verify_name(game_name)
         if valid != "valid":
             return valid
@@ -434,9 +370,9 @@ def run_game(commands=""):
         command_list = trim(command_list)
     elif command == "rename":
         command_list = trim(command_list)
-        old_name = get_item_safe(command_list)
+        old_name = utils.get_item_safe(command_list)
         command_list = trim(command_list)
-        new_name = get_item_safe(command_list)
+        new_name = utils.get_item_safe(command_list)
         command_list = trim(command_list)
         valid = verify_name(new_name)
         if valid != "valid":
@@ -448,7 +384,7 @@ def run_game(commands=""):
         command_list = trim(command_list)
     elif command == "delete":
         command_list = trim(command_list)
-        game_name = get_item_safe(command_list)
+        game_name = utils.get_item_safe(command_list)
         if not game_name:
             return "you must give the name of the game"
         elif game_name not in games.keys():
@@ -471,7 +407,7 @@ def run_game(commands=""):
 
 
 def load_games():
-    """loads games from a json file"""
+    "loads games from a json file"
     global games
     with open(save_file, "r") as save_data:
         data = json.load(save_data)
@@ -482,7 +418,7 @@ def load_games():
 
 
 def save_games():
-    """saves games to a json file"""
+    "saves games to a json file"
     global games
     games_dict = dict()
     for game_name, game in games.items():
@@ -491,7 +427,7 @@ def save_games():
         games_dict[game_name] = {
             "board": [cell.value for cell in game.board.cells],
             "has won": game.has_won,
-            "mode": get_key(Game.modes, game.mode),
+            "mode": utils.get_key(Game.modes, game.mode),
             "score": game.score
         }
     high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
@@ -507,6 +443,6 @@ if __name__ == "__main__":
         game_text = run_game(text)
         print(game_text)
         text = clean(input("enter a command: "))
-        if get_item_safe(text) == "break":
+        if utils.utils.get_item_safe(text) == "break":
             break
-
+"""
