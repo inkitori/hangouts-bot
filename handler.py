@@ -173,7 +173,7 @@ class Handler:
 
     async def yes_no(self, bot, event):
         user, conv = getUserConv(bot, event)
-        text = event.text
+        text = event.text.split()[0]
         if isIn(self.admins, user):
             text = "yes" if text == "yes" else "no"
         else:
