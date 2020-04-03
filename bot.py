@@ -1,7 +1,7 @@
 import hangups
 from hangups.ui.utils import get_conv_name  # never used, y is it here
 import asyncio
-from rpghandler import RPGHandler
+from handler import Handler
 from utils import *
 import sys
 
@@ -12,7 +12,7 @@ class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
-        self.handler = RPGHandler()
+        self.handler = Handler()
 
     def run(self):
         self.client.on_connect.add_observer(self._on_connect)

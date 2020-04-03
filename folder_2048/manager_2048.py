@@ -3,7 +3,7 @@ manager for 2048 games
 """
 import json
 import utils
-from game import Game
+from work_dang_it import Game
 
 
 class Manager:

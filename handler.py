@@ -163,7 +163,7 @@ class Handler:
     # chendi's stuff
     async def play_2048(self, bot, event):
         user, conv = getUserConv(bot, event)
-        game_text = run_game(event.text)
+        game_text = self.manager_2048.run_game(event.text)
         await conv.send_message(toSeg(game_text))
         save_games()
 
