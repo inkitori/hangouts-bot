@@ -4,7 +4,7 @@ Made by Chendi
 """
 
 import random
-import utils
+import utility
 
 
 class Cell():
@@ -213,7 +213,7 @@ class Game():
         """appends text based on current state"""
 
         if self.state == "help":
-            self.text += utils.newline("\n".join(self.help_text))
+            self.text += utility.newline("\n".join(self.help_text))
             for command, description in list(self.commands.items()) + list(self.extra_commands.items()):
                 self.text += f"{command} - {description}\n"
             self.state = None
@@ -241,13 +241,13 @@ class Game():
                 self.text += f"{direction} - {command}"
         self.state = None
 
-        self.text = utils.newline(self.text, 2)
+        self.text = utility.newline(self.text, 2)
         self.draw_game()
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        game_name = utils.get_key("placeholder", self, "current game")
-        mode_name = utils.get_key(Game.modes, self.mode)
+        game_name = utility.get_key("placeholder", self, "current game")
+        mode_name = utility.get_key(Game.modes, self.mode)
         self.text += f"{game_name} - {mode_name}\n"
         self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
@@ -299,10 +299,10 @@ class Game():
     def play_game(self, command_list):
         """runs the main game loop once"""
         self.text = ""
-        command = utils.get_item_safe(command_list)
+        command = utility.get_item_safe(command_list)
 
         # check player movement
-        command = utils.get_item_safe(command_list)
+        command = utility.get_item_safe(command_list)
         x = None
         positive = None
         if command in Game.movement["up"]:
@@ -329,7 +329,7 @@ class Game():
                 self.state = None
 
         self.update()
-        return utils.newline(self.text)
+        return utility.newline(self.text)
 
 
 """
@@ -354,15 +354,15 @@ def run_game(commands=""):
     runs the game based on commands"
     global games
     command_list = clean(commands)
-    command = utils.get_item_safe(command_list)
+    command = utility.get_item_safe(command_list)
 
     # processing commands
     if command == "/2048":
         command_list = trim(command_list)
-        command = utils.get_item_safe(command_list)
+        command = utility.get_item_safe(command_list)
     if command == "create":
         command_list = trim(command_list)
-        game_name = utils.get_item_safe(command_list)
+        game_name = utility.get_item_safe(command_list)
         valid = verify_name(game_name)
         if valid != "valid":
             return valid
@@ -370,9 +370,9 @@ def run_game(commands=""):
         command_list = trim(command_list)
     elif command == "rename":
         command_list = trim(command_list)
-        old_name = utils.get_item_safe(command_list)
+        old_name = utility.get_item_safe(command_list)
         command_list = trim(command_list)
-        new_name = utils.get_item_safe(command_list)
+        new_name = utility.get_item_safe(command_list)
         command_list = trim(command_list)
         valid = verify_name(new_name)
         if valid != "valid":
@@ -384,7 +384,7 @@ def run_game(commands=""):
         command_list = trim(command_list)
     elif command == "delete":
         command_list = trim(command_list)
-        game_name = utils.get_item_safe(command_list)
+        game_name = utility.get_item_safe(command_list)
         if not game_name:
             return "you must give the name of the game"
         elif game_name not in games.keys():
@@ -427,7 +427,7 @@ def save_games():
         games_dict[game_name] = {
             "board": [cell.value for cell in game.board.cells],
             "has won": game.has_won,
-            "mode": utils.get_key(Game.modes, game.mode),
+            "mode": utility.get_key(Game.modes, game.mode),
             "score": game.score
         }
     high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
@@ -443,6 +443,6 @@ if __name__ == "__main__":
         game_text = run_game(text)
         print(game_text)
         text = clean(input("enter a command: "))
-        if utils.utils.get_item_safe(text) == "break":
+        if utility.utility.get_item_safe(text) == "break":
             break
 """

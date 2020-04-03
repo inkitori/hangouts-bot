@@ -3,7 +3,7 @@ from hangups import hangouts_pb2
 from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
-from folder_2048.manager_2048 import Manager as Manager2048
+from game_2048.manager_2048 import Manager as Manager2048
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo  # joseph u never use tzinfo
@@ -165,7 +165,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
         game_text = self.manager_2048.run_game(event.text)
         await conv.send_message(toSeg(game_text))
-        save_games()
+        self.manager.save_games()
 
     async def yes_no(self, bot, event):
         user, conv = getUserConv(bot, event)
