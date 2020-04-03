@@ -6,7 +6,6 @@ from collections import defaultdict
 from datetime import datetime
 import json
 import math
-
 from utils import *
 
 
@@ -29,15 +28,6 @@ class RPGHandler:
         }
 
         self.cooldowns = defaultdict(dict)
-        self.admins = [
-            114207595761187114730,  # joseph
-            106637925595968853122,  # chendi
-            ]
-        self.ignore = [
-                105849946242372037157,
-                11470746254329358783, # saberbot
-                104687919952293193271 # chendibot
-                ]
 
         with open("data.json") as f:
             self.data = json.load(f)
@@ -196,7 +186,7 @@ class RPGHandler:
             enemy = self.userData[userID]["fighting"]
 
             userWeapon = self.userData[userID]["inventory"][self.userData[userID]["equipped_weapon"]]
-            baseDamage = self.data["items"]["weapons"][userWeapon["rarity"]][userWeapon["name"]]["atk"] 
+            baseDamage = self.data["items"]["weapons"][userWeapon["rarity"]][userWeapon["name"]]["atk"]
             modifierDamage = self.data["modifiers"][userWeapon["modifier"]]["atk"]
 
             damage_dealt = (baseDamage + baseDamage * modifierDamage) * (self.userData[userID]["atk"]/self.data["enemies"][enemy["name"]]["def"])
@@ -239,8 +229,6 @@ class RPGHandler:
 
             damage_taken = self.data["enemies"][enemy["name"]]["atk"] / (baseDefense + baseDefense * modifierDefense)
 
-            # joseph i replaced ur messy code with this to get ride of that if else statement
-            # its cleaner
             multiplier = random.choice((1, -1))
             damage_taken += multiplier * math.sqrt(damage_taken / 2)
 
