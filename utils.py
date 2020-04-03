@@ -1,5 +1,6 @@
 import hangups
-
+import decimal
+import json
 
 def toSeg(text):
     return hangups.ChatMessageSegment.from_str(text)
@@ -31,3 +32,9 @@ def isIn(userList, user):
 
 def scientific(number):
     return "{:.2e}".format(number)
+
+def save(file_name, contents):
+    with open(file_name, "w") as f:
+        json.dump(contents, f, indent=4)
+
+

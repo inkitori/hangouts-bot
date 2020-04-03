@@ -1,7 +1,7 @@
 import hangups
 from hangups.ui.utils import get_conv_name
 import asyncio
-from handler import Handler
+from rpghandler import RPGHandler
 from utils import *
 import sys
 
@@ -12,7 +12,7 @@ class Bot:
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
-        self.handler = Handler()
+        self.handler = RPGHandler()
 
     def run(self):
         self.client.on_connect.add_observer(self._on_connect)
@@ -36,9 +36,7 @@ class Bot:
         userID = user.id_[0]
         userData = self.handler.data["users"]
 
-        if isinstance(event, hangups.ChatMessageEvent) and (not user.is_self):
-            if userID in userData and event.text.strip().lower() != "/prestige_confirm":
-                userData[userID]["prestige_confirm"] = 0
+        if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
 
             strippedText = event.text.strip().lower()
 
