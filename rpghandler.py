@@ -12,44 +12,20 @@ from utils import *
 
 class RPGHandler:
     def __init__(self):
-        self.keywords = {
-            "good bot": "nyaa, thanku~~",
-            "bad bot": "nuu dun pweese~~ >.<",
-            "headpat": "uwu thanku",
-            "yamete": "kudasai!~~",
-            "ping": "pong",
-            "pong": "ping",
-            "saber": "hi",
-            "yes": "no",
-            "no": "yes"
-        }
         self.commands = {
-            "/help": self.help,
-            "/rename": self.rename,
-            "/say": self.say,
-            "/quit": self.quit,
-            "/reset": self.reset,
-            "/id": self.id,
-            "/2048": self.play_2048,
-            "/remove": self.remove,
-            "/sync": self.sync,
-            "/save_data": self.save_data,
-            "/set": self.set,
-            "/register": self.register,
-            "/inv": self.inv,
-            "/warp": self.warp,
-            "/equipped": self.equipped,
-            "/stats": self.stats,
-            "/rest": self.rest,
-            "/fight": self.fight,
-            "/atk": self.atk
-        }
-        self.images = {
-            "/gay": "images/gay.jpg",
-            "/math": "images/math.jpg",
-            "/praise": "images/praise.jpg",
-            "/goddammit": "images/goddammit.jpg",
-            "/heymister": "images/heymister.png"
+            "help": self.help,
+            "remove": self.remove,
+            "sync": self.sync,
+            "save_data": self.save_data,
+            "set": self.set,
+            "register": self.register,
+            "inv": self.inv,
+            "warp": self.warp,
+            "equipped": self.equipped,
+            "stats": self.stats,
+            "rest": self.rest,
+            "fight": self.fight,
+            "atk": self.atk
         }
 
         self.cooldowns = defaultdict(dict)
@@ -69,47 +45,6 @@ class RPGHandler:
         self.userData = self.data["users"]
 
         random.seed(datetime.now())
-
-    # utility
-    async def help(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 10):
-            return
-
-        f = open("text/help.txt", 'r')
-        contents = f.read()
-        await conv.send_message(toSeg(contents))
-        f.close()
-
-    async def rename(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 3):
-            return
-
-        try:
-            await conv.rename(event.text.split(' ', 1)[1])
-        except Exception as e:
-            await conv.send_message(toSeg("Format: /rename {name}"))
-
-    async def say(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 3):
-            return
-
-        try:
-            await conv.send_message(toSeg(event.text.split(' ', 1)[1]))
-        except Exception as e:
-            await conv.send_message(toSeg("Format: /say {message}"))
-
-    async def id(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 10):
-            return
-
-        try:
-            await conv.send_message(toSeg(user.id_[0]))
-        except Exception as e:
-            await conv.send_message(toSeg(str("Something went wrong!")))
 
     # rpg 
     async def register(self, bot, event):
@@ -328,7 +263,6 @@ class RPGHandler:
             save("data.json", self.data)
 
             
-
     async def rest(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
