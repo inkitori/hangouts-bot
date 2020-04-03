@@ -259,15 +259,13 @@ class RPGHandler:
             enemy = self.userData[userID]["fighting"]
 
             userWeapon = self.userData[userID]["inventory"][self.userData[userID]["equipped_weapon"]]
-            baseDamage = self.data["items"]["weapons"][userWeapon["rarity"]][userWeapon["name"]]["atk"] 
+            baseDamage = self.data["items"]["weapons"][userWeapon["rarity"]][userWeapon["name"]]["atk"]
             modifierDamage = self.data["modifiers"][userWeapon["modifier"]]["atk"]
 
             damage_dealt = (baseDamage + baseDamage * modifierDamage) * (self.userData[userID]["atk"]/self.data["enemies"][enemy["name"]]["def"])
 
-            if random.randint(0, 1):
-                damage_dealt += math.sqrt(damage_dealt/2)
-            else:
-                damage_dealt -= math.sqrt(damage_dealt/2)
+            multiplier = random.choice((1, -1))
+            damage_taken += multiplier * math.sqrt(damage_dealt / 2)
 
             damage_dealt = round(damage_dealt, 1)
 
@@ -304,8 +302,6 @@ class RPGHandler:
 
             damage_taken = self.data["enemies"][enemy["name"]]["atk"] / (baseDefense + baseDefense * modifierDefense)
 
-            # joseph i replaced ur messy code with this to get ride of that if else statement
-            # its cleaner
             multiplier = random.choice((1, -1))
             damage_taken += multiplier * math.sqrt(damage_taken / 2)
 

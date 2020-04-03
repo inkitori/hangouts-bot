@@ -4,6 +4,7 @@ specific things
     - only handler and bot should be able to send stuff to hangouts
         everything else should go through handler (see how i did 2048 for an example)
     - i left u a few comments about variables u never use, plz check if u actually need those
+    - learn git (this is a nice website for basics, i can send u some ebooks too http://think-like-a-git.net/)
 
 coding style
     - write shorter functions where possible (RPGHandler.atk is too long)
@@ -13,6 +14,9 @@ coding style
         save it into a variable, then assign that variable to the thing u need to change when ur done
     - don't use except unless u specify an error
     - if u print out an error message, be specific
+    - add comments now and then. if u r busy, add it when ur done with a feature
+    - docstrings are nice too, add those
+    - theres often an obvious way to make things simplier if u use a long if elif chain
 
 
     picky things that keep popping up in flake8 (optional, but appreciated)
@@ -20,7 +24,9 @@ coding style
             unless its assigning a keyword argument
                 yes: function(keyword=value)
                 no: function(keyword = value)
-        - 
+        - 2 spaces before inline comment
+            yes: code  # comment
+            no: code # comment OR code# comment OR code #comment
 
 other
     - push whenever it works, pull after u push (this reduces merge conflicts)
