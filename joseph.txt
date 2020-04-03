@@ -17,6 +17,13 @@ coding style
     - add comments now and then. if u r busy, add it when ur done with a feature
     - docstrings are nice too, add those
     - theres often an obvious way to make things simplier if u use a long if elif chain
+    - in classes, there are 4 places variables can go
+        - passed in as an argument: things that change each time u call it
+        - inside of the class: things which are always the same and/or universal
+        - defined in __init__ as an attribute of self: things which are specific to each object
+        - defined inside a function: temporary variable u need for that function only
+            OR that u also need to pass as an argument to another function
+
 
 
     picky things that keep popping up in flake8 (optional, but appreciated)
@@ -27,6 +34,22 @@ coding style
         - 2 spaces before inline comment
             yes: code  # comment
             no: code # comment OR code# comment OR code #comment
+        - when u have a long line so u continue it indent once from the start of the line, not the bracket
+            yes(
+                all the stuff
+            )
+            nononnoonnoonononnonononononononononononono(
+                                                        all the stuff
+            )
 
 other
     - push whenever it works, pull after u push (this reduces merge conflicts)
+
+never forget
+    multiplier = random.choice((1, -1))
+    damage_taken += multiplier * math.sqrt(damage_dealt / 2)
+    vs
+    if random.randint(0, 1):
+        damage_dealt += math.sqrt(damage_dealt/2)
+    else:
+        damage_dealt -= math.sqrt(damage_dealt/2)

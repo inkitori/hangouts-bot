@@ -44,24 +44,6 @@ class RPGHandler:
             "/fight": self.fight,
             "/atk": self.atk
         }
-        self.images = {
-            "/gay": "images/gay.jpg",
-            "/math": "images/math.jpg",
-            "/praise": "images/praise.jpg",
-            "/goddammit": "images/goddammit.jpg",
-            "/heymister": "images/heymister.png"
-        }
-
-        self.cooldowns = defaultdict(dict)
-        self.admins = [
-            114207595761187114730,  # joseph
-            106637925595968853122,  # chendi
-            ]
-        self.ignore = [
-                105849946242372037157,
-                11470746254329358783, # saberbot
-                104687919952293193271 # chendibot
-                ]
 
         with open("data.json") as f:
             self.data = json.load(f)
