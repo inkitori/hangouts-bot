@@ -37,7 +37,7 @@ class RPGHandler:
         random.seed(datetime.now())
 
     # rpg 
-    async def register(self, bot, event):
+    def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -78,7 +78,7 @@ class RPGHandler:
             await conv.send_message(toSeg(str(e)))
             print(e)
 
-    async def inv(self, bot, event):
+    def inv(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         inv = ""
@@ -93,7 +93,7 @@ class RPGHandler:
 
         await conv.send_message(toSeg(inv))
 
-    async def warp(self, bot, event):
+    def warp(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         inv = ""
@@ -124,7 +124,7 @@ class RPGHandler:
             save("data.json", self.data)
             await conv.send_message(toSeg("Successfully warped!"))
 
-    async def equipped(self, bot, event):
+    def equipped(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         equipped = ""
@@ -142,7 +142,7 @@ class RPGHandler:
 
         await conv.send_message(toSeg(equipped))
 
-    async def fight(self, bot, event):
+    def fight(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         rooms = self.data["rooms"]
@@ -168,7 +168,7 @@ class RPGHandler:
             self.userData[userID]["fighting"]["hp"] = enemyData["vit"]
             save("data.json", self.data)
 
-    async def atk(self, bot, event):
+    def atk(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         rooms = self.data["rooms"]
@@ -248,7 +248,7 @@ class RPGHandler:
             await conv.send_message(toSeg(text))
             save("data.json", self.data)
 
-    async def rest(self, bot, event):
+    def rest(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         text = ""
@@ -267,7 +267,7 @@ class RPGHandler:
             await conv.send_message(toSeg(text))
 
 
-    async def stats(self, bot, event):
+    def stats(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -277,7 +277,7 @@ class RPGHandler:
         userStats = self.userData[userID]
         await conv.send_message(toSeg("HP: " + str(userStats["hp"]) + "\nVIT: " + str(userStats["vit"]) + "\nATK: " + str(userStats["atk"]) + "\nDEF: " + str(userStats["def"])))
 
-    async def save_data(self, bot, event):
+    def save_data(self, bot, event):
         user, conv = getUserConv(bot, event)
 
         try:
@@ -291,7 +291,7 @@ class RPGHandler:
             await conv.send_message(toSeg("Something went wrong!"))
             await conv.send_message(toSeg(str(e)))
 
-    async def sync(self, bot, event):
+    def sync(self, bot, event):
         user, conv = getUserConv(bot, event)
         key = event.text.lower().split()[1]
         value = event.text.split(' ', 2)[2]
@@ -316,7 +316,7 @@ class RPGHandler:
             await conv.send_message(toSeg(str(e)))
             print(e)
 
-    async def remove(self, bot, event):
+    def remove(self, bot, event):
         user, conv = getUserConv(bot, event)
         key = event.text.lower().split()[1]
 
@@ -337,7 +337,7 @@ class RPGHandler:
             await conv.send_message(toSeg(str(e)))
             print(e)
 
-    async def set(self, bot, event):
+    def set(self, bot, event):
         user, conv = getUserConv(bot, event)
 
         try:
@@ -368,7 +368,7 @@ class RPGHandler:
             print(e)
 
     # not commands but also doesn't fit in utils
-    async def give_xp(self, conv, userID, xp_earned):
+    def give_xp(self, conv, userID, xp_earned):
         notify_level = 0
         self.userData[userID]["xp"] += xp_earned
 
