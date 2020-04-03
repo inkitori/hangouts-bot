@@ -1,110 +1,89 @@
 {
-	"users":{
-		"114207595761187114730":{
-			"balance":0,
-			"name":"Yeah",
-			"lifetime_balance":0,
-			"hp":100,
-			"vit":100,
-			"atk":5,
-			"def":5,
-			"xp":0,
-			"lvl":1,
-			"room":"floor0",
-			"equipped_armor":0,
-			"equipped_weapon":1,
-			"inventory_size":8,
-			"inventory":[
-				{
-					"name":"Starter Armor",
-					"type":"armor",
-					"rarity":"common",
-					"modifier":"shobby"
-				},
-				{
-					"name":"Starter Weapon",
-					"type":"weapon",
-					"rarity":"common",
-					"modifier":"shobby"
-				}
-			]
-		}		
-	},
-	"items":{
-		"armor":{
-			"common":{
-				"Starter Armor":{
-					"atk":5,
-					"buy":1,
-					"sell":1
-				}
-			},
-			"uncommon":{
-
-			},
-			"rare":{
-
-			},
-			"epic":{
-
-			},
-			"legendary":{
-
-			}
-		},
-		"weapons":{
-			"common":{
-				"Starter Weapon":{
-					"def":5,
-					"buy":1,
-					"sell":1
-				}
-			},
-			"uncommon":{
-
-			},
-			"rare":{
-
-			},
-			"epic":{
-
-			},
-			"legendary":{
-
-			}
-		},
-		"potions":{
-			"common":{
-				"Small HP":{
-
-				},
-				"uncommon":{
-
-				},
-				"rare":{
-
-				},
-				"epic":{
-
-				},
-				"legendary":{
-
-				}
-			}
-		}
-	},
-	"rooms":{
-		"market":1,
-		"floor0":1,
-		"floor1":3,
-		"floor2":5,
-		"floor3":7,
-		"floor4":9,
-		"floor5":11,
-		"floor6":13,
-		"floor7":15,
-		"floor8":17,
-		"floor9":19,
-		"floor10":20
-	}
+    "users": {
+        "114207595761187114730": {
+            "balance": 0,
+            "name": "Yeah",
+            "lifetime_balance": 0,
+            "hp": 100,
+            "vit": 100,
+            "atk": 5,
+            "def": 5,
+            "xp": 0,
+            "lvl": 1,
+            "room": "market",
+            "equipped_armor": 0,
+            "equipped_weapon": 1,
+            "inventory_size": 8,
+            "inventory": [
+                {
+                    "name": "Starter Armor",
+                    "type": "armor",
+                    "rarity": "common",
+                    "modifier": "boring"
+                }
+            ]
+        }
+    },
+    "items": {
+        "armor": {
+            "common": {
+                "Starter Armor": {
+                    "def": 5,
+                    "vit": 5,
+                    "buy": 1,
+                    "sell": 1,
+		    "info": "Some Starter Armor. We all have to start somewhere after all."
+                }
+            },
+            "uncommon": {},
+            "rare": {},
+            "epic": {},
+            "legendary": {}
+        },
+        "weapons": {
+            "common": {
+                "Starter Weapon": {
+                    "atk": 5,
+                    "vit": 0,
+                    "buy": 1,
+                    "sell": 1,
+		    "info": "A Starter Weapon. We all have to start somewhere after all."
+                },
+                "Frying Pan": {
+                    "atk": 8,
+                    "vit": 3,
+                    "buy": 3,
+                    "sell": 3,
+		    "info": "A frying pan. Looks like it's been recently used."
+                }
+            },
+            "uncommon": {},
+            "rare": {},
+            "epic": {},
+            "legendary": {}
+        },
+        "potions": {
+            "common": {
+                "Small HP": {},
+                "uncommon": {},
+                "rare": {},
+                "epic": {},
+                "legendary": {}
+            }
+        }
+    },
+    "rooms": {
+        "market": 1,
+        "floor0": 1,
+        "floor1": 3,
+        "floor2": 5,
+        "floor3": 7,
+        "floor4": 9,
+        "floor5": 11,
+        "floor6": 13,
+        "floor7": 15,
+        "floor8": 17,
+        "floor9": 19,
+        "floor10": 20
+    }
 }
