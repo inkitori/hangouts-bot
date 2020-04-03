@@ -76,9 +76,9 @@ class RPGHandler:
             self.userData[userID]["inventory_size"] = 8
             self.userData[userID]["fighting"] = {}
             self.userData[userID]["inventory"] = [
-                                        {"name": "Starter Armor", "type": "armor", "rarity": "common", "modifier": "boring"},
-                                        {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
-                                    ]
+                {"name": "Starter Armor", "type": "armor", "rarity": "common", "modifier": "boring"},
+                {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
+            ]
 
             save("data.json", self.data)
 
@@ -237,12 +237,12 @@ class RPGHandler:
             baseDefense = self.data["items"]["armor"][userArmor["rarity"]][userArmor["name"]]["def"]
             modifierDefense = self.data["modifiers"][userArmor["modifier"]]["def"]
 
-            damage_taken = self.data["enemies"][enemy["name"]]["atk"]/(baseDefense + baseDefense * modifierDefense)
+            damage_taken = self.data["enemies"][enemy["name"]]["atk"] / (baseDefense + baseDefense * modifierDefense)
 
-            if random.randint(0, 1):
-                damage_taken += math.sqrt(damage_taken/2)
-            else:
-                damage_taken -= math.sqrt(damage_taken/2)
+            # joseph i replaced ur messy code with this to get ride of that if else statement
+            # its cleaner
+            multiplier = random.choice((1, -1))
+            damage_taken += multiplier * math.sqrt(damage_taken / 2)
 
             damage_taken = round(damage_taken, 1)
 
@@ -262,7 +262,6 @@ class RPGHandler:
             await conv.send_message(toSeg(text))
             save("data.json", self.data)
 
-            
     async def rest(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
@@ -291,54 +290,6 @@ class RPGHandler:
 
         userStats = self.userData[userID]
         await conv.send_message(toSeg("HP: " + str(userStats["hp"]) + "\nVIT: " + str(userStats["vit"]) + "\nATK: " + str(userStats["atk"]) + "\nDEF: " + str(userStats["def"])))
-
-    # chendi's stuff
-    async def play_2048(self, bot, event):
-        pass
-
-    async def yes_no(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        text = event.text
-        if isIn(self.admins, user):
-            text = "yes" if text == "yes" else "no"
-        else:
-            text = "no" if text == "yes" else "yes"
-        await conv.send_message(toSeg(text))
-
-    async def say_something(self, bot, event):
-        pass
-
-    # admin 
-    async def quit(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 30):
-            return
-
-        try:
-            if isIn(self.admins, user):
-                await conv.send_message(toSeg("Saber out!"))
-                await bot.client.disconnect()
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except Exception as e:
-            await conv.send_message(toSeg("Something went wrong!"))
-            await conv.send_message(toSeg(str(e)))
-
-    async def reset(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
-        try:
-            arg1 = '/' + event.text.lower().split()[1]
-            if isIn(self.admins, user):
-                if arg1 in self.cooldowns[user]:
-                    self.cooldowns[user][arg1] = datetime.min.replace(tzinfo=None)
-                else:
-                    await conv.send_message(toSeg("Format: /reset {command}"))
-            else:
-                await conv.send_message(toSeg("bro wtf u can't use that"))
-        except Exception as e:
-            await conv.send_message(toSeg("Format: /reset {command}"))
-            await conv.send_message(toSeg(str(e)))
 
     async def save_data(self, bot, event):
         user, conv = getUserConv(bot, event)

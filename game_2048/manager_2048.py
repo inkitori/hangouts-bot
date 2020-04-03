@@ -8,7 +8,7 @@ from game import Game
 
 class Manager:
     games = {"current game": None}
-    save_file = "folder_2048/save_data.json"
+    save_file = "save_data.json"
 
     def __init__(self):
         self.load_games()
