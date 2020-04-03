@@ -23,6 +23,9 @@ coding style
         - defined in __init__ as an attribute of self: things which are specific to each object
         - defined inside a function: temporary variable u need for that function only
             OR that u also need to pass as an argument to another function
+    - dont async def functions that dont need to be concurrent
+    - dont abbreviate unless its really long, its not worth it
+    - avoid global variables if possible, most things u think should be global can be in a class
 
 
 
