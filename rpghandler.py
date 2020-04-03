@@ -1,6 +1,4 @@
 import hangups
-from hangups import hangouts_pb2
-from hangups.hangouts_pb2 import ParticipantId
 
 import asyncio
 from text_2048 import run_game
@@ -9,12 +7,11 @@ from collections import defaultdict
 from datetime import datetime, tzinfo
 import json
 import math
-import sys
 
 from utils import *
 
 
-class Handler:
+class RPGHandler:
     def __init__(self):
         self.keywords = {
             "good bot": "nyaa, thanku~~",
@@ -251,6 +248,7 @@ class Handler:
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         rooms = self.data["rooms"]
+        text = ""
 
         if userID not in self.userData:
             await conv.send_message(toSeg("You are not registered!"))
@@ -277,9 +275,10 @@ class Handler:
             enemy["hp"] -= damage_dealt
             enemy["hp"] = round(enemy["hp"], 1)
 
-            await conv.send_message(toSeg("You dealt " + str(damage_dealt) + " damage to " + enemy["name"] + "!"))
+            text += "You dealt " + str(damage_dealt) + " damage to " + enemy["name"] + "!\n"
+
             if enemy["hp"] <= 0:
-                await conv.send_message(toSeg(enemy["name"] + " is now dead!"))
+                text += enemy["name"] + " is now dead!\n"
 
                 xp_range = self.data["rooms"][self.userData[userID]["room"]]["xp_range"]
                 xp_earned = random.randint(xp_range[0], xp_range[1])
@@ -288,7 +287,9 @@ class Handler:
 
                 gold_earned = round(self.data["enemies"][enemy["name"]]["vit"]/10) + random.randint(1, 10)
 
-                await conv.send_message(toSeg("You earned " + str(xp_earned) + " xp and " + str(gold_earned) + " gold!"))
+                text += "You earned " + str(xp_earned) + " xp and " + str(gold_earned) + " gold!"
+                await conv.send_message(toSeg(text))
+
                 await self.give_xp(conv, userID, xp_earned)
 
                 self.userData[userID]["balance"] += gold_earned
@@ -312,17 +313,22 @@ class Handler:
             damage_taken = round(damage_taken, 1)
 
             self.userData[userID]["hp"] -= damage_taken
+            self.userData[userID]["hp"] = round(self.userData[userID]["hp"], 1)
 
-            await conv.send_message(toSeg(enemy["name"] + " dealt " + str(damage_taken) + " to you!"))
-            await conv.send_message(toSeg("You have " + str(self.userData[userID]["hp"]) + " hp left and " + enemy["name"] + " has " + str(enemy["hp"]) + "!"))
+            text += enemy["name"] + " dealt " + str(damage_taken) + " to you!\n"
+            text += "You have " + str(self.userData[userID]["hp"]) + " hp left and " + enemy["name"] + " has " + str(enemy["hp"]) + "!"
 
             save("data.json", self.data)
             if self.userData[userID]["hp"] <= 0:
-                await conv.send_message(toSeg("You were killed by " + enemy["name"] + "..."))
+                text += "\nYou were killed by " + enemy["name"] + "..."
+
                 self.userData[userID]["fighting"] = {}
                 self.userData[userID]["hp"] = self.userData[userID]["vit"]
-                save("data.json", self.data)
-                return
+
+            await conv.send_message(toSeg(text))
+            save("data.json", self.data)
+
+            
 
     async def rest(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -339,6 +345,7 @@ class Handler:
             self.userData[userID]["hp"] = self.userData[userID]["vit"]
             text += "You feel well rested...\n"
             text += "Your health is back up to " + str(self.userData[userID]["vit"]) + "!"
+            save("data.json", self.data)
             await conv.send_message(toSeg(text))
 
 
