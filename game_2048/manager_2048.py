@@ -2,7 +2,7 @@
 manager for 2048 games
 """
 import json
-import utility
+import utils
 from game import Game
 
 
@@ -31,29 +31,29 @@ class Manager:
 
     def run_game(self, commands=""):
         """runs the game based on commands"""
-        command_list = utility.clean(commands)
-        command = utility.get_item_safe(command_list)
+        command_list = utils.clean(commands)
+        command = utils.get_item_safe(command_list)
 
         # processing commands
         if command == "/2048":
-            command_list = utility.trim(command_list)
-            command = utility.get_item_safe(command_list)
+            command_list = utils.trim(command_list)
+            command = utils.get_item_safe(command_list)
 
         if command == "create":
-            command_list = utility.trim(command_list)
-            game_name = utility.get_item_safe(command_list)
+            command_list = utils.trim(command_list)
+            game_name = utils.get_item_safe(command_list)
             valid = self.verify_name(game_name)
             if valid != "valid":
                 return valid
             self.create_game(game_name)
-            command_list = utility.trim(command_list)
+            command_list = utils.trim(command_list)
 
         elif command == "rename":
-            command_list = utility.trim(command_list)
-            old_name = utility.get_item_safe(command_list)
-            command_list = utility.trim(command_list)
-            new_name = utility.get_item_safe(command_list)
-            command_list = utility.trim(command_list)
+            command_list = utils.trim(command_list)
+            old_name = utils.get_item_safe(command_list)
+            command_list = utils.trim(command_list)
+            new_name = utils.get_item_safe(command_list)
+            command_list = utils.trim(command_list)
             valid = self.verify_name(new_name)
             if valid != "valid":
                 return valid
@@ -61,11 +61,11 @@ class Manager:
                 return "that game does not exist"
             self.games[new_name] = self.games.pop(old_name)
             game_name = new_name
-            command_list = utility.trim(command_list)
+            command_list = utils.trim(command_list)
 
         elif command == "delete":
-            command_list = utility.trim(command_list)
-            game_name = utility.get_item_safe(command_list)
+            command_list = utils.trim(command_list)
+            game_name = utils.get_item_safe(command_list)
             if not game_name:
                 return "you must give the name of the game"
             elif game_name not in self.games.keys():
@@ -78,12 +78,12 @@ class Manager:
         elif command == "games":
             for game_name, game in self.games.items():
                 if game_name != "current game":
-                    return f"{game_name} - {utility.get_key(Game.modes, game.mode)} score: {game.score}\n"
+                    return f"{game_name} - {utils.get_key(Game.modes, game.mode)} score: {game.score}\n"
 
         elif command in self.games.keys():
             game_name = command
             self.games["current game"] = self.games[game_name]
-            command_list = utility.trim(command_list)
+            command_list = utils.trim(command_list)
         else:
             game_name = "current game"
         if type(self.games[game_name]) == Game:
@@ -109,7 +109,7 @@ class Manager:
             games_dict[game_name] = {
                 "board": [cell.value for cell in game.board.cells],
                 "has won": game.has_won,
-                "mode": utility.get_key(Game.modes, game.mode),
+                "mode": utils.get_key(Game.modes, game.mode),
                 "score": game.score
             }
         high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
@@ -125,6 +125,6 @@ if __name__ == "__main__":
     while True:
         game_text = manager.run_game(text)
         print(game_text)
-        text = utility.clean(input("enter a command: "))
-        if utility.get_item_safe(text) == "break":
+        text = utils.clean(input("enter a command: "))
+        if utils.get_item_safe(text) == "break":
             break

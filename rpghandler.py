@@ -36,7 +36,7 @@ class RPGHandler:
 
         random.seed(datetime.now())
 
-    # rpg 
+    # rpg
     def register(self, bot, event):
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
@@ -60,7 +60,7 @@ class RPGHandler:
             self.userData[userID]["def"] = 5
             self.userData[userID]["xp"] = 0
             self.userData[userID]["lvl"] = 1
-            self.userData[userID]["room"] = "village" 
+            self.userData[userID]["room"] = "village"
             self.userData[userID]["equipped_armor"] = 0
             self.userData[userID]["equipped_weapon"] = 1
             self.userData[userID]["inventory_size"] = 8
@@ -310,7 +310,7 @@ class RPGHandler:
                 return
             else:
                 await conv.send_message(toSeg("bro wtf u can't use that"))
-        
+
         except Exception as e:
             await conv.send_message(toSeg("Something went wrong!"))
             await conv.send_message(toSeg(str(e)))
@@ -375,12 +375,12 @@ class RPGHandler:
         while True:
             next_lvl = self.userData[userID]["lvl"] + 1
             xp_required = round(4 * ((next_lvl ** 4)/5))
-            
+
             if self.userData[userID]["xp"] >= xp_required:
                 self.userData[userID]["lvl"] += 1
                 self.userData[userID]["xp"] -= xp_required
                 notify_level = 1
-            
+
             else:
                 break
 

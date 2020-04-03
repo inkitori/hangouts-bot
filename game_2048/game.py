@@ -4,7 +4,7 @@ Made by Chendi
 """
 
 import random
-import utility
+import utils
 
 
 class Cell():
@@ -213,7 +213,7 @@ class Game():
         """appends text based on current state"""
 
         if self.state == "help":
-            self.text += utility.newline("\n".join(self.help_text))
+            self.text += utils.newline("\n".join(self.help_text))
             for command, description in list(self.commands.items()) + list(self.extra_commands.items()):
                 self.text += f"{command} - {description}\n"
             self.state = None
@@ -241,13 +241,13 @@ class Game():
                 self.text += f"{direction} - {command}"
         self.state = None
 
-        self.text = utility.newline(self.text, 2)
+        self.text = utils.newline(self.text, 2)
         self.draw_game()
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        game_name = utility.get_key("placeholder", self, "current game")
-        mode_name = utility.get_key(Game.modes, self.mode)
+        game_name = utils.get_key("placeholder", self, "current game")
+        mode_name = utils.get_key(Game.modes, self.mode)
         self.text += f"{game_name} - {mode_name}\n"
         self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
@@ -299,10 +299,10 @@ class Game():
     def play_game(self, command_list):
         """runs the main game loop once"""
         self.text = ""
-        command = utility.get_item_safe(command_list)
+        command = utils.get_item_safe(command_list)
 
         # check player movement
-        command = utility.get_item_safe(command_list)
+        command = utils.get_item_safe(command_list)
         x = None
         positive = None
         if command in Game.movement["up"]:
@@ -329,4 +329,4 @@ class Game():
                 self.state = None
 
         self.update()
-        return utility.newline(self.text)
+        return utils.newline(self.text)
