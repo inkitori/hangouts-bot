@@ -1,7 +1,6 @@
 import hangups
 
 import asyncio
-from text_2048 import run_game
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
@@ -361,10 +360,7 @@ class RPGHandler:
 
     # chendi's stuff
     async def play_2048(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        game_text = run_game(event.text)
-        await conv.send_message(toSeg(game_text))
-        save_games()
+        pass
 
     async def yes_no(self, bot, event):
         user, conv = getUserConv(bot, event)

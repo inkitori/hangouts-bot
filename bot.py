@@ -1,11 +1,11 @@
 import hangups
-from hangups.ui.utils import get_conv_name
+from hangups.ui.utils import get_conv_name  # never used, y is it here
 import asyncio
 from rpghandler import RPGHandler
 from utils import *
 import sys
 
-import signal
+import signal  # u never use this y is it here
 
 
 class Bot:
