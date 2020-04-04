@@ -84,8 +84,10 @@ class Player():
 class Enemy():
 
     def __init__():
-        pass
-
+        # ??
+        self.atk = atk
+        self.def = def
+        self.hp = hp
 
 class Item():
 
