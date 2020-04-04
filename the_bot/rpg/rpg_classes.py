@@ -13,7 +13,7 @@ class Stats():
             self.lifetime_balance = self.balance = balance
             self.xp = xp
         if random_stats():
-            attack, defense = self.generate_from_level(level)
+            attack, defense, health = self.generate_from_level(level)
         self.attack = attack
         self.defense = defense
         self.level = level
@@ -113,9 +113,8 @@ class Enemy():
 
     def __init__():
         # ??
-        self.atk = atk
-        self.def = def
-        self.hp = hp
+        self.name = name
+        self.stats = Stats()
 
 class room
 
