@@ -4,7 +4,7 @@ from datetime import datetime
 import json  # u shouldn't need this cause its in utils.py
 import math
 from utils import *
-from the_bot.rpg.rpg_classes import Player, Item, Enemy
+from the_bot.rpg.rpg_classes import *
 
 
 class RPGHandler:
@@ -15,10 +15,6 @@ class RPGHandler:
         106637925595968853122,  # chendi
     )
 
-    all_items = {
-        "starter armor": Item("armor"),
-        "starter weapon": Item("weapon"),
-    }
     users = {
 
     }
@@ -61,36 +57,21 @@ class RPGHandler:
             # eg. "u r in the village, enter help for help"
             return "you must enter a command"
 
-
         elif command not in self.commands:
             return "That command doesn't exist!"
 
         elif command != "register" and userID not in self.userData:
             return "You are not registered! Use register"
-
+        user = self.users[userID]
         commands = trim(commands)
-        return self.commands[command](userID, commands)
+        return self.commands[command](user, commands)
         save(self.save_file, self.data)
 
-    def register(self, userID, command):
+    def register(self, user, command):
+        userID = get_key(self.users, user)
         if userID in self.users:
             return "You are already registered!"
-        self.users[userID] = User()
-        self.userData[userID] = user
-        self.userData[userID] = {}
-        self.userData[userID]["balance"] = 0
-        self.userData[userID]["name"] = user.full_name
-        self.userData[userID]["lifetime_balance"] = 0
-        self.userData[userID]["stats"] = {"vitality": 100, "health": 100, "attack": 5, "defense": 5}
-        self.userData[userID]["xp"] = 0
-        self.userData[userID]["lvl"] = 1
-        self.userData[userID]["room"] = "village"
-        self.userData[userID]["equipped"] = {"armor": 0, "weapon": 1}
-        self.userData[userID]["tome"] = "Clarity"
-        self.userData[userID]["fighting"] = {}
-        self.userData[userID]["inventory"] = [None for i in range(8)]
-        self.userData[userID]["inventory"][0] = all_items["starter armor"]
-        self.userData[userID]["inventory"][1] = all_items["starter weapon"]
+        self.users[userID] = User("placeholder name")
 
         save(self.save_file, self.data)
         return "Successfully registered!"
@@ -99,7 +80,7 @@ class RPGHandler:
         inventory_text = ""
 
         for item in self.userData[userID]["inventory"]:
-            inventory_text += item.description
+            inventory_text += item.description()
 
         return inventory_text
 
@@ -134,7 +115,7 @@ class RPGHandler:
 
         for type_, index in userInfo["equipped"].items():
             item = userInfo["inventory"][index]
-            equipped += f"{type_}: {item.description}"
+            equipped += f"{type_}: {item.description()}"
 
         return equipped.title()
 
