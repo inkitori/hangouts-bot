@@ -1,4 +1,5 @@
 TO DO
+    joseph u can edit this too. if theres anything in this file u dont find useful, delete it
     - make the prestige stuff a new file
     - get all the old handler stuff out of rpg handler
     - only handler and bot should be able to send stuff to hangouts
@@ -6,17 +7,16 @@ TO DO
     - i left u a few comments about variables u never use, plz check if u actually need those
     - learn git (this is a nice website for basics, i can send u some ebooks too http://think-like-a-git.net/)
     - user class in rpg
-
-code improvement examples (talking to u joseph)
-    - what is this? its repetitive. also, i made funtions to deal with this in utils
-        userID = command.split()[1]
-        key = command.split()[2]
-        value = command.split(' ', 3)[3]
-        ---
-        command_list = utils.clean(commands)
-        # clean lowers, strips, then splits and also deals with empty strings so u dont get an empty list
-        userID, key, value = get_item_safe(command_list, (1, 2, 3))
-        # this handles index errors for u and is much shorter
+    - a quick note, clean(), trim(), and get_item_safe() are meant to be used together
+        to sequentially get commands from the user input to allow longer commands
+    - what is notify_level? strings instead of ints are much more informative.
+        if ur worried about mispelling, use Enum to restrict possible values
+    - dealing with admins should be a responsiblity for handler, not rpg
+        howver, this will cause circular import chains
+        therefore, it is probably best to deal with it inside of rpg
+        not idea, but better
+    - read improvement_examples.py
+    - delete line 199 of rpg handler? (its commented out)
 
 
 coding style
@@ -60,12 +60,3 @@ coding style
 
 other
     - push whenever whenever u can, pull after u push (this reduces merge conflicts)
-
-old code improvement examples
-    multiplier = random.choice((1, -1))
-    damage_taken += multiplier * math.sqrt(damage_dealt / 2)
-    vs
-    if random.randint(0, 1):
-        damage_dealt += math.sqrt(damage_dealt/2)
-    else:
-        damage_dealt -= math.sqrt(damage_dealt/2)

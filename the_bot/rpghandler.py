@@ -6,15 +6,50 @@ import math
 from utils import *
 
 
-class User():
-
-    def __init__(self, **kwargs):
+class Alive():
+    """ a class to represent living things such as enemies"""
+    def __init___(
+        name, stats, fighting={}
+    ):
+        self.stats = stats
+        # fighting
+        # name
         pass
+
+class Player(Alive):
+
+    def __init__(self, ):
+        super().__init__()
+
+
+class Enemy(Alive):
+
+    def __init__():
+        super().__init__()
+
+
+class Item():
+
+    rarities = ("common", "uncommon", "rare", "legendary")
+
+    def __init__(type_, rarity=0, modifier="boring"):
+        self.type_ = type_
+        self.rarity = rarity
+        self.modifier = modifier
 
 
 class RPGHandler:
 
     save_file = "the_bot/data.json"
+    admins = (
+        114207595761187114730,  # joseph
+        106637925595968853122,  # chendi
+    )
+
+    all_items = {
+        "starter armor": Item("armor"),
+        "starter weapon": Item("weapon"),
+    }
 
     def __init__(self):
         self.commands = {
@@ -23,7 +58,7 @@ class RPGHandler:
             "save_data": self.save_data,
             "set": self.set,
             "register": self.register,
-            "inv": self.inv,
+            "inventory": self.inventory,
             "warp": self.warp,
             "equipped": self.equipped,
             "stats": self.stats,
@@ -32,10 +67,7 @@ class RPGHandler:
             "atk": self.atk
         }
 
-        self.admins = [
-            114207595761187114730,  # joseph
-            106637925595968853122,  # chendi
-        ]
+        
 
         self.cooldowns = defaultdict(dict)
 
@@ -46,80 +78,78 @@ class RPGHandler:
 
     # rpg
     def rpg_process(self, userID, event_text):
-        command = clean(event_text)[1]
-        full_command = clean(event_text, 1)[1]
+        commands = clean(event_text)
+        commands = trim(commands)
+        command = get_item_safe[commands]
+        if not command:
+            # u might want to replace this with basic help text
+            # or the curent state of the game, incase they forgot
+            # eg. "u r in the village, enter help for help"
+            return "you must enter a command"
 
-        if command not in self.commands:
+
+        elif command not in self.commands:
             return "That command doesn't exist!"
-
-        elif command == "register" and userID in self.userData:
-            return "You are already registered!"
 
         elif command != "register" and userID not in self.userData:
             return "You are not registered! Use /register"
 
-        else:
-            self.commands[command](userID, full_command)
+        commands = trim(commands)
+        self.commands[command](userID, commands)
 
     def register(self, userID, command):
+        if userID in self.userData:
+            return "You are already registered!"
         self.userData[userID] = user
         self.userData[userID] = {}
         self.userData[userID]["balance"] = 0
         self.userData[userID]["name"] = user.full_name
         self.userData[userID]["lifetime_balance"] = 0
-        self.userData[userID]["vit"] = 100
-        self.userData[userID]["hp"] = 100
-        self.userData[userID]["atk"] = 5
-        self.userData[userID]["def"] = 5
+        self.userData[userID]["stats"] = {"vitality": 100, "health": 100, "attack": 5, "defense": 5}
         self.userData[userID]["xp"] = 0
         self.userData[userID]["lvl"] = 1
         self.userData[userID]["room"] = "village"
-        self.userData[userID]["equipped_armor"] = 0
-        self.userData[userID]["equipped_weapon"] = 1
-        self.userData[userID]["inventory_size"] = 8
+        self.userData[userID]["equipped"] = {"armor": 0, "weapon": 1}
         self.userData[userID]["fighting"] = {}
-        self.userData[userID]["inventory"] = [
-            {"name": "Starter Armor", "type": "armor", "rarity": "common", "modifier": "boring"},
-            {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
-        ]
+        self.userData[userID]["inventory"] = [None for i in range(8)]
+        self.userData[userID]["inventory"][0] = all_items["starter armor"]
+        self.userData[userID]["inventory"][1] = all_items["starter weapon"]
 
         save("data.json", self.data)
         return "Successfully registered!"
 
-    def inv(self, userID, command):
-        inv = ""
+    def inventory(self, userID, command):
+        inventory_text = ""
 
         for item in self.userData[userID]["inventory"]:
-            inv += item["rarity"] + " " + item["modifier"] + " " + item["name"] + '\n'
+            inventory_text += f"{Item.rarities[item.rarity]} {item.modifier} {get_key(self.all_items, item)}\n"
 
-        inv = inv.title()
-        return inv
+        inventory_text = inventory_text.title()
+        return inventory_text
 
     def warp(self, userID, command):
-        inv = ""
-        text = event.text.lower()
-        rooms = self.data["rooms"]
+        self.data["rooms"]
         users = self.userData
-
-        if len(command.split()) != 2:
-            return "Invalid arguments! /warp {room}"
-
-        elif self.userData[userID]["fighting"]:
+        room = get_item_safe(commands)
+        if not room:
+            return "Invalid argument! use warp {room}"
+        
+        if self.userData[userID]["fighting"]:
             return "You can't warp while in a fight!"
 
-        elif command.split()[1] not in rooms:
+        elif room not in rooms:
             return "That room doesn't exist!"
 
-        elif rooms[command.split()[1]]["required_lvl"] > users[userID]["lvl"]:
+        elif rooms[room]["required_lvl"] > users[userID]["lvl"]:
             return "Your level is not high enough to warp there!"
 
-        elif command.split()[1] == users[userID]["room"]:
+        elif room == users[userID]["room"]:
             return "You are already in that room!"
-
         else:
-            users[userID]["room"] = command.split()[1]
+            users[userID]["room"] = room
             save("data.json", self.data)
             return "Successfully warped!"
+
 
     def equipped(self, userID, command):
         equipped = ""
@@ -249,7 +279,7 @@ class RPGHandler:
         return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
 
     def save_data(self, userID, command):
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             save("data.json", self.data)
 
             return "Successfully saved!"
@@ -263,7 +293,7 @@ class RPGHandler:
         if value.isdigit():
             value = int(value)
 
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             for user in self.userData:
                 self.userData[user][key] = value
 
@@ -276,7 +306,7 @@ class RPGHandler:
     def remove(self, userID, command):
         key = command.split()[1]
 
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             for user in self.userData:
                 self.userData[user].pop(key, None)
 
@@ -287,14 +317,14 @@ class RPGHandler:
             return "bro wtf u can't use that"
 
     def set(self, userID, commands):
-        # i rewrote this, check things.txt
+        # i rewrote this, check improvement_examples.py
         command_list = utils.clean(commands)
         userID, key, value = get_item_safe(command_list, (1, 2, 3))
 
         if value.isdigit():
             value = int(value)
 
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             if userID in self.userData:
                 self.userData[userID][key] = value
 

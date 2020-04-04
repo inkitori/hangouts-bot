@@ -27,9 +27,8 @@ def cooldown(cooldowns, user, event, cooldown):
         cooldowns[user][text.split()[0]] = strippedTime
 
 
-def isIn(userList, user):
-    if int(user.id_[0]) in userList:
-        return True
+def userIn(userList, user):
+    return int(user.id_[0]) in userList
 
 
 def scientific(number):
@@ -37,13 +36,13 @@ def scientific(number):
 
 
 def save(file_name, contents):
-    with open(file_name, "w") as f:
-        json.dump(contents, f, indent=4)
+    with open(file_name, "w") as file:
+        json.dump(contents, file, indent=4)
 
 
 def load(file_name):
-    with open(file_name, "r") as f:
-        return json.load(file_name)
+    with open(file_name, "r") as file:
+        return json.load(file)
 
 
 def newline(text, number=1):

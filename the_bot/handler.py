@@ -182,7 +182,7 @@ class Handler:
     async def yes_no(self, bot, event):
         user, conv = getUserConv(bot, event)
         text = event.text.split()[0]
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             text = "yes" if text == "yes" else "no"
         else:
             text = "no" if text == "yes" else "yes"
@@ -366,7 +366,7 @@ class Handler:
 
             arg2 = int(event.text.split()[-1])
 
-            if isIn(self.ignore, user):
+            if userIn(self.ignore, user):
                 await conv.send_message(toSeg("You are an ignored user!"))
                 return
 
@@ -420,7 +420,7 @@ class Handler:
             give_user = event.text.split()[1]
             give_money = int(event.text.split()[-1])
 
-            if isIn(self.ignore, user):
+            if userIn(self.ignore, user):
                 await conv.send_message(toSeg("You are an ignored user!"))
                 return
 
@@ -645,7 +645,7 @@ class Handler:
         if cooldown(self.cooldowns, user, event, 30):
             return
 
-        if isIn(self.admins, user):
+        if userIn(self.admins, user):
             await conv.send_message(toSeg("Saber out!"))
             save_games()
             await bot.client.disconnect()
