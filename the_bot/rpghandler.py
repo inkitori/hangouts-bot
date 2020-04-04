@@ -26,8 +26,10 @@ class RPGHandler:
             "equipped": self.equipped,
             "stats": self.stats,
             "rest": self.rest,
+            "xp": self.xp,
             "fight": self.fight,
-            "atk": self.atk
+            "atk": self.atk,
+            "heal": self.heal
         }
 
         self.admins = [
@@ -78,6 +80,7 @@ class RPGHandler:
         self.userData[userID]["room"] = "village" 
         self.userData[userID]["equipped_armor"] = 0
         self.userData[userID]["equipped_weapon"] = 1
+        self.userData[userID]["tome"] = "Clarity"
         self.userData[userID]["inventory_size"] = 8
         self.userData[userID]["fighting"] = {}
         self.userData[userID]["inventory"] = [
@@ -133,6 +136,10 @@ class RPGHandler:
         equipped += "Armor: " + (userArmor["rarity"] + " " + userArmor["modifier"] + " " + userArmor["name"]).title()
 
         return equipped
+
+    def xp(self, userID, command):
+        return f"LVL: {self.userData[userID]['lvl']} | {self.userData[userID]['xp']}/{round(4 * (((self.userData[userID]['lvl'] + 1)** 4)/5))}"
+
 
     def fight(self, userID, command):
         rooms = self.data["rooms"]
@@ -247,7 +254,7 @@ class RPGHandler:
 
     def stats(self, userID, command):
         userStats = self.userData[userID]
-        return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
+        return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}\nMP: {userStats['mp']}"
 
     def save_data(self, userID, command):
         if isIn(self.admins, user):
@@ -329,6 +336,6 @@ class RPGHandler:
             return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
         
         else:
-            return "test"
+            return ""
 
         save(self.save_file, self.data)

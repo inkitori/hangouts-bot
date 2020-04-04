@@ -17,7 +17,7 @@ from utils import *
 class Handler:
 
     save_file = "the_bot/data.json"
-    images_folder = "the_bot/images"
+    images_folder = "the_bot/images/"
 
     keywords = {
         "good bot": "nyaa, thanku~~",
