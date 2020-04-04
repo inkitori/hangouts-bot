@@ -191,6 +191,10 @@ class Game():
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
         "down": ("down", "d", "v"), "right": ("right", "r", ">")
     }
+    directions = {
+        "up" (False, False), "left": (True, False),
+        "down": (False, True), "right": (True, True)
+    }
 
     reserved_words = (
         list(commands.keys()) + list(modes.keys()) +
@@ -305,19 +309,9 @@ class Game():
         command = utils.get_item_safe(command_list)
         x = None
         positive = None
-        if command in Game.movement["up"]:
-            x = False
-            positive = False
-        elif command in Game.movement["left"]:
-            x = True
-            positive = False
-        elif command in Game.movement["down"]:
-            x = False
-            positive = True
-        elif command in Game.movement["right"]:
-            x = True
-            positive = True
-
+        for direction in self.movement:
+            if command in self.movement[direction]:
+                self.move(directions[direction])
         self.move(x, positive)
         if (x, positive) == (None, None):
             if command in self.modes.keys():

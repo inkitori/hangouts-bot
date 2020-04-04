@@ -93,8 +93,7 @@ class Manager:
 
     def load_games(self):
         """loads games from a json file"""
-        with open(self.save_file, "r") as save_data:
-            data = json.load(save_data)
+        data = utils.load(self.save_file)
         for game_name, game_data in data["games"].items():
             self.games[game_name] = Game(game_data["board"], game_data["has won"], game_data["mode"], game_data["score"])
         for mode_name, mode in Game.modes.items():
