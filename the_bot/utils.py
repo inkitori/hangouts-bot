@@ -63,7 +63,17 @@ def get_item_safe(sequence, index=0, default=""):
     return item
 
 
-def clean(text, idx = 0):
+def clean(text):
+    """cleans user input and returns as a list"""
+    if text:
+        if type(text) == str:
+            return text.strip().lower().split()
+        elif type(text) == list:
+            return text
+    else:
+        return [""]
+
+def clean_idx(text, idx = 0):
     """cleans user input and returns as a list"""
     if text:
         if type(text) == str:

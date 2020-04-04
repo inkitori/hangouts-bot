@@ -48,7 +48,7 @@ class RPGHandler:
     # rpg 
     def rpg_process(self, userID, event_text):
         command = clean(event_text)[1]
-        full_command = clean(event_text, 1)[1]
+        full_command = clean_idx(event_text, 1)[1]
         
         if command not in self.commands:
             return "That command doesn't exist!"
@@ -60,7 +60,8 @@ class RPGHandler:
             return "You are not registered! Use /register"
 
         else:
-            self.commands[command](userID, full_command)
+            return self.commands[command](userID, full_command)
+            save(self.save_file, self.data)
 
     def register(self, userID, command):
         self.userData[userID] = user
@@ -84,7 +85,7 @@ class RPGHandler:
             {"name": "Starter Weapon", "type": "weapon", "rarity": "common", "modifier": "boring"}
         ]
 
-        save("data.json", self.data)
+        save(self.save_file, self.data)
         return "Successfully registered!"
 
     def inv(self, userID, command):
@@ -98,7 +99,6 @@ class RPGHandler:
 
     def warp(self, userID, command):
         inv = ""
-        text = event.text.lower()
         rooms = self.data["rooms"]
         users = self.userData
 
@@ -119,7 +119,7 @@ class RPGHandler:
 
         else:
             users[userID]["room"] = command.split()[1]
-            save("data.json", self.data)
+            save(self.save_file, self.data)
             return "Successfully warped!"
 
     def equipped(self, userID, command):
@@ -156,7 +156,7 @@ class RPGHandler:
             self.userData[userID]["fighting"]["name"] = enemy
             self.userData[userID]["fighting"]["hp"] = enemyData["vit"]
 
-            save("data.json", self.data)
+            save(self.save_file, self.data)
             return text
 
     def atk(self, userID, command):
@@ -202,7 +202,7 @@ class RPGHandler:
                 self.userData[userID]["lifetime_balance"] += gold_earned
 
                 self.userData[userID]["fighting"] = {}
-                save("data.json", self.data)
+                save(self.save_file, self.data)
                 return text
 
             userArmor = self.userData[userID]["inventory"][self.userData[userID]["equipped_armor"]]
@@ -222,7 +222,7 @@ class RPGHandler:
             text += enemy["name"] + " dealt " + str(damage_taken) + " to you!\n"
             text += "You have " + str(self.userData[userID]["hp"]) + " hp left and " + enemy["name"] + " has " + str(enemy["hp"]) + "!"
 
-            save("data.json", self.data)
+            save(self.save_file, self.data)
             if self.userData[userID]["hp"] <= 0:
                 text += "\nYou were killed by " + enemy["name"] + "..."
 
@@ -230,7 +230,7 @@ class RPGHandler:
                 self.userData[userID]["hp"] = self.userData[userID]["vit"]
 
             return text
-            save("data.json", self.data)
+            save(self.save_file, self.data)
 
     def rest(self, userID, command):
         text = ""
@@ -241,17 +241,17 @@ class RPGHandler:
         else:
             self.userData[userID]["hp"] = self.userData[userID]["vit"]
             text += "You feel well rested...\n"
-            text += "Your health is back up to {self.userData[userID]['vit']}!"
-            save("data.json", self.data)
+            text += f"Your health is back up to {self.userData[userID]['vit']}!"
+            save(self.save_file, self.data)
             return text
 
     def stats(self, userID, command):
         userStats = self.userData[userID]
-        return "HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
+        return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
 
     def save_data(self, userID, command):
         if isIn(self.admins, user):
-            save("data.json", self.data)
+            save(self.save_file, self.data)
 
             return "Successfully saved!"
         else:
@@ -268,7 +268,7 @@ class RPGHandler:
             for user in self.userData:
                 self.userData[user][key] = value
 
-            save("data.json", self.data)
+            save(self.save_file, self.data)
 
             return "Synced all values!"
         else:
@@ -281,7 +281,7 @@ class RPGHandler:
             for user in self.userData:
                 self.userData[user].pop(key, None)
 
-            save("data.json", self.data)
+            save(self.save_file, self.data)
 
             return "Removed key!"
         else:
@@ -299,7 +299,7 @@ class RPGHandler:
             if userID in self.userData:
                 self.userData[userID][key] = value
 
-                save("data.json", self.data)
+                save(self.save_file, self.data)
 
                 return "Set value!"
             else:
@@ -329,6 +329,6 @@ class RPGHandler:
             return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
         
         else:
-            return ""
+            return "test"
 
-        save("data.json", self.data)
+        save(self.save_file, self.data)
