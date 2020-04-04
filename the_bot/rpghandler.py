@@ -212,6 +212,7 @@ class RPGHandler:
                 save(self.save_file, self.data)
                 return text
 
+            # take damage
             userArmor = self.userData[userID]["inventory"][self.userData[userID]["equipped_armor"]]
             baseDefense = self.data["items"]["armor"][userArmor["rarity"]][userArmor["name"]]["def"]
             modifierDefense = self.data["modifiers"][userArmor["modifier"]]["def"]
