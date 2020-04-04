@@ -15,10 +15,6 @@ class RPGHandler:
         106637925595968853122,  # chendi
     )
 
-    users = {}
-    rooms = {"village": Room()}
-    enemies = {}
-
     def __init__(self):
         self.commands = {
             "register": self.register,

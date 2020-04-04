@@ -151,8 +151,12 @@ class Item():
         return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(all_items, self)}\n"
 
 
-all_items = {
-    "starter armor": Item("armor"),
-    "starter weapon": Item("weapon"),
-    "clarity tome": Item("tome")
-}
+class Game():
+    all_items = {
+        "starter armor": Item("armor"),
+        "starter weapon": Item("weapon"),
+        "clarity tome": Item("tome")
+    }
+    users = {}
+    rooms = {"village": Room()}
+    enemies = {}
