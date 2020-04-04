@@ -71,12 +71,12 @@ class Handler:
         self.admins = [
             114207595761187114730,  # joseph
             106637925595968853122,  # chendi
-            ]
+        ]
         self.ignore = [
-            105849946242372037157,
-            11470746254329358783, # saberbot
-            104687919952293193271 # Ether(chendibot)
-            ]
+            105849946242372037157,  # odlebot
+            11470746254329358783,  # saberbot
+            104687919952293193271,  # Ether(chendibot)
+        ]
         self.prestige_conversion = 100000
         self.prestige_upgrade_base = 2000
         random.seed(datetime.now())
