@@ -38,8 +38,6 @@ class RPGHandler:
             "set": self.set,
         }
 
-        
-
         self.cooldowns = defaultdict(dict)
 
         self.data = utils.load(self.save_file)
@@ -172,6 +170,7 @@ class RPGHandler:
                 save(self.save_file, self.data)
                 return text
 
+            # take damage
             userArmor = self.userData[userID]["inventory"][self.userData[userID]["equipped_armor"]]
             baseDefense = self.data["items"]["armor"][userArmor["rarity"]][userArmor["name"]]["def"]
             modifierDefense = self.data["modifiers"][userArmor["modifier"]]["def"]
@@ -209,11 +208,9 @@ class RPGHandler:
 
         return text
 
-
     def save_data(self, userID, commands):
         save(self.save_file, self.data)
         return "Successfully saved!"
-
 
     def sync(self, userID, commands):
         key, value = get_item_safe(commands, (0, 1)

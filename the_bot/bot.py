@@ -1,7 +1,7 @@
 import hangups
 from hangups.ui.utils import get_conv_name  # never used, y is it here
 import asyncio
-from rpghandler import RPGHandler
+from rpg.rpghandler import RPGHandler
 from handler import Handler
 from utils import *
 import sys

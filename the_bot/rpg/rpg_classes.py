@@ -20,9 +20,10 @@ class Stats():
 
     def generate_from_level(self, level):
         # change this joseph
-        attack = 5
-        defense = 5
-        return attack, defense
+        attack = round(5 * level ** 1.8)
+        defense = round(5 * level ** 1.5)
+        health = round(100 * level ** 2)
+        return attack, defense, health
 
     def print_stats(self):
         pass
@@ -116,8 +117,10 @@ class Player():
 class Enemy():
 
     def __init__():
-        pass
-
+        # ??
+        self.atk = atk
+        self.def = def
+        self.hp = hp
 
 class Room():
 
