@@ -3,12 +3,12 @@ manager for 2048 games
 """
 import json
 import utils
-from game import Game
+from game_2048.game import Game
 
 
 class Manager:
     games = {"current game": None}
-    save_file = "save_data.json"
+    save_file = "the_bot/game_2048/save_data.json"
 
     def __init__(self):
         self.load_games()

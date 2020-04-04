@@ -11,6 +11,9 @@ class User():
         pass
 
 class RPGHandler:
+
+    save_file = "the_bot/data.json"
+
     def __init__(self):
         self.commands = {
             "remove": self.remove,
@@ -34,7 +37,8 @@ class RPGHandler:
 
         self.cooldowns = defaultdict(dict)
 
-        with open("data.json") as f:
+        # replave with utils.load()
+        with open(self.save_file) as f:
             self.data = json.load(f)
 
         self.userData = self.data["users"]

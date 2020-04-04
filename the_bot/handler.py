@@ -5,7 +5,6 @@ from hangups.hangouts_pb2 import ParticipantId
 import asyncio
 from game_2048.manager_2048 import Manager as Manager2048
 from rpghandler import RPGHandler
-from handler import Handler
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo  # joseph u never use tzinfo
@@ -16,6 +15,9 @@ from utils import *
 
 
 class Handler:
+
+    save_file = "the_bot/data.json"
+    images_folder = "the_bot/images"
 
     keywords = {
         "good bot": "nyaa, thanku~~",
@@ -28,11 +30,11 @@ class Handler:
         "meep": "meep"
     }
     images = {
-        "/gay": "images/gay.jpg",
-        "/math": "images/math.jpg",
-        "/praise": "images/praise.jpg",
-        "/goddammit": "images/goddammit.jpg",
-        "/heymister": "images/heymister.png"
+        "/gay": "gay.jpg",
+        "/math": "math.jpg",
+        "/praise": "praise.jpg",
+        "/goddammit": "goddammit.jpg",
+        "/heymister": "heymister.png"
     }
 
     def __init__(self):
@@ -44,13 +46,11 @@ class Handler:
             "/say": self.say,
             "/rickroll": self.rickroll,
             "/quit": self.quit_,
-            "/reset": self.reset,
             "/id": self.id_,
             "/kick": self.kick,
             "/register": self.register,
             "/balance": self.balance,
             "/mine": self.mine,
-            "/save": self.save,
             "/shop": self.shop,
             "/buy": self.buy,
             "/give": self.give,
@@ -81,7 +81,7 @@ class Handler:
         self.prestige_upgrade_base = 2000
         random.seed(datetime.now())
 
-        with open("data.json") as f:
+        with open(self.save_file) as f:
             self.data = json.load(f)
 
     # utility
@@ -214,7 +214,7 @@ class Handler:
             self.data["users"][userID]["prestige_confirm"] = 0
             self.data["users"][userID]["prestige_upgrade"] = 0
 
-            with open("data.json", "w") as f:
+            with open(self.save_file, "w") as f:
                 json.dump(self.data, f)
 
             await conv.send_message(toSeg("Successfully registered!"))
@@ -264,7 +264,7 @@ class Handler:
 
             await conv.send_message(toSeg(user.full_name + ", you mined " + str(mined_amt) + " Saber Dollars!"))
 
-            with open("data.json", "w") as f:
+            with open(self.save_file, "w") as f:
                 json.dump(self.data, f)
 
         except Exception as e:
@@ -323,7 +323,7 @@ class Handler:
                         userData[item_type] = shopData[purchase]["name"]
                         userData["balance"] -= shopData[purchase]["price"]
 
-                        with open("data.json", "w") as f:
+                        with open(self.save_file, "w") as f:
                             json.dump(self.data, f)
 
                         await conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
@@ -346,7 +346,7 @@ class Handler:
                     self.data["users"][userID][item_type] = self.data["shop"][item_type][item]["name"]
                     self.data["users"][userID]["balance"] -= self.data["shop"][item_type][item]["price"]
 
-                    with open("data.json", "w") as f:
+                    with open(self.save_file, "w") as f:
                         json.dump(self.data, f)
 
                     await conv.send_message(toSeg("Purchase successful!"))
@@ -403,7 +403,7 @@ class Handler:
                 self.data["users"][give_users[0].id_[0]]["balance"] += arg2
                 self.data["users"][give_users[0].id_[0]]["total_balance"] += arg2
 
-                with open("data.json", "w") as f:
+                with open(self.save_file, "w") as f:
                     json.dump(self.data, f)
 
                 await conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
@@ -448,7 +448,7 @@ class Handler:
                 self.data["users"][userID]["balance"] -= give_money
                 self.data["users"][give_user]["balance"] += give_money
                 self.data["users"][give_user]["total_balance"] += give_money
-                with open("data.json", "w") as f:
+                with open(self.save_file, "w") as f:
                     json.dump(self.data, f)
                 await conv.send_message(toSeg("Successfully given " + str(give_money) + " Saber Dollars to ID: " + str(give_user)))
                 await conv.send_message(toSeg("That user now has " + str(self.data["users"][give_user]["balance"]) + " Saber Dollars"))
@@ -586,7 +586,7 @@ class Handler:
                 userData[userID]["total_balance"] = 0
                 userData[userID]["pick"] = "Copper Pick"
 
-                with open("data.json", "w") as f:
+                with open(self.save_file, "w") as f:
                     json.dump(self.data, f)
 
                 await conv.send_message(toSeg("Successfully prestiged"))
@@ -629,7 +629,7 @@ class Handler:
                     userData[userID]["prestige"] -= prestige_upgrade_cost
                     self.data["users"][userID]["prestige_upgrade_confirm"] = 0
 
-                    with open("data.json", "w") as f:
+                    with open(self.save_file, "w") as f:
                         json.dump(self.data, f)
 
                 await conv.send_message(toSeg("Successfully upgraded prestige!"))
