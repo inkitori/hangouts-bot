@@ -54,9 +54,6 @@ class RPGHandler:
         commands = trim(commands)
         command = get_item_safe[commands]
         if not command:
-            # u might want to replace this with basic help text
-            # or the curent state of the game, incase they forgot
-            # eg. "u r in the village, enter help for help"
             return "you must enter a command"
 
         elif command not in list(self.commands) + list(self.admin_commands):
@@ -91,7 +88,7 @@ class RPGHandler:
         if not room:
             return "Invalid argument! use warp {room}"
 
-        if self.userData[userID]["fighting"]:
+        if self.fighting:
             return "You can't warp while in a fight!"
 
         elif room not in rooms:
@@ -100,20 +97,18 @@ class RPGHandler:
         elif rooms[room]["required_lvl"] > users[userID]["lvl"]:
             return "Your level is not high enough to warp there!"
 
-        elif room == users[userID]["room"]:
+        elif room == user.room:
             return "You are already in that room!"
 
         users[userID]["room"] = room
         return "Successfully warped!"
 
 
-    
-
     def fight(self, userID, commands):
         rooms = self.data["rooms"]
         text = ""
 
-        playerRoom = self.userData[userID]["room"]
+        playerRoom = self.room
 
         # DO NOT let an if elif chain happen here
         if playerRoom == "village":

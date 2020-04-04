@@ -98,7 +98,7 @@ class Player():
     def print_stats(self):
         return self.stats.print_stats()
 
-    def equipped(self):
+    def print_equipped(self):
         equipped = ""
 
         for type_, index in self.equipped.items():
@@ -107,10 +107,14 @@ class Player():
 
         return equipped.title()
 
+
 class Enemy():
 
     def __init__():
         pass
+
+
+class room
 
 
 class Item():
