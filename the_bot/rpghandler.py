@@ -18,8 +18,36 @@ class Alive():
 
 class Player(Alive):
 
-    def __init__(self, ):
+    def __init__(self, name):
         super().__init__()
+        self.name = name
+        self.other_stats = {"balance": 0, "lifetime balance": 0, "level": 1, "xp": 0}
+        self.battle_stats = {"vitality": 100, "health": 100, "attack": 5, "defense": 5}
+        self.room = "village"
+        self.fighting = {}
+        self.inventory = [None for i in range(8)]
+        self.inventory[0:2] = [all_items["starter armor"], all_items["starter weapon"]]
+        self.equipped = {"armor": 0, "weapon": 1}
+
+    def add_to_inventory(item, slot=None):
+        """
+        puts an item into the first empty slot
+        if a slot is specifed, uses that slot instead
+        """
+        text = f"put {item_name} in slot {i}"
+        if slot is not None:
+            replaced_item_name = get_key(RPGManager.all_items, self.inventory[slot])
+            try:
+                self.inventory[slot] = item
+            except IndexError:
+                return f"slot {slot} does not exist"
+            return text + f"replacing {item_name}"
+        for i in range(len(self.inventory)):
+            if self.inventory[i] is None:
+                self.inventory[i] = item
+                item_name = get_key(RPGManager.all_items, item)
+                return text
+            return "there are no empy slots, specify a slot"
 
 
 class Enemy(Alive):
@@ -36,6 +64,7 @@ class Item():
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
+        self.description = f"{Item.rarities[self.rarity]} {self.modifier} {get_key(RPGHandler.all_items, self)}\n"
 
 
 class RPGHandler:
@@ -49,6 +78,9 @@ class RPGHandler:
     all_items = {
         "starter armor": Item("armor"),
         "starter weapon": Item("weapon"),
+    }
+    users = {
+
     }
 
     def __init__(self):
@@ -98,8 +130,9 @@ class RPGHandler:
         self.commands[command](userID, commands)
 
     def register(self, userID, command):
-        if userID in self.userData:
+        if userID in self.users:
             return "You are already registered!"
+        self.users[userID] = User()
         self.userData[userID] = user
         self.userData[userID] = {}
         self.userData[userID]["balance"] = 0
@@ -122,9 +155,8 @@ class RPGHandler:
         inventory_text = ""
 
         for item in self.userData[userID]["inventory"]:
-            inventory_text += f"{Item.rarities[item.rarity]} {item.modifier} {get_key(self.all_items, item)}\n"
+            inventory_text += item.description
 
-        inventory_text = inventory_text.title()
         return inventory_text
 
     def warp(self, userID, command):
@@ -133,7 +165,7 @@ class RPGHandler:
         room = get_item_safe(commands)
         if not room:
             return "Invalid argument! use warp {room}"
-        
+
         if self.userData[userID]["fighting"]:
             return "You can't warp while in a fight!"
 
@@ -153,15 +185,13 @@ class RPGHandler:
 
     def equipped(self, userID, command):
         equipped = ""
-
         userInfo = self.userData[userID]
-        userArmor = userInfo["inventory"][userInfo["equipped_armor"]]
-        userWeapon = userInfo["inventory"][userInfo["equipped_weapon"]]
 
-        equipped += "Weapon: " + (userWeapon["rarity"] + " " + userWeapon["modifier"] + " " + userWeapon["name"]).title() + '\n'
-        equipped += "Armor: " + (userArmor["rarity"] + " " + userArmor["modifier"] + " " + userArmor["name"]).title()
+        for type_, index in userInfo["equipped"].items():
+            item = userInfo["inventory"][index]
+            equipped += f"{type_}: {item.description}"
 
-        return equipped
+        return equipped.title()
 
     def fight(self, userID, command):
         rooms = self.data["rooms"]
@@ -169,6 +199,7 @@ class RPGHandler:
 
         playerRoom = self.userData[userID]["room"]
 
+        # DO NOT let an if elif chain happen here
         if playerRoom == "village":
             return "Don't fight in the village..."
 

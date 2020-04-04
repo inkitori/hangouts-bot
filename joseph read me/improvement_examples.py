@@ -2,6 +2,45 @@
 examples of improving and cleaning code for joseph
 in reverse chronological order (newest on top)
 """
+# this is just dumb
+# eventually this will become a monster because u only set up 2 items
+# and u thuoght doing it manually would suffice
+def equipped(self, userID, command):
+    equipped = ""
+
+    userInfo = self.userData[userID]
+    userArmor = userInfo["inventory"][userInfo["equipped_armor"]]
+    userWeapon = userInfo["inventory"][userInfo["equipped_weapon"]]
+
+    equipped += "Weapon: " + (userWeapon["rarity"] + " " + userWeapon["modifier"] + " " + userWeapon["name"]).title() + '\n'
+    equipped += "Armor: " + (userArmor["rarity"] + " " + userArmor["modifier"] + " " + userArmor["name"]).title()
+
+    return equipped
+# i changed some things and added an item class with attribute description so fix that real quick
+def equipped(self, userID, command):
+    equipped = ""
+
+    userInfo = self.userData[userID]
+    userArmor = userInfo["inventory"][userInfo["equipped"]["armor"]]
+    userWeapon = userInfo["inventory"][userInfo["equipped"]["weapon"]]
+
+    equipped += f"Weapon: {userWeapon.description}"
+    equipped += f"Armor: {userArmor.description}"
+
+    return equipped.title()
+# this is waiting to explode into a mess of repeated code, so lets fix that
+def equipped(self, userID, command):
+    equipped = ""
+    userInfo = self.userData[userID]
+
+    for type_, index in userInfo["equipped"].items():
+        item = userInfo["inventory"][index]
+        equipped += f"{type_}: {item.description}"
+
+    return equipped.title()
+
+
+
 # i wrote functions to deal with this nonsense
 # also, variables exist for a reason
 # u are goining about cleaning ur input wrong. the input sohuld be cleaned once, by rpg process

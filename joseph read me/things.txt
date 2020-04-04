@@ -17,6 +17,8 @@ TO DO
         not idea, but better
     - read improvement_examples.py
     - delete line 199 of rpg handler? (its commented out)
+    - make a folder for the rpg
+    - new file for classes for the rpg
 
 
 coding style
