@@ -107,19 +107,7 @@ class RPGHandler:
         return "Successfully warped!"
 
 
-    def equipped(self, userID, commands):
-        equipped = ""
-        userInfo = self.userData[userID]
-
-        for type_, index in userInfo["equipped"].items():
-            item = userInfo["inventory"][index]
-            equipped += f"{type_}: {item.description()}"
-
-        return equipped.title()
-
-    def xp(self, userID, commands):
-        return f"LVL: {self.userData[userID]['lvl']} | {self.userData[userID]['xp']}/{round(4 * (((self.userData[userID]['lvl'] + 1)** 4)/5))}"
-
+    
 
     def fight(self, userID, commands):
         rooms = self.data["rooms"]
@@ -167,7 +155,7 @@ class RPGHandler:
 
             damage_dealt = round(damage_dealt, 1)
 
-            enemy["hp"] -= damage_dealt
+            enemy.stts.hp -= damage_dealt
             enemy["hp"] = round(enemy["hp"], 1)
 
             text += "You dealt " + str(damage_dealt) + " damage to " + enemy["name"] + "!\n"
@@ -177,8 +165,6 @@ class RPGHandler:
 
                 xp_range = self.data["rooms"][self.userData[userID]["room"]]["xp_range"]
                 xp_earned = random.randint(xp_range[0], xp_range[1])
-                # gold_range = self.data["rooms"][self.userData[userID]["room"]]["gold_range"]
-                # gold_earned = random.randint(gold_range[0], gold_range[1])
 
                 gold_earned = round(self.data["enemies"][enemy["name"]]["vit"] / 10) + random.randint(1, 10)
 
@@ -273,25 +259,3 @@ class RPGHandler:
             return "Set value!"
         else:
             return "That user isn't registered!"
-
-    # not commands but also doesn't fit in utils
-    def give_xp(self, userID, xp_earned):
-        notify_level = 0
-        self.userData[userID]["xp"] += xp_earned
-
-        while True:
-            next_lvl = self.userData[userID]["lvl"] + 1
-            xp_required = round(4 * ((next_lvl ** 4) / 5))
-
-            if self.userData[userID]["xp"] >= xp_required:
-                self.userData[userID]["lvl"] += 1
-                self.userData[userID]["xp"] -= xp_required
-                notify_level = 1
-
-            else:
-                break
-
-        if notify_level:
-            return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
-
-        return ""

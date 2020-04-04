@@ -3,7 +3,7 @@ import utils
 class Stats():
 
     def __init__(
-        alive=False, random_stats=True, type_=None,
+        self, alive=False, random_stats=True, type_=None,
         *, max_health=100, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
         ):
         if alive:
@@ -13,7 +13,7 @@ class Stats():
             self.lifetime_balance = self.balance = balance
             self.xp = xp
         if random_stats():
-            attack, defense = generate_from_level()
+            attack, defense = self.generate_from_level(level)
         self.attack = attack
         self.defense = defense
         self.level = level
@@ -27,18 +27,39 @@ class Stats():
     def print_stats(self):
         pass
 
+    def next_level_xp(self):
+        return round(4 * (((self.level + 1) ** 4) / 5))
+
+    def print_level_xp(self):
+        return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
+
+    def give_xp(self, xp_earned):
+        notify = False
+        self.xp += xp_earned
+
+        xp_required = self.next_level_xp()
+
+        while self.xp > xp_required:
+            self.level += 1
+            self.xp -= xp_required
+            notify = True
+            xp_required = self.next_level_xp()
+        if notify:
+            return f"You are now level {self.level}!"
+
+        return ""
+
 
 class Player():
 
     def __init__(self, name):
         self.name = name
-        self.stats = Stats()
+        self.stats = Stats(True, False, "player")
         self.room = "village"
         self.fighting = {}
         self.inventory = [None for i in range(8)]
-        self.inventory[0:3] = [all_items["starter armor"], all_items["starter weapon"]]
-        self.equipped = {"armor": 0, "weapon": 1}
-        self.tome = "clarity"
+        self.add_to_inventory("starter armor", "starter weapon", "clarity")
+        self.equipped = {"armor": 0, "weapon": 1, "tome": "clarity"}
 
     def add_to_inventory(self, items, slot=None):
         """
@@ -51,34 +72,40 @@ class Player():
             return("you can only put in one item at a time if using a slot")
         output_text = ""
 
-        for item in items:
-            item_name = utils.get_key(all_items, item)
+        for item_name in items:
             added_text = f"put {item_name} in slot {i}"
             if slot is not None:
                 replaced_item_name = utils.get_key(all_items, self.inventory[slot])
                 try:
-                    self.inventory[slot] = item
+                    self.inventory[slot] = item_name
                 except IndexError:
                     return f"slot {slot} does not exist"
                 return text + f"replacing {replaced_item_name}"
             for i in range(len(self.inventory)):
                 if self.inventory[i] is None:
                     self.inventory[i] = item
-                    item_name = get_key(all_items, item)
-                    return text
-                return "there are no empy slots, specify a slot"
+                    output_text += utils.newline(added_text)
+                output_text += "there are no empy slots, specify a slot"
         return output_text
 
     def print_inventory(self):
         inventory_text = ""
 
-        for item in self.inventory:
-            inventory_text += item.description()
+        for item_name in self.inventory:
+            inventory_text += all_items[item_name].description()
         return inventory_text
 
     def print_stats(self):
         return self.stats.print_stats()
 
+    def equipped(self):
+        equipped = ""
+
+        for type_, index in self.equipped.items():
+            item = all_items[self.inventory[index]]
+            equipped += f"{type_}: {item.description()}"
+
+        return equipped.title()
 
 class Enemy():
 
