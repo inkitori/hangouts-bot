@@ -65,13 +65,7 @@ class RPGHandler:
         return self.commands[command](user, commands)
         save(self.save_file, self.data)
 
-    def register(self, user, commands):
-        userID = get_key(self.users, user)
-        if userID in self.users:
-            return "You are already registered!"
-        self.users[userID] = Player("placeholder name")
 
-        return "Successfully registered!"
 
     def warp(self, user, commands):
         inv = ""

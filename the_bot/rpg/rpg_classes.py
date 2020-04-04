@@ -160,3 +160,11 @@ class Game():
     users = {}
     rooms = {"village": Room()}
     enemies = {}
+
+    def register(self, user, commands):
+        userID = get_key(self.users, user)
+        if userID in self.users:
+            return "You are already registered!"
+        self.users[userID] = Player("placeholder name")
+
+        return "Successfully registered!"
