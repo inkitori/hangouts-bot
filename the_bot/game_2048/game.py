@@ -306,13 +306,11 @@ class Game():
         command = utils.get_item_safe(command_list)
 
         # check player movement
-        command = utils.get_item_safe(command_list)
         x = None
         positive = None
         for direction in self.movement:
             if command in self.movement[direction]:
                 self.move(directions[direction])
-        self.move(x, positive)
         if (x, positive) == (None, None):
             if command in self.modes.keys():
                 self.restart(Game.modes[command])
