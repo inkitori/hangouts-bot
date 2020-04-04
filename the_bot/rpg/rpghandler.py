@@ -15,9 +15,8 @@ class RPGHandler:
         106637925595968853122,  # chendi
     )
 
-    users = {
-
-    }
+    users = {}
+    rooms = {"village": Room()}
 
     def __init__(self):
         self.commands = {
@@ -52,7 +51,7 @@ class RPGHandler:
     def rpg_process(self, userID, event_text):
         commands = clean(event_text)
         commands = trim(commands)
-        command = get_item_safe[commands]
+        command = get_item_safe(commands)
         if not command:
             return "you must enter a command"
 
@@ -80,7 +79,7 @@ class RPGHandler:
         return "Successfully registered!"
 
 
-    def warp(self, userID, commands):
+    def warp(self, user, commands):
         inv = ""
         rooms = self.data["rooms"]
         users = self.userData
@@ -104,7 +103,7 @@ class RPGHandler:
         return "Successfully warped!"
 
 
-    def fight(self, userID, commands):
+    def fight(self, user, commands):
         rooms = self.data["rooms"]
         text = ""
 
@@ -129,7 +128,7 @@ class RPGHandler:
 
             return text
 
-    def atk(self, userID, commands):
+    def atk(self, user, commands):
         rooms = self.data["rooms"]
         text = ""
 
@@ -199,7 +198,7 @@ class RPGHandler:
 
             return text
 
-    def rest(self, userID, commands):
+    def rest(self, user, commands):
         text = ""
         if self.userData[userID]["room"] == "village":
             self.userData[userID]["hp"] = self.userData[userID]["vit"]

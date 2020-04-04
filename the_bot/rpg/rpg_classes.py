@@ -95,8 +95,13 @@ class Player():
             inventory_text += all_items[item_name].description()
         return inventory_text
 
-    def print_stats(self):
+    def print_raw_stats(self):
         return self.stats.print_stats()
+
+    def modified_stats(self):
+        # should use eqquiped item stats to change player stats
+        # reutrns stats objecct
+
 
     def print_equipped(self):
         equipped = ""
@@ -114,7 +119,11 @@ class Enemy():
         pass
 
 
-class room
+class Room():
+
+    def __init__(enemies_list=[], min_level=1):
+        self.enemies_list = enemies_list
+        self.min_level = min_level
 
 
 class Item():
@@ -128,6 +137,7 @@ class Item():
 
     def description(self):
         return f"{Item.rarities[self.rarity]} {self.modifier} {get_key(all_items, self)}\n"
+
 
 all_items = {
     "starter armor": Item("armor"),
