@@ -17,7 +17,7 @@ from utils import *
 class Handler:
 
     save_file = "the_bot/data.json"
-    images_folder = "the_bot/images"
+    images_folder = "the_bot/images/"
 
     keywords = {
         "good bot": "nyaa, thanku~~",
@@ -169,6 +169,7 @@ class Handler:
     async def rpg(self, bot, event):
         user, conv = getUserConv(bot, event)
         rpg_text = self.rpg_handler.rpg_process(user.id_[0], event.text)
+        print(rpg_text)
 
         await conv.send_message(toSeg(rpg_text))
 
