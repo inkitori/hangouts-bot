@@ -1,14 +1,16 @@
 import random
 from collections import defaultdict
 from datetime import datetime
-import json
+import json  # u shouldn't need this cause its in utils.py
 import math
 from utils import *
 
+
 class User():
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         pass
+
 
 class RPGHandler:
 
@@ -37,25 +39,22 @@ class RPGHandler:
 
         self.cooldowns = defaultdict(dict)
 
-        # replave with utils.load()
-        with open(self.save_file) as f:
-            self.data = json.load(f)
-
+        self.data = utils.load(self.save_file)
         self.userData = self.data["users"]
 
         random.seed(datetime.now())
 
-    # rpg 
+    # rpg
     def rpg_process(self, userID, event_text):
         command = clean(event_text)[1]
         full_command = clean(event_text, 1)[1]
-        
+
         if command not in self.commands:
             return "That command doesn't exist!"
 
         elif command == "register" and userID in self.userData:
             return "You are already registered!"
-        
+
         elif command != "register" and userID not in self.userData:
             return "You are not registered! Use /register"
 
@@ -74,7 +73,7 @@ class RPGHandler:
         self.userData[userID]["def"] = 5
         self.userData[userID]["xp"] = 0
         self.userData[userID]["lvl"] = 1
-        self.userData[userID]["room"] = "village" 
+        self.userData[userID]["room"] = "village"
         self.userData[userID]["equipped_armor"] = 0
         self.userData[userID]["equipped_weapon"] = 1
         self.userData[userID]["inventory_size"] = 8
@@ -173,10 +172,10 @@ class RPGHandler:
             baseDamage = self.data["items"]["weapons"][userWeapon["rarity"]][userWeapon["name"]]["atk"]
             modifierDamage = self.data["modifiers"][userWeapon["modifier"]]["atk"]
 
-            damage_dealt = (baseDamage + baseDamage * modifierDamage) * (self.userData[userID]["atk"]/self.data["enemies"][enemy["name"]]["def"])
+            damage_dealt = (baseDamage + baseDamage * modifierDamage) * (self.userData[userID]["atk"] / self.data["enemies"][enemy["name"]]["def"])
 
             multiplier = random.choice((1, -1))
-            damage_dealt += multiplier * math.sqrt(damage_dealt/2)
+            damage_dealt += multiplier * math.sqrt(damage_dealt / 2)
 
             damage_dealt = round(damage_dealt, 1)
 
@@ -193,7 +192,7 @@ class RPGHandler:
                 # gold_range = self.data["rooms"][self.userData[userID]["room"]]["gold_range"]
                 # gold_earned = random.randint(gold_range[0], gold_range[1])
 
-                gold_earned = round(self.data["enemies"][enemy["name"]]["vit"]/10) + random.randint(1, 10)
+                gold_earned = round(self.data["enemies"][enemy["name"]]["vit"] / 10) + random.randint(1, 10)
 
                 text += "You earned " + str(xp_earned) + " xp and " + str(gold_earned) + " gold!"
                 text += self.give_xp(userID, xp_earned)
@@ -247,7 +246,7 @@ class RPGHandler:
 
     def stats(self, userID, command):
         userStats = self.userData[userID]
-        return "HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
+        return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}"
 
     def save_data(self, userID, command):
         if isIn(self.admins, user):
@@ -287,10 +286,10 @@ class RPGHandler:
         else:
             return "bro wtf u can't use that"
 
-    def set(self, userID, command):
-        userID = command.split()[1]
-        key = command.split()[2]
-        value = command.split(' ', 3)[3]
+    def set(self, userID, commands):
+        # i rewrote this, check things.txt
+        command_list = utils.clean(commands)
+        userID, key, value = get_item_safe(command_list, (1, 2, 3))
 
         if value.isdigit():
             value = int(value)
@@ -307,7 +306,7 @@ class RPGHandler:
 
         else:
             return "bro wtf u can't use that"
-            
+
     # not commands but also doesn't fit in utils
     def give_xp(self, userID, xp_earned):
         notify_level = 0
@@ -315,7 +314,7 @@ class RPGHandler:
 
         while True:
             next_lvl = self.userData[userID]["lvl"] + 1
-            xp_required = round(4 * ((next_lvl ** 4)/5))
+            xp_required = round(4 * ((next_lvl ** 4) / 5))
 
             if self.userData[userID]["xp"] >= xp_required:
                 self.userData[userID]["lvl"] += 1
@@ -327,7 +326,7 @@ class RPGHandler:
 
         if notify_level:
             return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
-        
+
         else:
             return ""
 
