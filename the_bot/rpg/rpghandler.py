@@ -27,7 +27,6 @@ class RPGHandler:
         self.commands = {
             "remove": self.remove,
             "sync": self.sync,
-            "save_data": self.save_data,
             "set": self.set,
             "register": self.register,
             "inventory": self.inventory,
@@ -43,8 +42,6 @@ class RPGHandler:
         self.admin_commands = {
 
         }
-
-        
 
         self.cooldowns = defaultdict(dict)
 
@@ -261,14 +258,6 @@ class RPGHandler:
     def stats(self, userID, command):
         userStats = self.userData[userID]
         return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}\nMP: {userStats['mp']}"
-
-    def save_data(self, userID, command):
-        if userIn(self.admins, user):
-            save(self.save_file, self.data)
-
-            return "Successfully saved!"
-        else:
-            return "bro wtf u can't use that"
 
     def sync(self, userID, command):
         key = command.split()[1]
