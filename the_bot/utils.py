@@ -109,3 +109,11 @@ def get_key(dictionary, item, *ignore):
             pass
     key_index = list(dictionary.values()).index(item)
     return list(dictionary.keys())[key_index]
+
+
+def get_value(dictionary, key, default=""):
+    try:
+        value = dictionary[key]
+    except KeyError:
+        value = default
+    return value
