@@ -1,11 +1,12 @@
 import utils
 
+
 class Stats():
 
     def __init__(
         self, alive=False, random_stats=True, type_=None,
         *, max_health=100, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
-        ):
+    ):
         if alive:
             self.health = self.max_health = max_health
         if type_ == "player":
@@ -34,6 +35,10 @@ class Stats():
     def print_level_xp(self):
         return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
 
+    def increase_balance(self, money):
+        self.balance += money
+        self.lifetime_balance += money
+
     def give_xp(self, xp_earned):
         notify = False
         self.xp += xp_earned
@@ -50,6 +55,9 @@ class Stats():
 
         return ""
 
+    def full_health(self):
+        self.health = self.max_health
+
 
 class Player():
 
@@ -57,7 +65,7 @@ class Player():
         self.name = name
         self.stats = Stats(True, False, "player")
         self.room = "village"
-        self.fighting = {}
+        self.fighting = ""
         self.inventory = [None for i in range(8)]
         self.add_to_inventory("starter armor", "starter weapon", "clarity")
         self.equipped = {"armor": 0, "weapon": 1, "tome": "clarity"}
@@ -74,24 +82,23 @@ class Player():
         output_text = ""
 
         for item_name in items:
-            added_text = f"put {item_name} in slot {i}"
+            added_text = f"put {item_name} in slot"
             if slot is not None:
                 replaced_item_name = utils.get_key(all_items, self.inventory[slot])
                 try:
                     self.inventory[slot] = item_name
                 except IndexError:
                     return f"slot {slot} does not exist"
-                return text + f"replacing {replaced_item_name}"
+                return added_text + f" {slot} replacing {replaced_item_name}"
             for i in range(len(self.inventory)):
                 if self.inventory[i] is None:
-                    self.inventory[i] = item
-                    output_text += utils.newline(added_text)
-                output_text += "there are no empy slots, specify a slot"
+                    self.inventory[i] = item_name
+                    output_text += utils.newline(added_text) + f" {i}"
+                output_text += "there are no empty slots, specify a slot"
         return output_text
 
     def print_inventory(self):
         inventory_text = ""
-
         for item_name in self.inventory:
             inventory_text += all_items[item_name].description()
         return inventory_text
@@ -101,8 +108,7 @@ class Player():
 
     def modified_stats(self):
         # should use eqquiped item stats to change player stats
-        # reutrns stats objecct
-
+        return Stats()
 
     def print_equipped(self):
         equipped = ""
@@ -113,20 +119,23 @@ class Player():
 
         return equipped.title()
 
+    def died(self):
+        self.stats.full_health()
+        self.fighting = ""
+
 
 class Enemy():
 
-    def __init__():
-        # ??
-        self.atk = atk
-        self.def = def
-        self.hp = hp
+    def __init__(self):
+        self.stats = Stats(True, True, "enemy")
+
 
 class Room():
 
-    def __init__(enemies_list=[], min_level=1):
+    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0)):
         self.enemies_list = enemies_list
         self.min_level = min_level
+        self.xp_range = xp_range
 
 
 class Item():
@@ -139,7 +148,7 @@ class Item():
         self.modifier = modifier
 
     def description(self):
-        return f"{Item.rarities[self.rarity]} {self.modifier} {get_key(all_items, self)}\n"
+        return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(all_items, self)}\n"
 
 
 all_items = {
