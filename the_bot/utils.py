@@ -1,5 +1,5 @@
 import hangups
-import decimal
+import decimal  # why is this here
 import json
 
 
@@ -27,9 +27,8 @@ def cooldown(cooldowns, user, event, cooldown):
         cooldowns[user][text.split()[0]] = strippedTime
 
 
-def isIn(userList, user):
-    if int(user.id_[0]) in userList:
-        return True
+def userIn(userList, user):
+    return int(user.id_[0]) in userList
 
 
 def scientific(number):
@@ -37,13 +36,13 @@ def scientific(number):
 
 
 def save(file_name, contents):
-    with open(file_name, "w") as f:
-        json.dump(contents, f, indent=4)
+    with open(file_name, "w") as file:
+        json.dump(contents, file, indent=4)
 
 
 def load(file_name):
-    with open(file_name, "r") as f:
-        return json.load(file_name)
+    with open(file_name, "r") as file:
+        return json.load(file)
 
 
 def newline(text, number=1):
@@ -51,33 +50,31 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def get_item_safe(sequence, index=0, default=""):
+def get_item_safe(sequence, indexes=(0), defaults=("")):
     """
-    Retrives the item at index in sequence
+    Retrives the items at the indexes in sequence
     defaults to default if the item des not exist
     """
-    try:
-        item = sequence[index]
-    except IndexError:
-        item = default
-    return item
+    items = []
+    if len(defaults) == 1:
+        defaults = defaults * len(indexes)
+    for index, default in zip(indexes, defaults):
+        try:
+            item = sequence[index]
+        except IndexError:
+            item = default
+        items.append(item)
+    return items
 
 
-def clean(text):
+def clean(text, split=True):
     """cleans user input and returns as a list"""
     if text:
         if type(text) == str:
-            return text.strip().lower().split()
-        elif type(text) == list:
+            text = text.strip().lower()
+            if split:
+                text = text.split(' ')
             return text
-    else:
-        return [""]
-
-def clean_idx(text, idx = 0):
-    """cleans user input and returns as a list"""
-    if text:
-        if type(text) == str:
-            return text.strip().lower().split(' ', idx)
         elif type(text) == list:
             return text
     else:

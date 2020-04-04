@@ -1,4 +1,5 @@
-specific things
+TO DO
+    joseph u can edit this too. if theres anything in this file u dont find useful, delete it
     - make the prestige stuff a new file
     - get all the old handler stuff out of rpg handler
     - only handler and bot should be able to send stuff to hangouts
@@ -6,6 +7,19 @@ specific things
     - i left u a few comments about variables u never use, plz check if u actually need those
     - learn git (this is a nice website for basics, i can send u some ebooks too http://think-like-a-git.net/)
     - user class in rpg
+    - a quick note, clean(), trim(), and get_item_safe() are meant to be used together
+        to sequentially get commands from the user input to allow longer commands
+    - what is notify_level? strings instead of ints are much more informative.
+        if ur worried about mispelling, use Enum to restrict possible values
+    - dealing with admins should be a responsiblity for handler, not rpg
+        howver, this will cause circular import chains
+        therefore, it is probably best to deal with it inside of rpg
+        not idea, but better
+    - read improvement_examples.py
+    - delete line 199 of rpg handler? (its commented out)
+    - make a folder for the rpg
+    - new file for classes for the rpg
+
 
 coding style
     - write shorter functions where possible (RPGHandler.atk is too long)
@@ -47,13 +61,4 @@ coding style
             )
 
 other
-    - push whenever it works, pull after u push (this reduces merge conflicts)
-
-never forget
-    multiplier = random.choice((1, -1))
-    damage_taken += multiplier * math.sqrt(damage_dealt / 2)
-    vs
-    if random.randint(0, 1):
-        damage_dealt += math.sqrt(damage_dealt/2)
-    else:
-        damage_dealt -= math.sqrt(damage_dealt/2)
+    - push whenever whenever u can, pull after u push (this reduces merge conflicts)
