@@ -42,7 +42,11 @@ def save(file_name, contents):
 
 def load(file_name):
     with open(file_name, "r") as file:
-        return json.load(file)
+        try:
+            return json.load(file)
+        except json.decoder.JSONDecodeError:
+            return "could not load data"
+
 
 
 def newline(text, number=1):
