@@ -2,6 +2,9 @@
 examples of improving and cleaning code for joseph
 in reverse chronological order (newest on top)
 """
+
+
+
 # this is just dumb
 # eventually this will become a monster because u only set up 2 items
 # and u thuoght doing it manually would suffice
