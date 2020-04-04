@@ -42,7 +42,11 @@ class Player():
 
 class Enemy():
 
-    def __init__():
+    def __init__(self, name):
+        self.name = name
+        self.hp = hp
+        self.atk = atk
+        self.def = def
 
 
 class Item():
