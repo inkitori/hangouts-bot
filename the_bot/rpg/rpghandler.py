@@ -21,10 +21,6 @@ class RPGHandler:
 
     def __init__(self):
         self.commands = {
-            "remove": self.remove,
-            "sync": self.sync,
-            "save_data": self.save_data,
-            "set": self.set,
             "register": self.register,
             "inventory": self.inventory,
             "warp": self.warp,
@@ -37,7 +33,10 @@ class RPGHandler:
             "heal": self.heal
         }
         self.admin_commands = {
-
+            "remove": self.remove,
+            "sync": self.sync,
+            "save_data": self.save_data,
+            "set": self.set,
         }
 
         
@@ -60,34 +59,31 @@ class RPGHandler:
             # eg. "u r in the village, enter help for help"
             return "you must enter a command"
 
-        elif command not in self.commands:
+        elif command not in list(self.commands) + list(self.admin_commands):
             return "That command doesn't exist!"
 
         elif command != "register" and userID not in self.userData:
             return "You are not registered! Use register"
+
         user = self.users[userID]
         commands = trim(commands)
+
+        if command in self.admin_commands and not userIn(self.admins, userID):
+            return "bro wtf u cant use that"
+
         return self.commands[command](user, commands)
         save(self.save_file, self.data)
 
-    def register(self, user, command):
+    def register(self, user, commands):
         userID = get_key(self.users, user)
         if userID in self.users:
             return "You are already registered!"
-        self.users[userID] = User("placeholder name")
+        self.users[userID] = Player("placeholder name")
 
-        save(self.save_file, self.data)
         return "Successfully registered!"
 
-    def inventory(self, userID, command):
-        inventory_text = ""
 
-        for item in self.userData[userID]["inventory"]:
-            inventory_text += item.description()
-
-        return inventory_text
-
-    def warp(self, userID, command):
+    def warp(self, userID, commands):
         inv = ""
         rooms = self.data["rooms"]
         users = self.userData
@@ -108,11 +104,10 @@ class RPGHandler:
             return "You are already in that room!"
 
         users[userID]["room"] = room
-        save(self.save_file, self.data)
         return "Successfully warped!"
 
 
-    def equipped(self, userID, command):
+    def equipped(self, userID, commands):
         equipped = ""
         userInfo = self.userData[userID]
 
@@ -122,11 +117,11 @@ class RPGHandler:
 
         return equipped.title()
 
-    def xp(self, userID, command):
+    def xp(self, userID, commands):
         return f"LVL: {self.userData[userID]['lvl']} | {self.userData[userID]['xp']}/{round(4 * (((self.userData[userID]['lvl'] + 1)** 4)/5))}"
 
 
-    def fight(self, userID, command):
+    def fight(self, userID, commands):
         rooms = self.data["rooms"]
         text = ""
 
@@ -149,10 +144,9 @@ class RPGHandler:
             self.userData[userID]["fighting"]["name"] = enemy
             self.userData[userID]["fighting"]["hp"] = enemyData["vit"]
 
-            save(self.save_file, self.data)
             return text
 
-    def atk(self, userID, command):
+    def atk(self, userID, commands):
         rooms = self.data["rooms"]
         text = ""
 
@@ -223,83 +217,62 @@ class RPGHandler:
                 self.userData[userID]["hp"] = self.userData[userID]["vit"]
 
             return text
-            save(self.save_file, self.data)
 
-    def rest(self, userID, command):
+    def rest(self, userID, commands):
         text = ""
-
-        if self.userData[userID]["room"] != "village":
-            return "You have to rest in the village!"
-
-        else:
+        if self.userData[userID]["room"] == "village":
             self.userData[userID]["hp"] = self.userData[userID]["vit"]
             text += "You feel well rested...\n"
             text += f"Your health is back up to {self.userData[userID]['vit']}!"
-            save(self.save_file, self.data)
-            return text
-
-    def stats(self, userID, command):
-        userStats = self.userData[userID]
-        return f"HP: {userStats['hp']}\nVIT: {userStats['vit']}\nATK: {userStats['atk']}\nDEF: {userStats['def']}\nMP: {userStats['mp']}"
-
-    def save_data(self, userID, command):
-        if userIn(self.admins, user):
-            save(self.save_file, self.data)
-
-            return "Successfully saved!"
         else:
-            return "bro wtf u can't use that"
+            text = "You have to rest in the village!"
 
-    def sync(self, userID, command):
-        key = command.split()[1]
-        value = command.split()[2]
+        return text
+
+
+    def save_data(self, userID, commands):
+        save(self.save_file, self.data)
+        return "Successfully saved!"
+
+
+    def sync(self, userID, commands):
+        key, value = get_item_safe(commands, (0, 1)
 
         if value.isdigit():
             value = int(value)
 
-        if userIn(self.admins, user):
-            for user in self.userData:
-                self.userData[user][key] = value
+        for user in self.userData:
+            self.userData[user][key] = value
 
-            save(self.save_file, self.data)
+        save(self.save_file, self.data)
 
-            return "Synced all values!"
-        else:
-            return "bro wtf u can't use that"
+        return "Synced all values!"
 
-    def remove(self, userID, command):
+
+    def remove(self, userID, commands):
         key = command.split()[1]
 
-        if userIn(self.admins, user):
-            for user in self.userData:
-                self.userData[user].pop(key, None)
+        for user in self.userData:
+            self.userData[user].pop(key, None)
 
-            save(self.save_file, self.data)
+        save(self.save_file, self.data)
 
-            return "Removed key!"
-        else:
-            return "bro wtf u can't use that"
+        return "Removed key!"
 
     def set(self, userID, commands):
-        # i rewrote this, check improvement_examples.py
-        command_list = utils.clean(commands)
-        userID, key, value = get_item_safe(command_list, (1, 2, 3))
+        userID, key, value = get_item_safe(commands, (1, 2, 3))
 
         if value.isdigit():
             value = int(value)
 
-        if userIn(self.admins, user):
-            if userID in self.userData:
-                self.userData[userID][key] = value
+        if userID in self.userData:
+            self.userData[userID][key] = value
 
-                save(self.save_file, self.data)
+            save(self.save_file, self.data)
 
-                return "Set value!"
-            else:
-                return "That user isn't registered!"
-
+            return "Set value!"
         else:
-            return "bro wtf u can't use that"
+            return "That user isn't registered!"
 
     # not commands but also doesn't fit in utils
     def give_xp(self, userID, xp_earned):
@@ -321,7 +294,4 @@ class RPGHandler:
         if notify_level:
             return "You are now level " + str(self.userData[userID]["lvl"]) + "!"
 
-        else:
-            return ""
-
-        save(self.save_file, self.data)
+        return ""
