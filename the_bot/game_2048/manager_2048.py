@@ -31,6 +31,7 @@ class Manager:
 
     def run_game(self, commands=""):
         """runs the game based on commands"""
+        output_text = ""
         command_list = utils.clean(commands)
         command = utils.get_item_safe(command_list)
 
@@ -44,7 +45,7 @@ class Manager:
             game_name = utils.get_item_safe(command_list)
             valid = self.verify_name(game_name)
             if valid != "valid":
-                return valid
+                output_text = valid
             self.create_game(game_name)
             command_list = utils.trim(command_list)
 
@@ -56,9 +57,9 @@ class Manager:
             command_list = utils.trim(command_list)
             valid = self.verify_name(new_name)
             if valid != "valid":
-                return valid
+                output_text = valid
             if old_name not in self.games.keys():
-                return "that game does not exist"
+                output_text = "that game does not exist"
             self.games[new_name] = self.games.pop(old_name)
             game_name = new_name
             command_list = utils.trim(command_list)
@@ -67,18 +68,18 @@ class Manager:
             command_list = utils.trim(command_list)
             game_name = utils.get_item_safe(command_list)
             if not game_name:
-                return "you must give the name of the game"
+                output_text = "you must give the name of the game"
             elif game_name not in self.games.keys():
-                return "that game does not exist"
+                output_text = "that game does not exist"
             if self.games["current game"] == self.games[game_name]:
                 self.games["current game"] = None
             del self.games[game_name]
-            return f"{game_name} deleted"
+            output_text = f"{game_name} deleted"
 
         elif command == "games":
             for game_name, game in self.games.items():
                 if game_name != "current game":
-                    return f"{game_name} - {utils.get_key(Game.modes, game.mode)} score: {game.score}\n"
+                    output_text = f"{game_name} - {utils.get_key(Game.modes, game.mode)} score: {game.score}\n"
 
         elif command in self.games.keys():
             game_name = command
@@ -86,10 +87,13 @@ class Manager:
             command_list = utils.trim(command_list)
         else:
             game_name = "current game"
-        if type(self.games[game_name]) == Game:
-            return self.games[game_name].play_game(command_list)
-        else:
-            return "no game selected"
+        if not output_text:
+            if type(self.games[game_name]) == Game:
+                output_text = self.games[game_name].play_game(command_list)
+            else:
+                output_text = "no game selected"
+        save_games()
+        return output_text
 
     def load_games(self):
         """loads games from a json file"""
