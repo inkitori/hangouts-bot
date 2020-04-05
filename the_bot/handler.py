@@ -45,8 +45,6 @@ class Handler:
             "/economy": self.economy,
             "/2048": self.play_2048,
             "/rpg": self.rpg,
-            "yes": self.yes_no,
-            "no": self.yes_no,
             "say_something": self.say_something,
         }
         self.cooldowns = defaultdict(dict)
@@ -127,6 +125,7 @@ class Handler:
         except:
             await conv.send_message(toSeg("Yeah don't use this command lol"))
 
+    # games
     async def rpg(self, bot, event):
         user, conv = getUserConv(bot, event)
         rpg_text = self.rpg_handler.rpg_process(user.id_[0], event.text)
@@ -134,21 +133,11 @@ class Handler:
 
         await conv.send_message(toSeg(rpg_text))
 
-    # chendi's stuff
     async def play_2048(self, bot, event):
         user, conv = getUserConv(bot, event)
         game_text = self.manager_2048.run_game(event.text)
         await conv.send_message(toSeg(game_text))
         self.manager.save_games()
-
-    async def yes_no(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        text = event.text.split()[0]
-        if userIn(self.admins, user):
-            text = "yes" if text == "yes" else "no"
-        else:
-            text = "no" if text == "yes" else "yes"
-        await conv.send_message(toSeg(text))
 
     async def economy(self, bot, event):
         pass
