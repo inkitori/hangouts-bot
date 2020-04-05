@@ -1,5 +1,4 @@
 import hangups
-import decimal  # why is this here
 import json
 
 
@@ -15,7 +14,7 @@ def getUserConv(bot, event):
 
 
 def cooldown(cooldowns, user, event, cooldown):
-    text = event.text.lower()
+    text = clean(event.text, split=False)
     strippedTime = event.timestamp.replace(tzinfo=None)
 
     if user in cooldowns and text.split()[0] in cooldowns[user]:
@@ -42,7 +41,15 @@ def save(file_name, contents):
 
 def load(file_name):
     with open(file_name, "r") as file:
-        return json.load(file)
+        try:
+            return json.load(file)
+        except json.decoder.JSONDecodeError:
+            return "could not load data"
+
+
+def join_items(*list, seperator="\n"):
+    """joins a list using seperator"""
+    return seperator.join(list)
 
 
 def newline(text, number=1):
@@ -98,6 +105,15 @@ def trim(text, number=1, default=[""]):
         return text
     else:
         return["something is wrong"]
+
+
+def command_parser(command_text, has_prefix=True):
+    commands = clean(command_text)
+    if has_prefix:
+        commands = trim(commands)
+    while True:
+        yield get_item_safe(commands)
+        commands = trim(commands)
 
 
 def get_key(dictionary, item, *ignore):
