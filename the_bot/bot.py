@@ -26,7 +26,6 @@ class Bot:
     async def _on_connect(self):
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
         self._convo_list.on_event.add_observer(self._on_event)
-        convs = self._convo_list.get_all()
         print("Connected!")
 
     async def _on_disconnect(self):
@@ -36,24 +35,31 @@ class Bot:
         user, conv = getUserConv(self, event)
         userID = user.id_[0]
         userData = self.handler.data["users"]
+        output_message = ""
 
         if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
 
-            strippedText = event.text.strip().lower()
+            strippedText = clean(event.text)
+            command = get_item_safe(strippedText)
 
-            if strippedText in self.handler.keywords:
-                await conv.send_message(toSeg(self.handler.keywords[strippedText]))
+            if command in self.handler.keywords:
+                output_message = self.handler.keywords[command]
 
-            elif strippedText.split()[0] in self.handler.images:
+            elif command in self.handler.images:
                 if cooldown(self.handler.cooldowns, user, event, 5):
                     return
-                f = open(self.handler.images_folder + self.handler.images[strippedText.split()[0]], "rb")
-                await conv.send_message(toSeg(""), f)
-                f.close()
+                with open(self.handler.images_folder + self.handler.images[command], "rb") as image:
+                    await conv.send_message(toSeg(""), image)
 
-            elif strippedText.split()[0] in self.handler.commands:
+            elif command in self.handler.commands:
                 await self.handler.commands[strippedText.split()[0]](self, event)
+
+            elif command in self.handler.games:
+                await self.handler.play_game(self, event)
 
         elif isinstance(event, hangups.MembershipChangeEvent):
             if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
-                await conv.send_message(toSeg("Saber in!"))
+                output_message = "Saber in!"
+        if output_message:
+            await conv.send_message(toSeg(output_message))
+

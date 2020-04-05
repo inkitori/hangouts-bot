@@ -37,10 +37,16 @@ class Handler:
         "/rpg": RPGManager(),
         "/economy": EconomyManager(),
     }
-
+    ignore = (
+        105849946242372037157,  # odlebot
+        11470746254329358783,  # saberbot
+        104687919952293193271,  # Ether(chendibot)
+    )
+    self.admins = (
+        114207595761187114730,  # joseph
+        106637925595968853122,  # chendi
+    )
     def __init__(self):
-        self.manager_2048 = Manager2048()
-        self.rpg_handler = RPGHandler()
         self.commands = {
             "/help": self.help_,
             "/rename": self.rename_conv,
@@ -49,15 +55,8 @@ class Handler:
             "/kick": self.kick,
         }
         self.cooldowns = defaultdict(dict)
-        self.admins = [
-            114207595761187114730,  # joseph
-            106637925595968853122,  # chendi
-        ]
-        self.ignore = [
-            105849946242372037157,  # odlebot
-            11470746254329358783,  # saberbot
-            104687919952293193271,  # Ether(chendibot)
-        ]
+        
+        
 
         random.seed(datetime.now())
 
@@ -124,23 +123,9 @@ class Handler:
         except:
             await conv.send_message(toSeg("Yeah don't use this command lol"))
 
-    # games
-    async def play_rpg(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        rpg_text = self.rpg_handler.rpg_process(user.id_[0], event.text)
-        print(rpg_text)
-
-        await conv.send_message(toSeg(rpg_text))
-
-    async def play_2048(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        game_text = self.manager_2048.run_game(event.text)
-        await conv.send_message(toSeg(game_text))
-        self.manager.save_game()
-
     async def play_game(self, bot, event):
-        game = clean(event.text)[0]
-        manager = self.game_managers[game]
+        game_name = clean(event.text)[0]
+        manager = self.game_managers[game_name]
         user, conv = getUserConv(bot, event)
         game_text = manager.run_game(user.id_[0], event.text)
         await conv.send_message(toSeg(game_text))
