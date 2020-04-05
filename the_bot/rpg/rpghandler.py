@@ -15,6 +15,8 @@ class RPGHandler:
         106637925595968853122,  # chendi
     )
 
+    game = Game()
+
     def __init__(self):
         self.commands = {
             "register": self.register,
@@ -23,7 +25,6 @@ class RPGHandler:
             "equipped": self.equipped,
             "stats": self.stats,
             "rest": self.rest,
-            "xp": self.xp,
             "fight": self.fight,
             "atk": self.atk,
             "heal": self.heal
@@ -32,7 +33,7 @@ class RPGHandler:
             "remove": self.remove,
             "sync": self.sync,
             "save_data": self.save_data,
-            "set": self.set,
+            "set": self.set_,
         }
 
         self.cooldowns = defaultdict(dict)
@@ -65,36 +66,11 @@ class RPGHandler:
         return self.commands[command](user, commands)
         save(self.save_file, self.data)
 
-
-
-    def warp(self, user, commands):
-        inv = ""
-        rooms = self.data["rooms"]
-        users = self.userData
-        room = get_item_safe(commands)
-        if not room:
-            return "Invalid argument! use warp {room}"
-
-        if self.fighting:
-            return "You can't warp while in a fight!"
-
-        elif room not in rooms:
-            return "That room doesn't exist!"
-
-        elif rooms[room]["required_lvl"] > users[userID]["lvl"]:
-            return "Your level is not high enough to warp there!"
-
-        elif room == user.room:
-            return "You are already in that room!"
-
-        user.room = room
-        return "Successfully warped!"
-
     def fight(self, user, commands):
         rooms = self.data["rooms"]
         text = ""
 
-        player_room = self.room
+        player_room = user.room
 
         # DO NOT let an if elif chain happen here
         if player_room == "village":
@@ -152,31 +128,20 @@ class RPGHandler:
 
             user.health -= damage_taken
 
-            health_text = (
+            text += join_list(
                 f"{enemy.name} dealt {damage_taken} to you!",
                 f"You have {user.stats.hp} hp left",
                 f"{enemy.name} has {enemy.stats.health} left!"
-            )
-            text += "\n".join(health_text)
+                )
 
             save(self.save_file, self.data)
             if user.stats.health <= 0:
                 text += f"You were killed by {enemy.name}..."
 
-                user.died()
+                user.fighting = ""
+                user.stats.change_health("full")
 
             return text
-
-    def rest(self, user, commands):
-        text = ""
-        if user.room == "village":
-            user.stats.full_health()
-            text += "You feel well rested...\n"
-            text += f"Your health is back up to {user.stats.hp}!"
-        else:
-            text = "You have to rest in the village!"
-
-        return text
 
     def save_data(self, userID, commands):
         save(self.save_file, self.data)
@@ -206,7 +171,7 @@ class RPGHandler:
 
         return "Removed key!"
 
-    def set(self, userID, commands):
+    def set_(self, userID, commands):
         userID, key, value = get_item_safe(commands, (0, 1, 2))
 
         if value.isdigit():

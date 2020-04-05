@@ -14,7 +14,6 @@ import economy
 from rpghandler import RPGHandler
 
 
-
 class Handler:
 
     save_file = "the_bot/data.json"
@@ -60,8 +59,7 @@ class Handler:
             11470746254329358783,  # saberbot
             104687919952293193271,  # Ether(chendibot)
         ]
-        self.prestige_conversion = 100000
-        self.prestige_upgrade_base = 2000
+
         random.seed(datetime.now())
 
         with open(self.save_file) as f:
@@ -152,14 +150,8 @@ class Handler:
             text = "no" if text == "yes" else "yes"
         await conv.send_message(toSeg(text))
 
-    async def say_something(self, bot, event):
-        pass
-
-
     async def economy(self, bot, event):
         pass
-
-    # config
 
     async def quit_(self, bot, event):
         user, conv = getUserConv(bot, event)

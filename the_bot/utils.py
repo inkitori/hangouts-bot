@@ -48,6 +48,10 @@ def load(file_name):
             return "could not load data"
 
 
+def join_items(*list, seperator="\n"):
+    """joins a list using seperator"""
+    return seperator.join(list)
+
 
 def newline(text, number=1):
     """adds number newlines to the end of text"""
@@ -102,6 +106,13 @@ def trim(text, number=1, default=[""]):
         return text
     else:
         return["something is wrong"]
+
+
+def command_parser(commands):
+    commands = commands.clean()
+    while True:
+        commands.trim()
+        yield get_item_safe(commands)
 
 
 def get_key(dictionary, item, *ignore):
