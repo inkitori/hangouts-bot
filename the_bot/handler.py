@@ -11,13 +11,13 @@ from utils import *
 
 from game_2048.manager_2048 import Manager2048
 # import economy
-from rpghandler import RPGHandler
+from rpg.rpg_manager import RPGHandler
 
 
 class Handler:
 
-    save_file = "the_bot/data.json"
-    images_folder = "the_bot/images/"
+    save_file = "data.json"
+    images_folder = "images/"
 
     keywords = {
         "ping": "pong",
@@ -31,6 +31,10 @@ class Handler:
         "/praise": "praise.jpg",
         "/goddammit": "goddammit.jpg",
         "/heymister": "heymister.png"
+    }
+    game_managers = {
+        "/2048": Manager2048(),
+        "/rpg": RPGManager
     }
 
     def __init__(self):
@@ -137,10 +141,15 @@ class Handler:
         user, conv = getUserConv(bot, event)
         game_text = self.manager_2048.run_game(event.text)
         await conv.send_message(toSeg(game_text))
-        self.manager.save_games()
+        self.manager.save_game()
 
-    async def play_economy(self, bot, event):
-        pass
+    async def play_game(self, bot, event):
+        game = clean(event.text)[0]
+        manager = self.game_managers[game]
+        user, conv = getUserConv(bot, event)
+        game_text = manager.run_game(user.id_[0], event.text)
+        await conv.send_message(toSeg(game_text))
+        manager.save_game()
 
     async def quit_(self, bot, event):
         user, conv = getUserConv(bot, event)

@@ -8,10 +8,10 @@ from game_2048.classes_2048 import Game
 
 class Manager2048:
     games = {"current game": None}
-    save_file = "the_bot/game_2048/save_data.json"
+    save_file = "game_2048/save_data.json"
 
     def __init__(self):
-        self.load_games()
+        self.load_game()
         self.text = ""
 
     def create_game(self, game_name):
@@ -29,7 +29,7 @@ class Manager2048:
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
-    def run_game(self, commands=""):
+    def run_game(self, userID, commands=""):
         """runs the game based on commands"""
         output_text = ""
         command_list = utils.clean(commands)
@@ -92,10 +92,10 @@ class Manager2048:
                 output_text = self.games[game_name].play_game(command_list)
             else:
                 output_text = "no game selected"
-        self.save_games()
+        self.save_game()
         return output_text
 
-    def load_games(self):
+    def load_game(self):
         """loads games from a json file"""
         data = utils.load(self.save_file)
         for game_name, game_data in data["games"].items():
@@ -103,7 +103,7 @@ class Manager2048:
         for mode_name, mode in Game.modes.items():
             mode.high_score = data["scores"][mode_name]
 
-    def save_games(self):
+    def save_game(self):
         """saves games to a json file"""
         games_dict = dict()
         for game_name, game in self.games.items():

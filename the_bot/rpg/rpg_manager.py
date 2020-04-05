@@ -3,12 +3,12 @@ from datetime import datetime
 import math
 import random
 from utils import *
-from the_bot.rpg.rpg_classes import *
+from rpg.rpg_classes import *
 
 
 class RPGManager:
 
-    save_file = "the_bot/data.json"
+    save_file = "data.json"
     admins = (
         114207595761187114730,  # joseph
         106637925595968853122,  # chendi
