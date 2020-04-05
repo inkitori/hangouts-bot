@@ -5,7 +5,7 @@ class Stats():
 
     def __init__(
         self, alive=False, random_stats=True, type_=None,
-        *, max_health=100, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
+        *, max_health=100, health=5, mana=5, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
     ):
         if alive:
             self.health = self.max_health = max_health
@@ -13,6 +13,9 @@ class Stats():
             self.mana = self.max_mana = max_mana
             self.lifetime_balance = self.balance = balance
             self.xp = xp
+        elif type_ == "item":
+            self.mana = mana
+            self.health = health
         if random_stats():
             attack, defense, health = self.generate_from_level(level)
         self.attack = attack
@@ -175,10 +178,11 @@ class Item():
 
     rarities = ("common", "uncommon", "rare", "legendary")
 
-    def __init__(self, type_, rarity=0, modifier="boring"):
+    def __init__(self, type_, rarity=0, modifier="boring", health, attack, defense, mana):
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
+        self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
 
     def description(self):
         return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(Game.all_items, self)}\n"
