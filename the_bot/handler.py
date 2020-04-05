@@ -53,7 +53,7 @@ class Handler:
             "/rename": self.rename_conv,
             "/quit": self.quit_,
             "/id": self.id_,
-            # "/kick": self.kick,
+            "/kick": self.kick,
         }
         self.play_game.cooldown_time = 0
         self.help_.cooldown_time = 10
@@ -91,7 +91,7 @@ class Handler:
             bot.output_text = "Something went wrong!"
 
     async def kick(self, bot, event):
-        user, conv = getUserConv(bot, event)
+        user, conv = utils.getUserConv(bot, event)
         arg1 = event.text.lower().split()[1]
         users = conv.users
         ids = []
@@ -134,7 +134,6 @@ class Handler:
 
         if userIn(self.admins, user):
             bot.output_text = "Saber out!"
-            save_games()
             await bot.client.disconnect()
         else:
             bot.output_text = "bro wtf u can't use that"

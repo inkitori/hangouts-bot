@@ -107,7 +107,7 @@ def trim(text, number=1, default=[""]):
         return["something is wrong"]
 
 
-def command_parser(command_text, has_prefix=True):
+def command_parser(command_text, has_prefix=False):
     commands = clean(command_text)
     if has_prefix:
         commands = trim(commands)

@@ -35,8 +35,8 @@ class Bot:
 
         # handles messages
         if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
-            strippedText = utils.clean(event.text)
-            command = utils.get_item_safe(strippedText)
+            commands = utils.command_parser(event.text)
+            command = next(commands)
 
             if command in self.handler.keywords:
                 self.output_text = self.handler.keywords[command]
