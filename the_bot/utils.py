@@ -107,12 +107,13 @@ def trim(text, number=1, default=[""]):
         return["something is wrong"]
 
 
-def command_parser(commands):
-    commands = commands.clean()
+def command_parser(command_text, has_prefix=True):
+    commands = clean(command_text)
+    if has_prefix:
+        commands = trim(commands)
     while True:
-        commands.trim()
         yield get_item_safe(commands)
-
+        commands = trim(commands)
 
 def get_key(dictionary, item, *ignore):
     dictionary = dictionary.copy()

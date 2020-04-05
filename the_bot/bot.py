@@ -57,7 +57,3 @@ class Bot:
         elif isinstance(event, hangups.MembershipChangeEvent):
             if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
                 await conv.send_message(toSeg("Saber in!"))
-
-
-bot = Bot()
-bot.run()

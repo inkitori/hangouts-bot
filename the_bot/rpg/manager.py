@@ -3,7 +3,7 @@ from datetime import datetime
 import math
 import random
 from utils import *
-from rpg.rpg_classes import *
+from rpg.classes import *
 
 
 class RPGManager:
@@ -35,15 +35,13 @@ class RPGManager:
             "set": self.set_,
         }
 
-        self.cooldowns = defaultdict(dict)
-
         self.data = utils.load(self.save_file)
         self.userData = self.data["users"]
 
         random.seed(datetime.now())
 
     # rpg
-    def rpg_process(self, userID, event_text):
+    def run_game(self, userID, event_text):
         commands = clean(event_text)
         commands = trim(commands)
         command = get_item_safe(commands)
@@ -142,7 +140,10 @@ class RPGManager:
 
             return text
 
-    def save_data(self, userID, commands):
+    def load_game():
+        pass
+
+    def save_game(self, userID, commands):
         save(self.save_file, self.data)
         return "Successfully saved!"
 

@@ -1,5 +1,6 @@
 import economy.classes
 
+
 class EconomyManager():
 
     picks = {
@@ -22,15 +23,18 @@ class EconomyManager():
         "Luminite": 233077812,
     }
 
+    def __init__(self):
+        pass
+
+    def run_game(self, userID, commands):
+        pass
+
     def leaderboard(self, bot, event):
-        user, conv = getUserConv(bot, event)
+        user, conv = utils.getUserConv(bot, event)
         users = {}
         count = 1
         leaderboard = "Ranking by balanced earned in this lifetime:\n"
-
-        if cooldown(self.cooldowns, user, event, 10):
-            return
-
+        output_text = ""
         try:
             for user in self.data["users"]:
                 users[user] = (self.data["users"][user]["total_balance"])
@@ -46,7 +50,9 @@ class EconomyManager():
             conv.send_message(toSeg(leaderboard))
 
         except:
-            conv.send_message(toSeg("Failed retrieving leaderboard info!"))
+            return "Failed retrieving leaderboard info!"
+
+        return output_text
 
     def shop(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -60,3 +66,9 @@ class EconomyManager():
                 conv.send_message(toSeg(s))
         except:
             conv.send_message(toSeg("Failed to retrieve shop!"))
+
+    def save_game(self):
+        pass
+
+    def load_game(self):
+        pass

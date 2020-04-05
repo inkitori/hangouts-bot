@@ -14,7 +14,7 @@
             "room": "floor1",
             "equipped_armor": 0,
             "equipped_weapon": 1,
-	    "tome": "Clarity",
+	        "tome": "Clarity",
             "inventory_size": 8,
             "fighting": {},
             "inventory": [

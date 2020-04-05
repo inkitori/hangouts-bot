@@ -9,9 +9,9 @@ import json
 # import math
 from utils import *
 
-from game_2048.manager_2048 import Manager2048
-# import economy
-from rpg.rpg_manager import RPGHandler
+from game_2048.manager import Manager2048
+from economy.manager import EconomyManager
+from rpg.manager import RPGHandler
 
 
 class Handler:
@@ -34,7 +34,8 @@ class Handler:
     }
     game_managers = {
         "/2048": Manager2048(),
-        "/rpg": RPGManager
+        "/rpg": RPGManager(),
+        "/economy": EconomyManager(),
     }
 
     def __init__(self):
@@ -42,14 +43,10 @@ class Handler:
         self.rpg_handler = RPGHandler()
         self.commands = {
             "/help": self.help_,
-            "/rename": self.rename,
+            "/rename": self.rename_conv,
             "/quit": self.quit_,
             "/id": self.id_,
             "/kick": self.kick,
-            "/economy": self.play_economy,
-            "/2048": self.play_2048,
-            "/rpg": self.play_rpg,
-            "say_something": self.say_something,
         }
         self.cooldowns = defaultdict(dict)
         self.admins = [
@@ -64,9 +61,6 @@ class Handler:
 
         random.seed(datetime.now())
 
-        with open(self.save_file) as f:
-            self.data = json.load(f)
-
     # utility
     async def help_(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -78,10 +72,11 @@ class Handler:
         await conv.send_message(toSeg(contents))
         f.close()
 
-    async def rename(self, bot, event):
+    async def rename_conv(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 3):
             return
+        commands = trim(clean(event.text))
 
         try:
             await conv.rename(event.text.split(' ', 1)[1])
