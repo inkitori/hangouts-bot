@@ -42,9 +42,9 @@ class Handler:
             "/quit": self.quit_,
             "/id": self.id_,
             "/kick": self.kick,
-            "/economy": self.economy,
+            "/economy": self.play_economy,
             "/2048": self.play_2048,
-            "/rpg": self.rpg,
+            "/rpg": self.play_rpg,
             "say_something": self.say_something,
         }
         self.cooldowns = defaultdict(dict)
@@ -126,7 +126,7 @@ class Handler:
             await conv.send_message(toSeg("Yeah don't use this command lol"))
 
     # games
-    async def rpg(self, bot, event):
+    async def play_rpg(self, bot, event):
         user, conv = getUserConv(bot, event)
         rpg_text = self.rpg_handler.rpg_process(user.id_[0], event.text)
         print(rpg_text)
@@ -139,7 +139,7 @@ class Handler:
         await conv.send_message(toSeg(game_text))
         self.manager.save_games()
 
-    async def economy(self, bot, event):
+    async def play_economy(self, bot, event):
         pass
 
     async def quit_(self, bot, event):
