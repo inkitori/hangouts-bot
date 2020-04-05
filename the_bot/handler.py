@@ -5,7 +5,7 @@ import asyncio
 import random
 from collections import defaultdict
 from datetime import datetime, tzinfo
-import json
+# import json
 # import math
 import utils
 
@@ -53,15 +53,14 @@ class Handler:
             "/rename": self.rename_conv,
             "/quit": self.quit_,
             "/id": self.id_,
-            "/kick": self.kick,
+            # "/kick": self.kick,
         }
-        for command in self.commands.values():
-            command.cooldown_time = 0
-        help_.cooldown_time
-        rename_conv.cooldown_time
-        quit_.cooldown_time
-        id_.cooldown_time
-        kick.cooldown_time
+        self.play_game.cooldown_time = 0
+        self.help_.cooldown_time = 10
+        self.rename_conv.cooldown_time = 3
+        self.quit_.cooldown_time = 10
+        self.id_.cooldown_time = 10
+        self.kick.cooldown_time = 10
 
         self.cooldowns = defaultdict(dict)
 
@@ -69,18 +68,14 @@ class Handler:
 
     # utility
     async def help_(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 10):
-            return
+        user, conv = utils.getUserConv(bot, event)
 
         with open("text/help.txt", 'r') as help_text:
-            bot.output_text =  help_text.read()
+            bot.output_text = help_text.read()
 
     async def rename_conv(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 3):
-            return ""
-        commands = trim(clean(event.text))
+        commands = utilstrim(clean(event.text))
         new_name = get_item_safe(commands)
         if not new_name:
             bot.output_text = "Format: /rename {name}"
@@ -89,8 +84,6 @@ class Handler:
 
     async def id_(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 10):
-            return
 
         try:
             bot.output_text = user.id_[0]
@@ -138,8 +131,6 @@ class Handler:
 
     async def quit_(self, bot, event):
         user, conv = getUserConv(bot, event)
-        if cooldown(self.cooldowns, user, event, 30):
-            return
 
         if userIn(self.admins, user):
             bot.output_text = "Saber out!"
