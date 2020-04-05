@@ -7,11 +7,11 @@ from collections import defaultdict
 from datetime import datetime, tzinfo
 import json
 # import math
-from utils import *
+import utils
 
 from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
-from rpg.manager import RPGHandler
+from rpg.manager import RPGManager
 
 
 class Handler:
@@ -42,10 +42,11 @@ class Handler:
         11470746254329358783,  # saberbot
         104687919952293193271,  # Ether(chendibot)
     )
-    self.admins = (
+    admins = (
         114207595761187114730,  # joseph
         106637925595968853122,  # chendi
     )
+
     def __init__(self):
         self.commands = {
             "/help": self.help_,
@@ -54,9 +55,15 @@ class Handler:
             "/id": self.id_,
             "/kick": self.kick,
         }
+        for command in self.commands.values():
+            command.cooldown_time = 0
+        help_.cooldown_time
+        rename_conv.cooldown_time
+        quit_.cooldown_time
+        id_.cooldown_time
+        kick.cooldown_time
+
         self.cooldowns = defaultdict(dict)
-        
-        
 
         random.seed(datetime.now())
 
@@ -66,21 +73,19 @@ class Handler:
         if cooldown(self.cooldowns, user, event, 10):
             return
 
-        f = open("text/help.txt", 'r')
-        contents = f.read()
-        await conv.send_message(toSeg(contents))
-        f.close()
+        with open("text/help.txt", 'r') as help_text:
+            bot.output_text =  help_text.read()
 
     async def rename_conv(self, bot, event):
         user, conv = getUserConv(bot, event)
         if cooldown(self.cooldowns, user, event, 3):
-            return
+            return ""
         commands = trim(clean(event.text))
-
-        try:
-            await conv.rename(event.text.split(' ', 1)[1])
-        except:
-            await conv.send_message(toSeg("Format: /rename {name}"))
+        new_name = get_item_safe(commands)
+        if not new_name:
+            bot.output_text = "Format: /rename {name}"
+        else:
+            await conv.rename(new_name)
 
     async def id_(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -88,9 +93,9 @@ class Handler:
             return
 
         try:
-            await conv.send_message(toSeg(user.id_[0]))
+            bot.output_text = user.id_[0]
         except:
-            await conv.send_message(toSeg(str("Something went wrong!")))
+            bot.output_text = "Something went wrong!"
 
     async def kick(self, bot, event):
         user, conv = getUserConv(bot, event)
@@ -105,7 +110,7 @@ class Handler:
                     kick_users.append(user)
 
             if not kick_users:
-                await conv.send_message(toSeg("Nobody in this conversation goes by that name"))
+                bot.output_text = "Nobody in this conversation goes by that name"
                 return
             # only reason i figured this out was because of hangupsbot, so thank you so much
             # https://github.com/xmikos/hangupsbot/blob/master/hangupsbot/commands/conversations.py
@@ -121,14 +126,14 @@ class Handler:
                 res = await bot.client.remove_user(request)
                 conv.add_event(res.created_event)
         except:
-            await conv.send_message(toSeg("Yeah don't use this command lol"))
+            bot.output_text = "Yeah don't use this command lol"
 
     async def play_game(self, bot, event):
         game_name = clean(event.text)[0]
         manager = self.game_managers[game_name]
         user, conv = getUserConv(bot, event)
         game_text = manager.run_game(user.id_[0], event.text)
-        await conv.send_message(toSeg(game_text))
+        bot.output_text = game_text
         manager.save_game()
 
     async def quit_(self, bot, event):
@@ -137,8 +142,8 @@ class Handler:
             return
 
         if userIn(self.admins, user):
-            await conv.send_message(toSeg("Saber out!"))
+            bot.output_text = "Saber out!"
             save_games()
             await bot.client.disconnect()
         else:
-            await conv.send_message(toSeg("bro wtf u can't use that"))
+            bot.output_text = "bro wtf u can't use that"

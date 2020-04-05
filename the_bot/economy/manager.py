@@ -1,4 +1,5 @@
 import economy.classes
+import utils
 
 
 class EconomyManager():
@@ -35,37 +36,37 @@ class EconomyManager():
         count = 1
         leaderboard = "Ranking by balanced earned in this lifetime:\n"
         output_text = ""
-        try:
-            for user in self.data["users"]:
-                users[user] = (self.data["users"][user]["total_balance"])
+        # try:
+        for user in self.data["users"]:
+            users[user] = (self.data["users"][user]["total_balance"])
 
-            sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
+        sorted_users = {key: value for key, value in sorted(users.items(), key=lambda x: x[1], reverse=True)}
 
-            for key, value in sorted_users.items():
-                if count == 6:
-                    break
+        for key, value in sorted_users.items():
+            if count == 6:
+                break
 
-                leaderboard += str(count) + '. ' + self.data["users"][key]["name"] + ": " + str(value) + '\n'
-                count += 1
-            conv.send_message(toSeg(leaderboard))
+            leaderboard += str(count) + '. ' + self.data["users"][key]["name"] + ": " + str(value) + '\n'
+            count += 1
+        conv.send_message(utils.toSeg(leaderboard))
 
-        except:
-            return "Failed retrieving leaderboard info!"
+        # except:
+        #    return "Failed retrieving leaderboard info!"
 
         return output_text
 
     def shop(self, bot, event):
-        user, conv = getUserConv(bot, event)
+        user, conv = utils.getUserConv(bot, event)
 
-        if cooldown(self.cooldowns, user, event, 20):
+        if utils.cooldown(self.cooldowns, user, event, 20):
             return
 
-        try:
-            with open("text/shop.txt", "r") as f:
-                s = f.read()
-                conv.send_message(toSeg(s))
-        except:
-            conv.send_message(toSeg("Failed to retrieve shop!"))
+        # try:
+        with open("text/shop.txt", "r") as f:
+            s = f.read()
+            conv.send_message(utils.toSeg(s))
+        # except:
+            # conv.send_message(utils.toSeg("Failed to retrieve shop!"))
 
     def save_game(self):
         pass

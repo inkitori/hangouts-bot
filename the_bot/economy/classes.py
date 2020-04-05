@@ -1,7 +1,7 @@
 """
 economy for bot
 """
-from utils import *
+import utils
 
 
 class EconomyUser():

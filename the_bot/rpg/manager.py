@@ -2,8 +2,8 @@ from collections import defaultdict
 from datetime import datetime
 import math
 import random
-from utils import *
-from rpg.classes import *
+import utils
+import rpg.classes
 
 
 class RPGManager:
