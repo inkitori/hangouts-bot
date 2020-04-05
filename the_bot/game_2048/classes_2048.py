@@ -192,7 +192,7 @@ class Game():
         "down": ("down", "d", "v"), "right": ("right", "r", ">")
     }
     directions = {
-        "up" (False, False), "left": (True, False),
+        "up": (False, False), "left": (True, False),
         "down": (False, True), "right": (True, True)
     }
 
@@ -310,7 +310,7 @@ class Game():
         positive = None
         for direction in self.movement:
             if command in self.movement[direction]:
-                self.move(directions[direction])
+                self.move(self.directions[direction])
         if (x, positive) == (None, None):
             if command in self.modes.keys():
                 self.restart(Game.modes[command])

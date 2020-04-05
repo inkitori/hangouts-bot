@@ -3,10 +3,10 @@ manager for 2048 games
 """
 import json
 import utils
-from game_2048.game import Game
+from game_2048.classes_2048 import Game
 
 
-class Manager:
+class Manager2048:
     games = {"current game": None}
     save_file = "the_bot/game_2048/save_data.json"
 
@@ -92,7 +92,7 @@ class Manager:
                 output_text = self.games[game_name].play_game(command_list)
             else:
                 output_text = "no game selected"
-        save_games()
+        self.save_games()
         return output_text
 
     def load_games(self):

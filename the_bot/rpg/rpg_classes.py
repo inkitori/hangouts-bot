@@ -85,7 +85,7 @@ class Player():
         for item_name in items:
             added_text = f"put {item_name} in slot"
             if slot is not None:
-                replaced_item_name = utils.get_key(all_items, self.inventory[slot])
+                replaced_item_name = utils.get_key(Game.all_items, self.inventory[slot])
                 try:
                     self.inventory[slot] = item_name
                 except IndexError:
@@ -105,21 +105,23 @@ class Player():
     def print_inventory(self):
         inventory_text = ""
         for item_name in self.inventory:
-            inventory_text += all_items[item_name].description()
+            inventory_text += Game.all_items[item_name].description()
         return inventory_text
 
     def print_stats(self):
         # should print stats + modifers from weapons
+        return
 
     def modified_stats(self):
         # should use eqquiped item stats to calculate stats
         # then return a stats obbjcet with those stats
+        return
 
     def print_equipped(self):
         equipped = ""
 
         for type_, index in self.equipped.items():
-            item = all_items[self.inventory[index]]
+            item = Game.all_items[self.inventory[index]]
             equipped += f"{type_}: {item.description()}"
 
         return equipped.title()
@@ -150,7 +152,7 @@ class Player():
         if self.room == "village":
             self.stats.change_health("full")
             text += "You feel well rested...\n"
-            text += f"Your health is back up to {user.stats.hp}!"
+            text += f"Your health is back up to {self.stats.hp}!"
         else:
             text = "You have to rest in the village!"
 
@@ -181,7 +183,7 @@ class Item():
         self.modifier = modifier
 
     def description(self):
-        return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(all_items, self)}\n"
+        return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(Game.all_items, self)}\n"
 
 
 class Game():

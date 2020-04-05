@@ -1,13 +1,12 @@
 from collections import defaultdict
 from datetime import datetime
-import json  # u shouldn't need this cause its in utils.py
 import math
 import random
 from utils import *
 from the_bot.rpg.rpg_classes import *
 
 
-class RPGHandler:
+class RPGManager:
 
     save_file = "the_bot/data.json"
     admins = (
@@ -132,7 +131,7 @@ class RPGHandler:
                 f"{enemy.name} dealt {damage_taken} to you!",
                 f"You have {user.stats.hp} hp left",
                 f"{enemy.name} has {enemy.stats.health} left!"
-                )
+            )
 
             save(self.save_file, self.data)
             if user.stats.health <= 0:
@@ -159,7 +158,6 @@ class RPGHandler:
         save(self.save_file, self.data)
 
         return "Synced all values!"
-
 
     def remove(self, userID, commands):
         key = get_item_safe(commands)
