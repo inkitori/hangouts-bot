@@ -48,7 +48,9 @@ class Bot:
                     await conv.send_message(utils.toSeg(""), image)
 
             elif command in self.handler.commands:
-                await self.handler.commands[command](self, event)
+                function_ = self.handler.commands[command]
+                if not utils.cooldown(self.handler.cooldowns, user, event, function_.cooldown_time):
+                    await self.handler.commands[command](self, event)
 
             elif command in self.handler.games:
                 await self.handler.play_game(self, event)
