@@ -3,7 +3,43 @@ classes for economy game
 """
 import utils
 import math
+import random
 
+
+class Item():
+
+    def __init__(self, type_, price, modifer="", mining_range=None):
+        self.type_ = type_
+        self.price = price
+        self.modifer = modifer
+        if self.type_ == "pick":
+            self.mining_range = mining_range
+
+    def name(self):
+        """the name of the item"""
+        return f"{self.modifer}{self.type_}".title().replace(" ", "_")
+
+shop = {
+    "picks": (
+        Item("pick", 100, "tin"),
+        Item("pick", 250, "iron"),
+        Item("pick", 625, "lead"),
+        Item("pick", 1565, "silver"),
+        Item("pick", 3910, "tungsten"),
+        Item("pick", 9775, "gold"),
+        Item("pick", 24440, "platinum"),
+        Item("pick", 61100, "molten"),
+        Item("pick", 152750, "cobalt"),
+        Item("pick", 381875, "palladium"),
+        Item("pick", 954687, "mythril"),
+        Item("pick", 2386717, "orichalcum"),
+        Item("pick", 5966792, "adamantite"),
+        Item("pick", 14916980, "titanium"),
+        Item("pick", 37292450, "chlorophyte"),
+        Item("pick", 93231125, "spectre"),
+        Item("pick", 233077812, "luminite"),
+    )
+}
 
 class EconomyUser():
     """class for users in economy"""
@@ -11,113 +47,90 @@ class EconomyUser():
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
 
-    def __init__(self, user):
-        try:
-            self.balance = 0
-            self.lifetime_balance = 0
-            self.prestige = 0
-            self.pick = 0
-            self.name = user.full_name
-            self.prestige_confirm = 0
-            self.prestige_upgrade = 0
+    def __init__(self, name):
+        self.name = name
+        self.balance = 0
+        self.lifetime_balance = 0
+        self.prestige = 0
+        self.items = {"pick": 0}
+        self.prestige_confirm = 0
+        self.prestige_upgrade = 0
 
-    def increase_balance(self, money):
+    def change_balance(self, money):
         """increases money"""
         self.balance += money
-        self.lifetime_balance += money
+        if money > 0:
+            self.lifetime_balance += money
 
     def balance(self):
         """returns balance"""
-        try:
-            balance = self.data["users"][userID]["balance"]
-            conv.send_message(toSeg(user.full_name + ", you currently have " + str(balance) + " Saber Dollars!"))
-        except Exception as e:
-            conv.send_message(toSeg("Failed to retrieve balance info!"))
-            print(e)
+        return f"{self.name}, you currently have {self.balance} Saber Dollars!"
 
     def mine(self):
         """mines for saber dollars"""
-        user, conv = getUserConv(bot, event)
+        userID = user.id_[0]
+
+        player_pick = shop["picks"][self.items["pick"]]
+        mined_amount = random.randint(*player_pick.mining_range)
+        mined_amount += math.ceil(mined_amount * self.prestige / 100)
+        mined_amount *= 2 ** self.prestige_upgrade
+
+        self.change_balance(mined_amount)
+
+        return f"{self.name}, you mined {mined_amount} Saber Dollars!"
+
+    def buy(self, commands):
+        """buys a item"""
         userID = user.id_[0]
 
         try:
-            playerPick = self.data["shop"]["pick"][self.data["users"][userID]["pick"]]
-            mined_amt = random.randint(playerPick["range"][0], playerPick["range"][1])
-            mined_amt += math.ceil(mined_amt * self.data["users"][userID]["prestige"] / 100)
-            mined_amt *= 2 ** self.data["users"][userID]["prestige_upgrade"]
+            item_type = next(commands)
+            item = next(commands)
 
-            self.data["users"][userID]["balance"] += mined_amt
-            self.data["users"][userID]["lifetime_balance"] += mined_amt
-
-            return f"{user.full_name}, you mined {mined_amt} Saber Dollars!"
-
-        except Exception as e:
-            conv.send_message(toSeg("Failed to mine!"))
-            print(e)
-
-    def buy(self, bot, event):
-        """buys a pick"""
-        user, conv = getUserConv(bot, event)
-        userID = user.id_[0]
-
-        if cooldown(self.cooldowns, user, event, 10):
-            return
-
-        try:
-            item_type = event.text.split()[1].lower()
-            item = event.text.split(' ', 2)[2].strip().lower().title()
-
-            if userID not in self.data["users"]:
-                conv.send_message(toSeg("You are not registered!  Use /register"))
-                return
-
-            elif item == "Top":
+            if item == "Top":
                 if item_type not in self.data["shop"]:
                     conv.send_message(toSeg("That class doesn't exist!"))
                     return
 
+                shopData = self.data["shop"][item_type]
+                possible_items = []
+
+                for possible_item in shopData:
+                    if shopData[possible_item]["value"] > shopData[self.pick] and shopData[possible_item]["price"] <= self["balance"]:
+                        possible_items.append(possible_item)
+
+                if len(possible_items) == 0:
+                    conv.send_message(toSeg("No possible item of that class you can purchase!"))
+                    return
+
                 else:
-                    shopData = self.data["shop"][item_type]
-                    userData = self.data["users"][userID]
-                    possible_items = []
+                    purchase = possible_items[-1]
+                    userData[item_type] = shopData[purchase]["name"]
+                    self.change_balance(purchase.price)
 
-                    for possible_item in shopData:
-                        if shopData[possible_item]["value"] > shopData[userData["pick"]]["value"] and shopData[possible_item]["price"] <= userData["balance"]:
-                            possible_items.append(possible_item)
-
-                    if len(possible_items) == 0:
-                        conv.send_message(toSeg("No possible item of that class you can purchase!"))
-                        print("test")
-                        return
-
-                    else:
-                        purchase = possible_items[-1]
-                        userData[item_type] = shopData[purchase]["name"]
-                        userData["balance"] -= shopData[purchase]["price"]
-
-                        conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
-                        return
+                    conv.send_message(toSeg("Successful purchase of the " + purchase + "!"))
+                    return
 
             elif item_type not in self.data["shop"] or item not in self.data["shop"][item_type]:
-                conv.send_message(toSeg("That item doesn't exist!"))
-                return
+                return "That item doesn't exist!"
+
             else:
-                if self.data["users"][userID]["balance"] < self.data["shop"][item_type][item]["price"]:
+                if self.balance < self.data["shop"][item_type][item]["price"]:
                     conv.send_message(toSeg("You don't have enough money for that!"))
                     return
                 elif self.data["shop"][item_type][self.data["users"][userID][item_type]]["value"] == self.data["shop"][item_type][item]["value"]:
                     conv.send_message(toSeg("You already have that pick!"))
                     return
                 elif self.data["shop"][item_type][self.data["users"][userID][item_type]]["value"] > self.data["shop"][item_type][item]["value"]:
-                    conv.send_message(toSeg("You already have a pick better than that!"))
-                    return
+                    return "You already have a pick better than that!"
                 else:
                     self.data["users"][userID][item_type] = self.data["shop"][item_type][item]["name"]
                     self.data["users"][userID]["balance"] -= self.data["shop"][item_type][item]["price"]
 
-                    conv.send_message(toSeg("Purchase successful!"))
+                    return "Purchase successful!"
+
         except Exception as e:
-            conv.send_message(toSeg("Format: /buy {type} {item}"))
+            return "Format: /buy {type} {item}"
             print(e)
 
     def give(self, bot, event):
@@ -128,17 +141,17 @@ class EconomyUser():
         give_users = []
 
         try:
-            arg1 = event.text.split(' ', 1)[1]
-            arg1 = arg1.rsplit(' ', 1)[0]
+            give_user = event.text.split(' ', 1)[1]
+            give_user = give_user.rsplit(' ', 1)[0]
 
-            arg2 = int(event.text.split()[-1])
+            money = int(event.text.split()[-1])
 
             if userIn(self.ignore, user):
                 conv.send_message(toSeg("You are an ignored user!"))
                 return
 
             for u in users:
-                if arg1 in u.full_name:
+                if give_user in u.full_name:
                     give_users.append(u)
 
             if userID not in self.data["users"]:
@@ -157,20 +170,20 @@ class EconomyUser():
                 conv.send_message(toSeg("That user is you!"))
                 return
 
-            elif arg2 < 0:
+            elif money < 0:
                 conv.send_message(toSeg("You can't give negative money!"))
                 return
 
-            elif self.data["users"][userID]["balance"] < arg2:
+            elif self.data["users"][userID]["balance"] < money:
                 conv.send_message(toSeg("You don't have enough money to do that!"))
                 return
 
             else:
-                self.data["users"][userID]["balance"] -= arg2
-                self.data["users"][give_users[0].id_[0]]["balance"] += arg2
-                self.data["users"][give_users[0].id_[0]]["lifetime_balance"] += arg2
+                self.data["users"][userID]["balance"] -= money
+                self.data["users"][give_users[0].id_[0]]["balance"] += money
+                self.data["users"][give_users[0].id_[0]]["lifetime_balance"] += money
 
-                conv.send_message(toSeg("Successfully given " + str(arg2) + " Saber Dollars to " + give_users[0].full_name))
+                conv.send_message(toSeg("Successfully given " + str(money) + " Saber Dollars to " + give_users[0].full_name))
                 conv.send_message(toSeg("That user now has " + str(self.data["users"][give_users[0].id_[0]]["balance"]) + " Saber Dollars"))
 
         except:

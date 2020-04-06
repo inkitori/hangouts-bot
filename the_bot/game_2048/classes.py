@@ -164,7 +164,7 @@ class Game():
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
         "reserved": "prints reserved words",
-        "move": "prints valid <directions>"
+        "move": "prints valid {directions>"
     }
     help_text = (
         "this is a 2048 clone by chendi",
@@ -180,11 +180,11 @@ class Game():
     )
 
     extra_commands = {
-        "<direction> - move the tiles in the given direction (use move to see valid <directions>)"
-        "create <game_name>": "creates a new game with the given name (can be combined with other commands",
-        "<game_name>": "loads the game named game_name (can be combined with other commands)",
-        "rename <old_name> <new_name>": "renames a game from old_name to new_name",
-        "delete <game_name>": "deletes the game named game_name",
+        "{direction} - move the tiles in the given direction (use move to see valid {directions})"
+        "create {game_name}": "creates a new game with the given name (can be combined with other commands",
+        "{game_name}": "loads the game named game_name (can be combined with other commands)",
+        "rename {old_name} {new_name}": "renames a game from old_name to new_name",
+        "delete {game_name}": "deletes the game named game_name",
         "games": "prints all existing games, their mode and score",
     }
     movement = {

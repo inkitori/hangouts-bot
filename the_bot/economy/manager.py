@@ -2,31 +2,13 @@
 manager for economy
 """
 import economy.classes as classes
+import classes.items as items
 import utils
 
 
 class EconomyManager():
     """manager for economy"""
 
-    picks = {
-        "Tin": 100,
-        "Iron": 250,
-        "Lead": 625,
-        "Silver": 1565,
-        "Tungsten": 3910,
-        "Gold": 9775,
-        "Platinum": 24440,
-        "Molten": 61100,
-        "Cobalt": 152750,
-        "Palladium": 381875,
-        "Mythril": 954687,
-        "Orichalcum": 2386717,
-        "Adamantite": 5966792,
-        "Titanium": 14916980,
-        "Chlorophyte": 37292450,
-        "Spectre": 93231125,
-        "Luminite": 233077812,
-    }
     users = {}
 
     def __init__(self):

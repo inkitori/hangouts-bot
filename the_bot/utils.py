@@ -154,6 +154,7 @@ def get_value(dictionary, key, default=""):
         value = default
     return value
 
+
 def clamp(value, min, max):
     """clamps value inside min and max"""
     if value < min:
