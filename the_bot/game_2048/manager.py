@@ -7,6 +7,7 @@ from game_2048.classes_2048 import Game
 
 
 class Manager2048:
+    """manager for 2048 game"""
     games = {"current game": None}
     save_file = "game_2048/save_data.json"
 
@@ -20,6 +21,7 @@ class Manager2048:
         return self.games["current game"]
 
     def verify_name(self, *names):
+        """verifies a name for a game"""
         for name in names:
             if name in Game.reserved_words:
                 return "game names cannot be reserved words"
@@ -29,7 +31,7 @@ class Manager2048:
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
-    def run_game((self, bot, user, conv, commands)):
+    def run_game(self, bot, user, conv, commands):
         """runs the game based on commands"""
         output_text = ""
         command_list = utils.clean(commands)

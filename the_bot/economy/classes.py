@@ -1,11 +1,12 @@
 """
-economy for bot
+classes for economy game
 """
 import utils
 import math
 
 
 class EconomyUser():
+    """class for users in economy"""
 
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
@@ -20,11 +21,13 @@ class EconomyUser():
             self.prestige_confirm = 0
             self.prestige_upgrade = 0
 
-        def increase_balance(self, money):
-            self.balance += money
-            self.lifetime_balance += money
+    def increase_balance(self, money):
+        """increases money"""
+        self.balance += money
+        self.lifetime_balance += money
 
     def balance(self):
+        """returns balance"""
         try:
             balance = self.data["users"][userID]["balance"]
             conv.send_message(toSeg(user.full_name + ", you currently have " + str(balance) + " Saber Dollars!"))
@@ -33,6 +36,7 @@ class EconomyUser():
             print(e)
 
     def mine(self):
+        """mines for saber dollars"""
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -52,6 +56,7 @@ class EconomyUser():
             print(e)
 
     def buy(self, bot, event):
+        """buys a pick"""
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -116,6 +121,7 @@ class EconomyUser():
             print(e)
 
     def give(self, bot, event):
+        """gives money to another user"""
         user, conv = getUserConv(bot, event)
         users = conv.users
         userID = user.id_[0]
@@ -171,6 +177,7 @@ class EconomyUser():
             conv.send_message(toSeg("Format: /give {user} {money}"))
 
     def id_give(self, bot, event):
+        """gives money to another user"""
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -212,6 +219,7 @@ class EconomyUser():
             conv.send_message(toSeg("Format: /id_give {id} {money}"))
 
     def prestige(self, bot, event):
+        """prestiges"""
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
 
@@ -239,6 +247,7 @@ class EconomyUser():
             conv.send_message(toSeg("Something went wrong!"))
 
     def prestige_confirm(self, bot, event):
+        """confirms prestige"""
         user, conv = getUserConv(bot, event)
         userID = user.id_[0]
         userData = self.data["users"]
@@ -268,6 +277,7 @@ class EconomyUser():
             conv.send_message(toSeg("Something went wrong!"))
 
     def prestige_upgrade_info(self, bot, event):
+        """returns information about prestige"""
         user, conv = getUserConv(bot, event)
         userData = self.data["users"]
         userID = user.id_[0]
@@ -280,6 +290,7 @@ class EconomyUser():
         conv.send_message(toSeg("By prestiging, you will lose " + str(prestige_upgrade_cost) + " prestige."))
 
     def prestige_upgrade(self, bot, event):
+        """upgrades prestige"""
         try:
             prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)
 
@@ -301,6 +312,7 @@ class EconomyUser():
             print(e)
 
     def profile(self):
+        """returns user profile"""
         profile_text = utils.join_items(
             f"Name: {self.name}",
             f"Balance: {self.balance}",

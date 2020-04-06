@@ -1,8 +1,12 @@
+"""
+manager for economy
+"""
 import economy.classes as classes
 import utils
 
 
 class EconomyManager():
+    """manager for economy"""
 
     picks = {
         "Tin": 100,
@@ -29,12 +33,14 @@ class EconomyManager():
         pass
 
     def run_game(self, bot, user, conv, commands):
+        """runs the game"""
         if userID not in self.users:
             return "You are not registered! Use /register"
 
         # use commands
 
     def leaderboard(self, bot, event):
+        """returns leaderboard"""
         user_balances = {user: user.lifetime_balance for user in self.users}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
@@ -47,16 +53,20 @@ class EconomyManager():
         return leaderboard_text
 
     def shop(self):
+        """returns shop"""
         with open("text/shop.txt", "r") as shop_text:
             return shop_text.read()
 
     def save_game(self):
+        """saves the game"""
         utils.save(self.save_file, self.data)
 
     def load_game(self):
+        """loads the game"""
         pass
         
     def register(self, userID):
+        """registers a user"""
         if userID in self.users:
             return "You are already registered!"
         try:
@@ -67,6 +77,7 @@ class EconomyManager():
             print(e)
 
     def profile(self):
+        """returns a user profile"""
         output_text = ""
 
         try:
@@ -87,7 +98,7 @@ class EconomyManager():
 
                     for user in possible_users:
                         output_text += utils.join_items(
-                            f"**Name:** {dataUsers[user]["name"]}"",  # multiple users
+                            f"**Name:** {dataUsers[user]["name"]}",  # multiple users
                             f"**Balance:** {dataUsers[user]["balance"]}",
                             f"**Pick:** {dataUsers[user]["pick"]}",
                             f"**Prestige:** {dataUsers[user]["prestige"]}",

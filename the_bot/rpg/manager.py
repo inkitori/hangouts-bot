@@ -1,3 +1,6 @@
+"""
+manager for rpg
+"""
 from collections import defaultdict
 from datetime import datetime
 import math
@@ -7,6 +10,7 @@ import rpg.classes
 
 
 class RPGManager:
+    """manager for rpg"""
 
     save_file = "data.json"
     admins = (
@@ -39,13 +43,13 @@ class RPGManager:
         random.seed(datetime.now())
 
     def register(self):
+        """registers a user"""
         pass
 
 
     def run_game(self, bot, user, conv, commands):
-        commands = clean(event_text)
-        commands = trim(commands)
-        command = get_item_safe(commands)
+        """runs the game"""
+        command = next(commands)
         if not command:
             return "you must enter a command"
 
@@ -65,6 +69,7 @@ class RPGManager:
         save(self.save_file, self.data)
 
     def fight(self, user, commands):
+        """starts a with an enemy"""
         rooms = self.data["rooms"]
         text = ""
 
@@ -86,6 +91,7 @@ class RPGManager:
             return text
 
     def attack(self, user, commands):
+        """attacks an enemy"""
         text = ""
 
         if not user.fighting:
@@ -141,14 +147,17 @@ class RPGManager:
 
             return text
 
-    def load_game():
+    def load_game(self):
+        """loads the game"""
         pass
 
     def save_game(self, userID, commands):
+        """saves the game"""
         save(self.save_file, self.data)
         return "Successfully saved!"
 
     def sync(self, userID, commands):
+        """syncs value to save_file"""
         key, value = get_item_safe(commands, (0, 1))
 
         if value.isdigit():
@@ -162,6 +171,7 @@ class RPGManager:
         return "Synced all values!"
 
     def remove(self, userID, commands):
+        """removes a key from data"""
         key = get_item_safe(commands)
 
         for user in self.userData:
@@ -172,6 +182,7 @@ class RPGManager:
         return "Removed key!"
 
     def set_(self, userID, commands):
+        """sets a value"""
         userID, key, value = get_item_safe(commands, (0, 1, 2))
 
         if value.isdigit():

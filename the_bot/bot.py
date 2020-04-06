@@ -10,6 +10,7 @@ import sys
 
 
 class Bot:
+    """bot for hangouts"""
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
@@ -26,11 +27,13 @@ class Bot:
         sys.exit(0)
 
     async def _on_connect(self):
+        """called when bot connects to hangouts"""
         self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
         self._convo_list.on_event.add_observer(self._on_event)
         print("Connected!")
 
     async def _on_event(self, event):
+        """called when there is an event in hangouts"""
         user, conv = utils.getUserConv(self, event)
         # userID = user.id_[0]
         self.output_text = ""

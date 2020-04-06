@@ -153,3 +153,11 @@ def get_value(dictionary, key, default=""):
     except KeyError:
         value = default
     return value
+
+def clamp(value, min, max):
+    """clamps value inside min and max"""
+    if value < min:
+        value = min
+    elif value > max:
+        value = max
+    return value

@@ -1,8 +1,11 @@
+"""
+classes for rpg
+"""
 import utils
 
 
 class Stats():
-
+    """class for stats"""
     def __init__(
         self, alive=False, random_stats=True, type_=None,
         *, max_health=100, health=5, mana=5, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
@@ -23,6 +26,7 @@ class Stats():
         self.level = level
 
     def generate_from_level(self, level):
+        """generates stats from level"""
         # change this joseph
         attack = round(5 * level ** 1.8)
         defense = round(5 * level ** 1.5)
@@ -30,19 +34,24 @@ class Stats():
         return attack, defense, health
 
     def print_stats(self):
+        """returns text representation of stats"""
         pass
 
     def next_level_xp(self):
+        """returns next level xp"""
         return round(4 * (((self.level + 1) ** 4) / 5))
 
     def print_level_xp(self):
+        """returns string representation of level and xp"""
         return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
 
     def increase_balance(self, money):
+        """increases balance"""
         self.balance += money
         self.lifetime_balance += money
 
     def give_xp(self, xp_earned):
+        """increases xp"""
         notify = False
         self.xp += xp_earned
 
@@ -59,11 +68,16 @@ class Stats():
         return ""
 
     def change_health(self, amount):
+        """changes player health"""
         if amount == "full":
             self.health = self.max_health
+            return
+        self.health += amount
+        self.health = utils.clamp(self.health, 0, self.max_health)
 
 
 class Player():
+    """represents a player in the rpg"""
 
     def __init__(self, name):
         self.name = name
@@ -106,21 +120,25 @@ class Player():
         pass
 
     def print_inventory(self):
+        """returns string representation of inventory"""
         inventory_text = ""
         for item_name in self.inventory:
             inventory_text += Game.all_items[item_name].description()
         return inventory_text
 
     def print_stats(self):
+        """returns string representation of stats"""
         # should print stats + modifers from weapons
         return
 
     def modified_stats(self):
+        """returns Stats() of player modified by player.equipped"""
         # should use eqquiped item stats to calculate stats
         # then return a stats obbjcet with those stats
         return
 
     def print_equipped(self):
+        """returns string representation of equipped items"""
         equipped = ""
 
         for type_, index in self.equipped.items():
@@ -130,6 +148,7 @@ class Player():
         return equipped.title()
 
     def warp(self, user, commands):
+        """warps to rooms"""
         rooms = Game.rooms
         room = utils.get_item_safe(commands)
         if not room:
@@ -151,6 +170,7 @@ class Player():
         return "Successfully warped!"
 
     def rest(self):
+        """rests player"""
         text = ""
         if self.room == "village":
             self.stats.change_health("full")
@@ -163,10 +183,13 @@ class Player():
 
 
 class Enemy():
+    """represents an enemy"""
+
     def __init__(self):
         self.stats = Stats(True, True, "enemy")
 
 class Room():
+    """represents a room in the world"""
 
     def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0)):
         self.enemies_list = enemies_list
@@ -175,20 +198,27 @@ class Room():
 
 
 class Item():
+    """represents an item"""
 
     rarities = ("common", "uncommon", "rare", "legendary")
 
-    def __init__(self, type_, rarity=0, modifier="boring", health, attack, defense, mana):
+    def __init__(
+        self, type_, rarity=0, modifier="boring",
+        health=0, attack=0, defense=0, mana=0
+    ):
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
         self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
 
     def description(self):
+        """returns text description of item"""
         return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(Game.all_items, self)}\n"
 
 
 class Game():
+    """game"""
+
     all_items = {
         "starter armor": Item("armor"),
         "starter weapon": Item("weapon"),
@@ -201,6 +231,7 @@ class Game():
     enemies = {}
 
     def register(self, user, commands):
+        """registers a user in the game"""
         userID = utils.get_key(self.users, user)
         if userID in self.users:
             return "You are already registered!"
