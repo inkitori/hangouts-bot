@@ -29,7 +29,7 @@ class Manager2048:
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
-    def run_game(self, userID, commands=""):
+    def run_game((self, bot, user, conv, commands)):
         """runs the game based on commands"""
         output_text = ""
         command_list = utils.clean(commands)

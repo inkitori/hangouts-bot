@@ -1,12 +1,13 @@
+"""
+handler for bot.Bot()
+"""
 import hangups
 from hangups import hangouts_pb2
-from hangups.hangouts_pb2 import ParticipantId
+from hangouts_pb2 import ParticipantId
 import asyncio
 import random
 from collections import defaultdict
-from datetime import datetime, tzinfo
-# import json
-# import math
+from datetime import datetime  # , tzinfo
 import utils
 
 from game_2048.manager import Manager2048
@@ -67,72 +68,60 @@ class Handler:
         random.seed(datetime.now())
 
     # utility
-    async def help_(self, bot, event):
-        user, conv = utils.getUserConv(bot, event)
-
+    async def help_(self, bot, user, conv, commands):
         with open("text/help.txt", 'r') as help_text:
             bot.output_text = help_text.read()
 
-    async def rename_conv(self, bot, event):
-        user, conv = getUserConv(bot, event)
-        commands = utilstrim(clean(event.text))
-        new_name = get_item_safe(commands)
+    async def rename_conv(self, bot, user, conv, commands):
+        new_name = next(commands)
         if not new_name:
             bot.output_text = "Format: /rename {name}"
         else:
             await conv.rename(new_name)
 
-    async def id_(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
+    async def id_(self, bot, user, conv):
         try:
             bot.output_text = user.id_[0]
-        except:
+        except Exception:
             bot.output_text = "Something went wrong!"
 
-    async def kick(self, bot, event):
-        user, conv = utils.getUserConv(bot, event)
-        arg1 = event.text.lower().split()[1]
+    async def kick(self, bot, user, conv, commands):
+        kick_user_name = next(commands)
         users = conv.users
-        ids = []
-        kick_users = []
 
         try:
             for user in users:
-                if arg1 in user.full_name.lower():
-                    kick_users.append(user)
+                if kick_user_name in user.full_name.lower():
+                    kick_user = kick_user_name
+                    break
 
-            if not kick_users:
+            if not kick_user:
                 bot.output_text = "Nobody in this conversation goes by that name"
                 return
             # only reason i figured this out was because of hangupsbot, so thank you so much
             # https://github.com/xmikos/hangupsbot/blob/master/hangupsbot/commands/conversations.py
 
-            ids = [ParticipantId(gaia_id=user.id_.gaia_id, chat_id=conv.id_) for user in kick_users]
+            kick_id = ParticipantId(gaia_id=kick_user.id_.gaia_id, chat_id=conv.id_)
 
-            for kick_id in ids:
-                request = hangouts_pb2.RemoveUserRequest(
-                    request_header=bot.client.get_request_header(),
-                    participant_id=kick_id,
-                    event_request_header=conv._get_event_request_header()
-                )
-                res = await bot.client.remove_user(request)
-                conv.add_event(res.created_event)
-        except:
+            request = hangouts_pb2.RemoveUserRequest(
+                request_header=bot.client.get_request_header(),
+                participant_id=kick_id,
+                event_request_header=conv._get_event_request_header()
+            )
+            res = await bot.client.remove_user(request)
+            conv.add_event(res.created_event)
+        except Exception:
             bot.output_text = "Yeah don't use this command lol"
 
-    async def play_game(self, bot, event):
-        game_name = clean(event.text)[0]
+    async def play_game(self, bot, user, conv, commands):
+        game_name = next(commands)
         manager = self.game_managers[game_name]
-        user, conv = getUserConv(bot, event)
-        game_text = manager.run_game(user.id_[0], event.text)
+        game_text = manager.run_game(user.id_[0], commands)
         bot.output_text = game_text
         manager.save_game()
 
-    async def quit_(self, bot, event):
-        user, conv = getUserConv(bot, event)
-
-        if userIn(self.admins, user):
+    async def quit_(self, bot, user, conv, comands):
+        if utils.userIn(self.admins, user):
             bot.output_text = "Saber out!"
             await bot.client.disconnect()
         else:

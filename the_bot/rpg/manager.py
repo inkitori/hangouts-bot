@@ -14,8 +14,6 @@ class RPGManager:
         106637925595968853122,  # chendi
     )
 
-    game = Game()
-
     def __init__(self):
         self.commands = {
             "register": self.register,
@@ -40,8 +38,11 @@ class RPGManager:
 
         random.seed(datetime.now())
 
-    # rpg
-    def run_game(self, userID, event_text):
+    def register(self):
+        pass
+
+
+    def run_game(self, bot, user, conv, commands):
         commands = clean(event_text)
         commands = trim(commands)
         command = get_item_safe(commands)

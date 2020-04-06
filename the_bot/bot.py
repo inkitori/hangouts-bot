@@ -1,5 +1,7 @@
+"""
+bot for hangouts
+"""
 import hangups
-# from hangups.ui.utils import get_conv_name
 import asyncio
 from handler import Handler
 import utils
@@ -36,7 +38,7 @@ class Bot:
         # handles messages
         if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
             commands = utils.command_parser(event.text)
-            command = next(commands)
+            command = next(self.commands)
 
             if command in self.handler.keywords:
                 self.output_text = self.handler.keywords[command]
@@ -49,11 +51,13 @@ class Bot:
 
             elif command in self.handler.commands:
                 function_ = self.handler.commands[command]
-                if not utils.cooldown(self.handler.cooldowns, user, event, function_.cooldown_time):
-                    await self.handler.commands[command](self, event)
 
             elif command in self.handler.games:
-                await self.handler.play_game(self, event)
+                function_ = self.handler.play_game
+
+            if function_ and not utils.cooldown(self.handler.cooldowns, user, event, function_.cooldown_time):
+                user, conv = utils.getUserConv(self, event)
+                await function_(self, user, conv, commands)
 
         # new member
         elif isinstance(event, hangups.MembershipChangeEvent):

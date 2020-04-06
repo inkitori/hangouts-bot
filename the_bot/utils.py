@@ -1,12 +1,17 @@
+"""
+assorted useful functions
+"""
 import hangups
 import json
 
 
 def toSeg(text):
+    """converts string to hangouts message"""
     return hangups.ChatMessageSegment.from_str(text)
 
 
 def getUserConv(bot, event):
+    """gets user and conversation"""
     conv = bot._convo_list.get(event.conversation_id)
     user = conv.get_user(event.user_id)
 
@@ -14,32 +19,40 @@ def getUserConv(bot, event):
 
 
 def cooldown(cooldowns, user, event, cooldown):
-    text = clean(event.text, split=False)
-    strippedTime = event.timestamp.replace(tzinfo=None)
+    """checks cooldown for a command and user"""
+    text = clean(event.text)
+    command = get_item_safe(text)
+    stripped_time = event.timestamp.replace(tzinfo=None)
+    cooldown_time = cooldowns[user][command]
 
-    if user in cooldowns and text.split()[0] in cooldowns[user]:
-        if (strippedTime - cooldowns[user][text.split()[0]]).seconds < cooldown:
-            return cooldown - (strippedTime - cooldowns[user][text.split()[0]]).seconds
+    if user in cooldowns and command in cooldowns[user]:
+        if (stripped_time - cooldown_time).seconds < cooldown:
+            return cooldown - (stripped_time - cooldown_time).seconds
         else:
-            cooldowns[user][text.split()[0]] = strippedTime
+            cooldown_time = stripped_time
     else:
-        cooldowns[user][text.split()[0]] = strippedTime
+        cooldown_time = stripped_time
+    cooldowns[user][command] = cooldown_time
 
 
-def userIn(userList, user):
-    return int(user.id_[0]) in userList
+def userIn(user_list, user):
+    """checks if the user is in user_List"""
+    return int(user.id_[0]) in user_list
 
 
 def scientific(number):
+    """returns a string in scientific number format"""
     return "{:.2e}".format(number)
 
 
 def save(file_name, contents):
+    """saves data into a json"""
     with open(file_name, "w") as file:
         json.dump(contents, file, indent=4)
 
 
 def load(file_name):
+    """loads a file from a json"""
     with open(file_name, "r") as file:
         try:
             return json.load(file)
@@ -108,6 +121,7 @@ def trim(text, number=1, default=[""]):
 
 
 def command_parser(command_text, has_prefix=False):
+    """returns a generator of commands"""
     commands = clean(command_text)
     if has_prefix:
         commands = trim(commands)
@@ -117,6 +131,11 @@ def command_parser(command_text, has_prefix=False):
 
 
 def get_key(dictionary, item, *ignore):
+    """
+    gets a key using a value
+    assumes unique values
+    will ignore keys in ignore
+    """
     dictionary = dictionary.copy()
     for key in ignore:
         try:
@@ -128,6 +147,7 @@ def get_key(dictionary, item, *ignore):
 
 
 def get_value(dictionary, key, default=""):
+    """safely gets the value of a key from a dictionary"""
     try:
         value = dictionary[key]
     except KeyError:
