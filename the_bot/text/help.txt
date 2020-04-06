@@ -31,7 +31,6 @@ meep
 /shop
 /buy
 /give
-/id_give
 /prestige
 
 **Configuration**

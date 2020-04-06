@@ -38,11 +38,6 @@ class Handler:
         "/rpg": RPGManager(),
         "/economy": EconomyManager(),
     }
-    ignore = (
-        105849946242372037157,  # odlebot
-        11470746254329358783,  # saberbot
-        104687919952293193271,  # Ether(chendibot)
-    )
     admins = (
         114207595761187114730,  # joseph
         106637925595968853122,  # chendi

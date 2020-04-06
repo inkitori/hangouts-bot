@@ -46,7 +46,7 @@ class EconomyManager():
     def load_game(self):
         """loads the game"""
         pass
-        
+
     def register(self, userID):
         """registers a user"""
         if userID in self.users:
@@ -54,12 +54,44 @@ class EconomyManager():
         try:
             users[userID] = classes.User()
             return "Successfully registered!"
-        except Exception as e:
-            return "Failed to register!"
-            print(e)
 
-    def profile(self):
-        """returns a user profile"""
+    def give(self, giving_user, commands):
+        """gives money to another user"""
+        reciveing_user = next(commands)
+        money = next(commands)
+
+        if not reciveing_user:
+            return "You must specfiy a user or ID"
+        elif not money:
+            return "You must specify an amount"
+
+        for user in users.values():
+            if reciveing_user in user.name:
+                reciving_user = user
+                break
+
+        if reciveing_user in self.users:
+            reciving_user = self.users[reciveing_user]
+        elif reciving_user.id_[0] not in self.users:
+            return "That user has not registered!"
+        elif reciving_user.id_[0] == giving_user.id_[0]:
+            return "That user is you!"
+
+        if money < 0:
+            return "You can't give negative money!"
+        elif user.change_balance < money:
+            return "You don't have enough money to do that!"
+        else:
+            giving_user.change_balance(- money)
+            reciveing_user.change_balance(money)
+
+            return utils.join_items(
+                f"Successfully given {money} Saber Dollars to {reciving_user.name}.",
+                f"That user now has {reciveing_user.balance} Saber Dollars."
+            )
+
+    def profile(self, commands):
+        """returns user profiles"""
         output_text = ""
 
         try:
@@ -67,46 +99,21 @@ class EconomyManager():
                 name = event.text.split(' ', 1)[1]
                 possible_users = []
 
-                for user in self.data["users"]:
-                    if name in self.data["users"][user]["name"]:
+                for user in self.data["users"].values():
+                    if name in user.name:
                         possible_users.append(user)
 
                 if len(possible_users) == 0:
                     return "No users go by that name!"
-                    return
 
                 elif len(possible_users) > 1:
                     output_text += f"{len(possible_users)} user(s) go by that name:\n"
 
-                    for user in possible_users:
-                        output_text += utils.join_items(
-                            f"**Name:** {dataUsers[user]["name"]}",  # multiple users
-                            f"**Balance:** {dataUsers[user]["balance"]}",
-                            f"**Pick:** {dataUsers[user]["pick"]}",
-                            f"**Prestige:** {dataUsers[user]["prestige"]}",
-                            f"**Prestige Level:** {dataUsers[user]["prestige_upgrade"]}",
-                            f"**ID:** {user}"
-                        )
-                else:
-                    conv.send_message(toSeg(
-                        "**Name:** " + dataUsers[possible_users[0]]["name"] + '\n' +  # single user
-                        "**Balance:** " + str(dataUsers[possible_users[0]]["balance"]) + '\n' +
-                        "**Pick:** " + dataUsers[possible_users[0]]["pick"] + '\n' +
-                        "**Prestige:** " + str(dataUsers[possible_users[0]]["prestige"]) + '\n' +
-                        "**Prestige Level:** " + str(dataUsers[possible_users[0]]["prestige_upgrade"]) + '\n' +
-                        "**ID:** " + possible_users[0])
-                    )
+                for user in possible_users:
+                    output_text += user.profile()
 
-            else:
-                if user.id_[0] in self.data["users"]:
-                    conv.send_message(toSeg(
-                        "**Name:** " + self.data["users"][user.id_[0]]["name"] + '\n' +  # no args
-                        "**Balance:** " + str(self.data["users"][user.id_[0]]["balance"]) + '\n' +
-                        "**Pick:** " + dataUsers[user.id_[0]]["pick"] + '\n' +
-                        "**Prestige:** " + str(dataUsers[user.id_[0]]["prestige"]) + '\n' +
-                        "**Prestige Level:** " + str(dataUsers[user.id_[0]]["prestige_upgrade"]) + '\n' +
-                        "**ID:** " + user.id_[0])
-                    )
+            elif user.id_[0] in self.users:
+                output_text += users[user.id_[0]].profile()
         except Exception as e:
             output_text += "Failed to retrieve user info!"
             print(e)

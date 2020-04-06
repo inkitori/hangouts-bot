@@ -11,6 +11,13 @@ import sys
 
 class Bot:
     """bot for hangouts"""
+
+    ignore = (
+        105849946242372037157,  # odlebot
+        11470746254329358783,  # saberbot
+        104687919952293193271,  # Ether(chendibot)
+    )
+
     def __init__(self):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
@@ -39,7 +46,7 @@ class Bot:
         self.output_text = ""
 
         # handles messages
-        if isinstance(event, hangups.ChatMessageEvent) and not user.is_self:
+        if isinstance(event, hangups.ChatMessageEvent) and not user.is_self and not utils.userIn(self.ignore, user):
             commands = utils.command_parser(event.text)
             command = next(self.commands)
 
