@@ -80,7 +80,7 @@ class RPGManager:
 
     def sync(self, userID, commands):
         """syncs value to save_file"""
-        key, value = utils.get_item_safe(commands, (0, 1))
+        key, value = next(commands), next(commands)
 
         if value.isdigit():
             value = int(value)
