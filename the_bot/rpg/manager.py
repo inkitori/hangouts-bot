@@ -153,7 +153,7 @@ class RPGManager:
 
     def save_game(self, userID, commands):
         """saves the game"""
-        save(self.save_file, self.data)
+        utils.save(self.save_file, self.data)
         return "Successfully saved!"
 
     def sync(self, userID, commands):

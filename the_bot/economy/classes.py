@@ -90,7 +90,7 @@ class EconomyUser():
                 if item_type not in self.shop:
                     return "That class doesn't exist!"
 
-                shopData = self.data["shop"][item_type]
+                shopData = self.shop[item_type]
                 possible_items = []
 
                 for possible_item in shopData:
@@ -148,17 +148,13 @@ class EconomyUser():
     def prestige_confirm(self):
         """confirms prestige"""
         output_text = ""
-        userID = user.id_[0]
+        if not self.confirmed_prestige:
+            output_text = "You have to use /prestige before using this command!"
+        else:
+            self.prestige_reset()
+            output_text = "Successfully prestiged"
 
-        try:
-            if not self.confirmed_prestige:
-                return "You have to use /prestige before using this command!"
-
-            else:
-                self.prestige_reset()
-                return "Successfully prestiged"
-        except:
-            return "Something went wrong!"
+        return output_text
 
     def prestige_reset(self):
         self.balance = 0

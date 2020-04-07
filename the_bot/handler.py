@@ -11,7 +11,7 @@ from datetime import datetime  # , tzinfo
 import utils
 
 from game_2048.manager import Manager2048
-from economy.manager import EconomyManager
+# from economy.manager import EconomyManager
 from rpg.manager import RPGManager
 
 
@@ -36,7 +36,7 @@ class Handler:
     game_managers = {
         "/2048": Manager2048(),
         "/rpg": RPGManager(),
-        "/economy": EconomyManager(),
+        # "/economy": EconomyManager(),
     }
     admins = (
         114207595761187114730,  # joseph

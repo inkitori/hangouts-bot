@@ -1,11 +1,7 @@
 **Keywords**
-good bot
-bad bot
-headpat
-yamete
 ping
-yes
-no
+pong
+saber
 meep
 
 **Utility**
@@ -16,22 +12,12 @@ meep
 /kick (needs work)
 
 **Fun**
-/rickroll
 /gay
 /math
 /praise
 /goddammit
 /heymister
 /2048
-
-**Economy**
-/register
-/money
-/mine
-/shop
-/buy
-/give
-/prestige
 
 **Configuration**
 /quit

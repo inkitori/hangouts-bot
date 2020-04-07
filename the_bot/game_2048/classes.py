@@ -2,7 +2,6 @@
 A text based clone of 2048
 Made by Chendi
 """
-
 import random
 import utils
 
@@ -53,9 +52,9 @@ class Board():
                             neighbor = self.cells[indexes[indexes.index(j) - 1]]
                         # merges blocks
                         elif (
-                                current_cell.value == neighbor.value and not
-                                current_cell.has_merged and not neighbor.has_merged
-                                ):
+                            current_cell.value == neighbor.value and not
+                            current_cell.has_merged and not neighbor.has_merged
+                        ):
                             current_cell.value += 1
                             game.score += game.mode.increase_score(current_cell.value)
                             neighbor.value = 0
@@ -121,7 +120,7 @@ class GameMode():
     def __init__(
         self, start_value=2, increase_type="normal",
         size=4, win_value=11, description="", shuffled=False
-            ):
+    ):
         self.size = size
         self.number_of_cells = size ** 2
         self.increase_type = increase_type
@@ -181,7 +180,7 @@ class Game():
 
     extra_commands = {
         "{direction} - move the tiles in the given direction (use move to see valid {directions})"
-        "create {game_name}": "creates a new game with the given name (can be combined with other commands",
+        "create {game_name}": "creates a new game with the given name (can be combined with other commands).",
         "{game_name}": "loads the game named game_name (can be combined with other commands)",
         "rename {old_name} {new_name}": "renames a game from old_name to new_name",
         "delete {game_name}": "deletes the game named game_name",
@@ -300,10 +299,10 @@ class Game():
         GameMode.shuffled.insert(0, 0)
         Game.modes["confusion"].values = GameMode.shuffled
 
-    def play_game(self, command_list):
+    def play_game(self, commands):
         """runs the main game loop once"""
         self.text = ""
-        command = utils.get_item_safe(command_list)
+        command = next(commands)
 
         # check player movement
         x = None
@@ -311,14 +310,16 @@ class Game():
         for direction in self.movement:
             if command in self.movement[direction]:
                 self.move(self.directions[direction])
-        if (x, positive) == (None, None):
-            if command in self.modes.keys():
-                self.restart(Game.modes[command])
-            elif command in self.commands.keys():
-                self.state = command
-            elif command != "":
-                self.text += "invalid command, use help to see commands\n"
-                self.state = None
+                break
+        else:
+            if (x, positive) == (None, None):
+                if command in self.modes:
+                    self.restart(Game.modes[command])
+                elif command in self.commands:
+                    self.state = command
+                elif command != "":
+                    self.text += "invalid command, use help to see commands\n"
+                    self.state = None
 
         self.update()
         return utils.newline(self.text)
