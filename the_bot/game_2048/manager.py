@@ -71,7 +71,7 @@ class Manager2048:
         elif command == "games":
             for game_name, game in self.games.items():
                 if game_name != "current game":
-                    output_text = f"{game_name} - {utils.get_key(Game.modes, game.mode)} score: {game.score}\n"
+                    output_text = f"{game_name} - {game.mode.name()} score: {game.score}\n"
 
         elif command in self.games.keys():
             play_game_name = command
@@ -106,7 +106,7 @@ class Manager2048:
             games_dict[game_name] = {
                 "board": [cell.value for cell in game.board.cells],
                 "has won": game.has_won,
-                "mode": utils.get_key(Game.modes, game.mode),
+                "mode": game.mode.name(),
                 "score": game.score
             }
         high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}

@@ -188,6 +188,9 @@ class EconomyUser():
             f"Pick: {self.pick}",
             f"Prestige: {self.prestige}",
             f"Prestige Level: {self.prestige_level}",
-            f"ID: {utils.get_key(self)}"
+            f"ID: {self.id()}"
         )
         return profile_text
+
+    def id(self):
+        return utils.get_key(users, self)

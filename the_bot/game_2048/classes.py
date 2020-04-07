@@ -134,6 +134,9 @@ class GameMode():
         self.win_value = win_value
         self.description = description
 
+    def name(self):
+        return utils.get_key(Game.modes, self)
+
     def increase(self, value):
         """Increases cell value based on game mode"""
         if self.increase_type == "normal":
@@ -212,6 +215,9 @@ class Game():
         for i in range(2):
             self.board.make_new_block(self.mode)
 
+    def name(self):
+        return utils.get_key(games, self)
+
     def update(self):
         """appends text based on current state"""
 
@@ -249,9 +255,7 @@ class Game():
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        game_name = utils.get_key("placeholder", self, "current game")
-        mode_name = utils.get_key(Game.modes, self.mode)
-        self.text += f"{game_name} - {mode_name}\n"
+        self.text += f"{self.name()} - {self.mode.name()}\n"
         self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
 

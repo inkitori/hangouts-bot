@@ -32,7 +32,7 @@ class EconomyManager():
 
         for rank in range(5):
             user, balance = sorted_users[rank]
-            leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+            leaderboard_text += f"{rank + 1}. {user.name()}: {balance}\n"
 
         return leaderboard_text
 
@@ -41,7 +41,7 @@ class EconomyManager():
         shop_text = ""
         for type_ in shop:
             for item in type_:
-                shop_text += f"{item.name} - {item.price} Saber Dollars"
+                shop_text += f"{item.name()} - {item.price} Saber Dollars"
         return shop_text
 
     def save_game(self):
