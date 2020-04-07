@@ -3,6 +3,7 @@ assorted useful functions
 """
 import hangups
 import json
+import inspect
 
 
 def toSeg(text):
@@ -75,6 +76,10 @@ def get_item_safe(sequence, indexes=(0), defaults=("")):
     Retrives the items at the indexes in sequence
     defaults to default if the item des not exist
     """
+    if inspect.isgenerator(sequence):
+        if indexes or defaults:
+            return "You can't use indexes or defaults with generators"
+        return next(sequence)
     items = []
     if len(defaults) == 1:
         defaults = defaults * len(indexes)
@@ -90,12 +95,12 @@ def get_item_safe(sequence, indexes=(0), defaults=("")):
 def clean(text, split=True):
     """cleans user input and returns as a list"""
     if text:
-        if type(text) == str:
+        if isinstance(text, str):
             text = text.strip().lower()
             if split:
                 text = text.split(' ')
             return text
-        elif type(text) == list:
+        elif ininstance(text, list):
             return text
     else:
         return [""]
