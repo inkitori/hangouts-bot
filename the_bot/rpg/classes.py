@@ -27,6 +27,9 @@ class Stats():
         self.defense = defense
         self.level = level
 
+    def to_dict(self):
+        return self.__dict__
+
     def generate_from_level(self, level):
         """generates stats from level"""
         # change this joseph
@@ -88,7 +91,7 @@ class Player():
         self.fighting = {}
         self.inventory = [None for i in range(8)]
         self.add_to_inventory("starter armor", "starter weapon", "clarity")
-        self.equipped = {"armor": 0, "weapon": 1, "tome": "clarity"}
+        self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
 
     def id(self):
         return utils.get_key(RPG.players, self)
@@ -174,6 +177,17 @@ class Player():
             self.room = room
             output_text = "Successfully warped!"
         return output_text
+
+    def to_dict(self):
+        player_dict = {
+            "name": self.name,
+            "stats": self.stats.to_dict(),
+            "room": self.room,
+            "fighting": {enemy_name: enemy.to_dict() for enemy_name, enemy in self.fighting.items()},
+            "inventory": self.inventory,
+            "equipped": self.equipped
+        }
+        return player_dict
 
     def rest(self):
         """rests player"""
@@ -272,19 +286,18 @@ class Player():
 
         # DO NOT let an if elif chain happen here
         if self.room == "village":
-            return "Don't fight in the village..."
+            text = "Don't fight in the village..."
 
         elif self.fighting:
-            return f"You are already fighting {self.fighting}!"
+            text = f"You are already fighting {self.fighting}!"
 
         else:
-            enemy = random.choice(rooms[self.room].enemies_list)
+            enemy_name = random.choice(rooms[self.room].enemies_list)
 
-            text += f"{enemy.name} has approached to fight!\n"
+            text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
             self.fighting = enemy
-            return text
->>>>>>> a5a36898fbb95a4447facfea035992747e68a4ee
+        return text
 
 
 class Enemy():
@@ -296,6 +309,8 @@ class Enemy():
     def name(self):
         return utils.get_key(RPG.enemies, self)
 
+    def to_dict(self):
+        return {"stats": self.stats.to_dict()}
 
 class Room():
     """represents a room in the world"""

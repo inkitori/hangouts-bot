@@ -15,6 +15,7 @@ class RPGManager:
         114207595761187114730,  # joseph
         106637925595968853122,  # chendi
     )
+    game = classes.RPG()
 
     def __init__(self):
         self.commands = {
@@ -57,22 +58,25 @@ class RPGManager:
         elif command != "register" and userID not in classes.RPG.users:
             return "You are not registered! Use register"
 
-        commands = utils.trim(commands)
-
         if command in self.admin_commands and not utils.userIn(self.admins, userID):
             return "bro wtf u cant use that"
 
         return self.commands[command](user, commands)
-        self.save_game(self.save_file, self.data)
+        self.save_game()
 
     def load_game(self):
         """loads the game"""
         pass
 
-    def save_game(self, userID, commands):
+    def save_game(self):
         """saves the game"""
-        utils.save(self.save_file, self.data)
-        return "Successfully saved!"
+        save_data = self.game.players.copy()
+
+        for userID, player in save_data:
+            save_data[userID] = player.to_dict()
+
+        utils.save(self.save_file, save_data)
+        print("Successfully saved!")
 
     def sync(self, userID, commands):
         """syncs value to save_file"""
