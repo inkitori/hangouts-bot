@@ -11,21 +11,13 @@ from datetime import datetime  # , tzinfo
 import utils
 
 from game_2048.manager import Manager2048
-from economy.manager import EconomyManager
+# from economy.manager import EconomyManager
 from rpg.manager import RPGManager
 
 
 class Handler:
-
-    save_file = "data.json"
+    """handler for bot"""
     images_folder = "images/"
-
-    keywords = {
-        "ping": "pong",
-        "pong": "ping",
-        "saber": "hi",
-        "meep": "meep"
-    }
     images = {
         "/gay": "gay.jpg",
         "/math": "math.jpg",
@@ -36,7 +28,7 @@ class Handler:
     game_managers = {
         "/2048": Manager2048(),
         "/rpg": RPGManager(),
-        "/economy": EconomyManager(),
+        # "/economy": EconomyManager(),
     }
     admins = (
         114207595761187114730,  # joseph
@@ -45,12 +37,29 @@ class Handler:
 
     def __init__(self):
         self.commands = {
-            "/help": self.help_,
             "/rename": self.rename_conv,
             "/quit": self.quit_,
             "/id": self.id_,
             "/kick": self.kick,
         }
+        self.help_text = utils.join_items(
+            *(
+                ["I'm a bot by Yeah and Chendi."] +
+                ["You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT"] +
+                ["Keywords:"] + list(self.keywords) +
+                ["Images:"] + list(self.images) +
+                ["Games:"] + list(self.games) +
+                ["Commands:"] + list(self.commands)
+            )
+        )
+        self.keywords = {
+            "ping": "pong",
+            "pong": "ping",
+            "saber": "hi",
+            "meep": "meep",
+            "/help": self.help_text
+        }
+
         self.play_game.cooldown_time = 0
         self.help_.cooldown_time = 10
         self.rename_conv.cooldown_time = 3
@@ -62,12 +71,8 @@ class Handler:
 
         random.seed(datetime.now())
 
-    # utility
-    async def help_(self, bot, user, conv, commands):
-        with open("text/help.txt", 'r') as help_text:
-            bot.output_text = help_text.read()
-
     async def rename_conv(self, bot, user, conv, commands):
+        """renames a conversation"""
         new_name = next(commands)
         if not new_name:
             bot.output_text = "Format: /rename {name}"
@@ -75,12 +80,14 @@ class Handler:
             await conv.rename(new_name)
 
     async def id_(self, bot, user, conv):
+        """get the id of a user"""
         try:
             bot.output_text = user.id_[0]
         except Exception:
             bot.output_text = "Something went wrong!"
 
     async def kick(self, bot, user, conv, commands):
+        """kicks a user"""
         kick_user_name = next(commands)
         users = conv.users
 
@@ -109,6 +116,7 @@ class Handler:
             bot.output_text = "Yeah don't use this command lol"
 
     async def play_game(self, bot, user, conv, commands):
+        """plays a game"""
         game_name = next(commands)
         manager = self.game_managers[game_name]
         game_text = manager.run_game(user.id_[0], commands)
@@ -116,6 +124,7 @@ class Handler:
         manager.save_game()
 
     async def quit_(self, bot, user, conv, comands):
+        """makes the bot quit"""
         if utils.userIn(self.admins, user):
             bot.output_text = "Saber out!"
             await bot.client.disconnect()

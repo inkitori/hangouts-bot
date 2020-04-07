@@ -2,6 +2,8 @@
 classes for rpg
 """
 import utils
+import random
+import math
 
 
 class Stats():
@@ -88,6 +90,9 @@ class Player():
         self.add_to_inventory("starter armor", "starter weapon", "clarity")
         self.equipped = {"armor": 0, "weapon": 1, "tome": "clarity"}
 
+    def id(self):
+        return utils.get_key(RPG.players, self)
+
     def add_to_inventory(self, items, slot=None):
         """
         puts an item into the first empty slot
@@ -102,7 +107,7 @@ class Player():
         for item_name in items:
             added_text = f"put {item_name} in slot"
             if slot is not None:
-                replaced_item_name = utils.get_key(Game.all_items, self.inventory[slot])
+                replaced_item_name = self.inventory[slot]
                 try:
                     self.inventory[slot] = item_name
                 except IndexError:
@@ -123,7 +128,7 @@ class Player():
         """returns string representation of inventory"""
         inventory_text = ""
         for item_name in self.inventory:
-            inventory_text += Game.all_items[item_name].description()
+            inventory_text += RPG.all_items[item_name].description()
         return inventory_text
 
     def print_stats(self):
@@ -142,40 +147,43 @@ class Player():
         equipped = ""
 
         for type_, index in self.equipped.items():
-            item = Game.all_items[self.inventory[index]]
+            item = RPG.all_items[self.inventory[index]]
             equipped += f"{type_}: {item.description()}"
 
         return equipped.title()
 
-    def warp(self, user, commands):
+    def warp(self, commands):
         """warps to rooms"""
-        rooms = Game.rooms
-        room = utils.get_item_safe(commands)
+        output_text = ""
+        rooms = RPG.rooms
+        room = next(commands)
         if not room:
-            return "Invalid argument! use warp {room}"
-
-        if self.fighting:
-            return "You can't warp while in a fight!"
+            output_text = "Invalid argument! use warp {room}"
+        elif self.fighting:
+            output_text = "You can't warp while in a fight!"
 
         elif room not in rooms:
-            return "That room doesn't exist!"
+            output_text = "That room doesn't exist!"
 
         elif rooms[room].min_level > self.stats.level:
-            return "Your level is not high enough to warp there!"
+            output_text = "Your level is not high enough to warp there!"
 
-        elif room == user.room:
-            return "You are already in that room!"
-
-        user.room = room
-        return "Successfully warped!"
+        elif room == self.room:
+            output_text = "You are already in that room!"
+        else:
+            self.room = room
+            output_text = "Successfully warped!"
+        return output_text
 
     def rest(self):
         """rests player"""
         text = ""
         if self.room == "village":
             self.stats.change_health("full")
-            text += "You feel well rested...\n"
-            text += f"Your health is back up to {self.stats.hp}!"
+            text += utils.join_items(
+                "You feel well rested...\n",
+                f"Your health is back up to {self.stats.hp}!",
+            )
         else:
             text = "You have to rest in the village!"
 
@@ -183,7 +191,100 @@ class Player():
 
     def heal(self):
         """heal the player with their tome"""
+        if self.stats.mana < "idk how i'd access tome stats":
+            return "You do not have enough mana to heal!"
 
+        else:
+            self.stats.mana -= "tome mana usage thingy"
+            self.stats.health += "tome health give thingy"
+
+            if self.stats.health > self.stats.max_health:
+                self.stats.health = self.stats.max_health
+                return "You have been healed to full health!"
+
+            return f"You have been healthed back up to {self.stats.health}"
+
+    def attack(self, enemy):
+        """attacks an enemy"""
+        text = ""
+
+        if not self.fighting:
+            return "You need to be in a fight!"
+
+        enemy = RPG.enemies[self.fighting]
+        user_damage = self.modified_stats().attack
+        damage_dealt = (user_damage) * (user_damage / enemy.defense)
+
+        multiplier = random.choice((1, -1))
+        damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
+        enemy.stats.health -= damage_dealt
+
+        text += f"You dealt {damage_dealt} damage to {enemy.name()}!\n"
+
+        if enemy.stats.health <= 0:
+            text = self.killed_enemy(enemy)
+
+        else:
+            # take damage
+            damage_taken = enemy.attack / self.modified_stats().defense
+
+            multiplier = random.choice((1, -1))
+            damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
+
+            self.stats.change_health(- damage_taken)
+
+            text += utils.join_list(
+                f"{enemy.name} dealt {damage_taken} to you!",
+                f"You have {self.stats.hp} hp left",
+                f"{enemy.name} has {enemy.stats.health} left!"
+            )
+
+            if self.stats.health <= 0:
+                text += f"You were killed by {enemy.name}..."
+
+                self.fighting = ""
+                self.stats.change_health("full")
+
+        return text
+
+    def killed_enemy(self, enemy):
+        """changes stuff based on enemy"""
+        text = ""
+        text += f"{enemy.name} is now dead!\n"
+
+        xp_range = RPG.rooms[self.room].xp_range
+        xp_earned = random.randint(*xp_range)
+
+        gold_earned = int(enemy.max_health / 10) + random.randint(1, 10)
+
+        text += f"You earned {xp_earned} xp and {gold_earned} gold!"
+        text += self.stats.give_xp(xp_earned)
+
+        self.stats.increase_balance(gold_earned)
+        self.fighting = ""
+
+        return text
+
+    def fight(self):
+        """starts a with an enemy"""
+        rooms = RPG.rooms["rooms"]
+        text = ""
+
+        # DO NOT let an if elif chain happen here
+        if self.room == "village":
+            return "Don't fight in the village..."
+
+        elif self.fighting:
+            return f"You are already fighting {self.fighting}!"
+
+        else:
+            enemy = random.choice(rooms[self.room].enemies_list)
+
+            text += f"{enemy.name} has approached to fight!\n"
+            text += enemy.stats.print_stats()
+            self.fighting = enemy
+            return text
+>>>>>>> a5a36898fbb95a4447facfea035992747e68a4ee
 
 
 class Enemy():
@@ -192,6 +293,10 @@ class Enemy():
     def __init__(self):
         self.stats = Stats(True, True, "enemy")
 
+    def name(self):
+        return utils.get_key(RPG.enemies, self)
+
+
 class Room():
     """represents a room in the world"""
 
@@ -199,6 +304,9 @@ class Room():
         self.enemies_list = enemies_list
         self.min_level = min_level
         self.xp_range = xp_range
+
+    def name(self):
+        return utils.get_key(RPG.rooms, self)
 
 
 class Item():
@@ -217,28 +325,34 @@ class Item():
 
     def description(self):
         """returns text description of item"""
-        return f"{Item.rarities[self.rarity]} {self.modifier} {utils.get_key(Game.all_items, self)}\n"
+        return f"{Item.rarities[self.rarity]} {self.modifier} {self.name()}\n"
+
+    def name(self):
+        return utils.get_key(RPG.all_items, self)
 
 
-class Game():
-    """game"""
+class RPG():
+    """the RPG"""
 
     all_items = {
         "starter armor": Item("armor"),
         "starter weapon": Item("weapon"),
         "clarity tome": Item("tome")
     }
-    users = {}
+    players = {}
     rooms = {
         "village": Room()
     }
     enemies = {}
 
-    def register(self, user, commands):
+    def register(self, user):
         """registers a user in the game"""
-        userID = utils.get_key(self.users, user)
-        if userID in self.users:
+        userID = user.id_[0]
+        if userID in self.players:
             return "You are already registered!"
-        self.users[userID] = Player("placeholder name")
+        self.players[userID] = Player("placeholder name")
 
         return "Successfully registered!"
+
+    def play_game(self, user, commands):
+        pass

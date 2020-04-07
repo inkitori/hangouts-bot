@@ -2,7 +2,7 @@
 manager for economy
 """
 import economy.classes as classes
-import classes.items as items
+import classes.shop as shop
 import utils
 
 
@@ -16,8 +16,10 @@ class EconomyManager():
 
     def run_game(self, bot, user, conv, commands):
         """runs the game"""
+        userID = user.id_[0]
         if userID not in self.users:
             return "You are not registered! Use /register"
+        command = next(commands)
 
         # use commands
 
@@ -30,14 +32,17 @@ class EconomyManager():
 
         for rank in range(5):
             user, balance = sorted_users[rank]
-            leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+            leaderboard_text += f"{rank + 1}. {user.name()}: {balance}\n"
 
         return leaderboard_text
 
     def shop(self):
         """returns shop"""
-        with open("text/shop.txt", "r") as shop_text:
-            return shop_text.read()
+        shop_text = ""
+        for type_ in shop:
+            for item in type_:
+                shop_text += f"{item.name()} - {item.price} Saber Dollars"
+        return shop_text
 
     def save_game(self):
         """saves the game"""
@@ -51,21 +56,21 @@ class EconomyManager():
         """registers a user"""
         if userID in self.users:
             return "You are already registered!"
-        try:
-            users[userID] = classes.User()
-            return "Successfully registered!"
+        self.users[userID] = classes.User()
+        return "Successfully registered!"
 
     def give(self, giving_user, commands):
         """gives money to another user"""
         reciveing_user = next(commands)
         money = next(commands)
+        output_text = ""
 
         if not reciveing_user:
-            return "You must specfiy a user or ID"
+            output_text = "You must specfiy a user or ID"
         elif not money:
-            return "You must specify an amount"
+            output_text = "You must specify an amount"
 
-        for user in users.values():
+        for user in self.users.values():
             if reciveing_user in user.name:
                 reciving_user = user
                 break
@@ -73,49 +78,41 @@ class EconomyManager():
         if reciveing_user in self.users:
             reciving_user = self.users[reciveing_user]
         elif reciving_user.id_[0] not in self.users:
-            return "That user has not registered!"
+            output_text = "That user has not registered!"
         elif reciving_user.id_[0] == giving_user.id_[0]:
-            return "That user is you!"
+            output_text = "That user is you!"
 
         if money < 0:
-            return "You can't give negative money!"
+            output_text = "You can't give negative money!"
         elif user.change_balance < money:
-            return "You don't have enough money to do that!"
+            output_text = "You don't have enough money to do that!"
         else:
             giving_user.change_balance(- money)
             reciveing_user.change_balance(money)
 
-            return utils.join_items(
+            output_text = utils.join_items(
                 f"Successfully given {money} Saber Dollars to {reciving_user.name}.",
                 f"That user now has {reciveing_user.balance} Saber Dollars."
             )
+        return output_text
 
     def profile(self, commands):
         """returns user profiles"""
         output_text = ""
+        user_name = next(commands)
+        possible_users = []
 
-        try:
-            if len(event.text.split()) > 1:
-                name = event.text.split(' ', 1)[1]
-                possible_users = []
+        for user in self.data["users"].values():
+            if user_name in user.name:
+                possible_users.append(user)
 
-                for user in self.data["users"].values():
-                    if name in user.name:
-                        possible_users.append(user)
+        if not possible_users:
+            return "No users go by that name!"
 
-                if len(possible_users) == 0:
-                    return "No users go by that name!"
+        elif len(possible_users) > 1:
+            output_text += f"{len(possible_users)} user(s) go by that name:\n"
 
-                elif len(possible_users) > 1:
-                    output_text += f"{len(possible_users)} user(s) go by that name:\n"
-
-                for user in possible_users:
-                    output_text += user.profile()
-
-            elif user.id_[0] in self.users:
-                output_text += users[user.id_[0]].profile()
-        except Exception as e:
-            output_text += "Failed to retrieve user info!"
-            print(e)
+        for user in possible_users:
+            output_text += user.profile()
 
         return utils.newline(output_text)
