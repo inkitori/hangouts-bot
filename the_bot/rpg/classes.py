@@ -83,7 +83,7 @@ class Player():
         self.name = name
         self.stats = Stats(True, False, "player")
         self.room = "village"
-        self.fighting = ""
+        self.fighting = {}
         self.inventory = [None for i in range(8)]
         self.add_to_inventory("starter armor", "starter weapon", "clarity")
         self.equipped = {"armor": 0, "weapon": 1, "tome": "clarity"}
@@ -180,6 +180,10 @@ class Player():
             text = "You have to rest in the village!"
 
         return text
+
+    def heal(self):
+        """heal the player with their tome"""
+
 
 
 class Enemy():
