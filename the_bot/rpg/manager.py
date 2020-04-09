@@ -10,7 +10,7 @@ import rpg.classes as classes
 class RPGManager:
     """manager for rpg"""
 
-    save_file = "data.json"
+    save_file = "the_bot/rpg/save_data.json"
     admins = (
         114207595761187114730,  # joseph
         106637925595968853122,  # chendi
@@ -19,6 +19,7 @@ class RPGManager:
 
     def __init__(self):
         self.commands = {
+            """
             "register": self.register,
             "inventory": self.inventory,
             "warp": self.warp,
@@ -28,11 +29,12 @@ class RPGManager:
             "fight": self.fight,
             "atk": self.atk,
             "heal": self.heal
+            """
         }
         self.admin_commands = {
             "remove": self.remove,
             "sync": self.sync,
-            "save_data": self.save_data,
+            "save": self.save_game,
             "set": self.set_,
         }
 

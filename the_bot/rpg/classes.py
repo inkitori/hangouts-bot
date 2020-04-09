@@ -21,7 +21,7 @@ class Stats():
         elif type_ == "item":
             self.mana = mana
             self.health = health
-        if random_stats():
+        if random_stats:
             attack, defense, health = self.generate_from_level(level)
         self.attack = attack
         self.defense = defense

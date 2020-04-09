@@ -71,24 +71,23 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def get_item_safe(sequence, indexes=(0), defaults=("")):
+def get_item_safe(sequence, indexes=(0,), default=""):
     """
     Retrives the items at the indexes in sequence
     defaults to default if the item des not exist
     """
     if inspect.isgenerator(sequence):
-        if indexes or defaults:
-            return "You can't use indexes or defaults with generators"
         return next(sequence)
     items = []
-    if len(defaults) == 1:
-        defaults = defaults * len(indexes)
-    for index, default in zip(indexes, defaults):
+    for index in indexes:
         try:
             item = sequence[index]
         except IndexError:
             item = default
-        items.append(item)
+        if len(indexes) == 1:
+            items = item
+        else:
+            items.append(item)
     return items
 
 
@@ -167,3 +166,17 @@ def clamp(value, min, max):
     elif value > max:
         value = max
     return value
+
+
+def is_yes(text):
+    """checks if a text input starts with y"""
+    return get_item_safe(clean(text, split=False)) == "y"
+
+
+def description(name, *description):
+    if len(description) == 1:
+        full_description = f"{name} - {description[0]}"
+    else:
+        description = join_items(*description, seperator="\n\t")
+        full_description = f"{name.title()}:\n{description}"
+    return full_description

@@ -10,7 +10,7 @@ import sys
 
 
 class Bot:
-    """bot for hangouts"""
+    """bot for hangouts (normal use case)"""
 
     ignore = (
         105849946242372037157,  # odlebot
@@ -22,7 +22,6 @@ class Bot:
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
-        self.output_text = ""
 
     def run(self):
         """main loop for running bot"""
@@ -42,38 +41,46 @@ class Bot:
     async def _on_event(self, event):
         """called when there is an event in hangouts"""
         user, conv = utils.getUserConv(self, event)
-        # userID = user.id_[0]
-        self.output_text = ""
+        output_text = ""
 
         # handles messages
         if isinstance(event, hangups.ChatMessageEvent) and not user.is_self and not utils.userIn(self.ignore, user):
-            commands = utils.command_parser(event.text)
-            command = next(self.commands)
-
-            if command in self.handler.keywords:
-                self.output_text = self.handler.keywords[command]
-
-            elif command in self.handler.images:
-                if utils.cooldown(self.handler.cooldowns, user, event, 5):
-                    return
-                with open(f"{self.handler.images_folder}{self.handler.images[command]}", "rb") as image:
-                    await conv.send_message(utils.toSeg(""), image)
-
-            elif command in self.handler.commands:
-                function_ = self.handler.commands[command]
-
-            elif command in self.handler.games:
-                function_ = self.handler.play_game
-
-            if function_ and not utils.cooldown(self.handler.cooldowns, user, event, function_.cooldown_time):
-                user, conv = utils.getUserConv(self, event)
-                await function_(self, user, conv, commands)
+            output_text = await self.handler.handle_message(event)
 
         # new member
         elif isinstance(event, hangups.MembershipChangeEvent):
             if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
-                self.output_text = "Saber in!"
+                output_text = "Saber in!"
 
         # sends message to hangouts
-        if self.output_text:
-            await conv.send_message(utils.toSeg(self.output_text))
+        if output_text:
+            await conv.send_message(utils.toSeg(output_text))
+
+
+class ConsoleBot():
+    """console based bot (for testing)"""
+    def __init__(self):
+        self.handler = Handler()
+
+    def run(self):
+        """main bot loop"""
+        while True:
+            text = input("Enter a command: ")
+            asyncio.run(self.main(text))
+
+    async def main(self, text):
+        """called when there is an event in hangouts"""
+        output_text = ""
+
+        # handles messages
+        output_text = await self.handler.handle_message(text)
+
+        # sends message to hangouts
+        if output_text:
+            print(output_text)
+
+
+bots = {
+    "hangouts": Bot,
+    "console": ConsoleBot
+}
