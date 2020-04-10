@@ -93,26 +93,9 @@ class Manager2048:
         elif command in self.games:
             self.games["current game"] = self.games[command]
 
-        elif command == "gamemodes":
-            output_text += "pick a gamemode or continue playing\n"
-            output_text += utils.join_items(
-                *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
-                is_description=True
-            )
-        elif command == "scores":
-            output_text += utils.join_items(
-                *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
-                is_description=True
-            )
-        elif command == "reserved":
-            output_text += utils.join_items(*Game.reserved_words, seperator=", ")
-        elif command == "move":
-            output_text += utils.join_items(
-                *[[direction] + list(commands) for direction, commands in Game.movement.items()],
-                is_description=True
-            )
-        elif command == "help":
-            output_text += utils.join_items(*list(Game.game_commands.items()) + list(Game.commands.items()), is_description=True)
+        elif command in self.help_texts:
+            output_text += self.help_texts[command]
+            
         else:
             used_command = False
 
