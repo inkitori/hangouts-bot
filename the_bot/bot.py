@@ -66,7 +66,7 @@ class ConsoleBot():
         """main bot loop"""
         while True:
             text = input("Enter a command: ")
-            if utils.clean(text, split=False) == "quit":
+            if utils.clean(text, split=False) == "/quit":
                 break
             asyncio.run(self.main(text))
 
