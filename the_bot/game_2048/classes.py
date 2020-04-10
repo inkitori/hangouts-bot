@@ -163,14 +163,14 @@ class Game():
     }
     commands = {
         "restart": "restarts the game in the current gamemode",
+    }
+
+    extra_commands = {
         "gamemodes": "lists the gamemodes",
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
         "reserved": "prints reserved words",
-        "move": "prints valid {directions}"
-    }
-
-    extra_commands = {
+        "move": "prints valid {directions}",
         "{direction}": "move the tiles in the given direction (use move to see valid {directions})",
         "create {game_name}": "creates a new game with the given name (can be combined with other commands).",
         "{game_name}": "loads the game named game_name (can be combined with other commands)",
@@ -212,11 +212,6 @@ class Game():
 
     def update(self):
         """appends text based on current state"""
-
-        if self.state == "help":
-            self.text += utils.join_items(*list(self.commands.items()) + list(self.extra_commands.items()), is_description=True)
-            self.state = None
-
         if self.state == "won":
             self.has_won = True
             self.draw_game()
@@ -225,24 +220,6 @@ class Game():
             self.text += "you lost, use restart to restart, or gamemodes to get a list of gamemodes"
         elif self.state == "restart":
             self.restart()
-        elif self.state == "gamemodes":
-            self.text += "pick a gamemode or continue playing\n"
-            self.text += utils.join_items(
-                *[(mode_name, mode.description) for mode_name, mode in self.modes.items()],
-                is_description=True
-            )
-        elif self.state == "scores":
-            self.text += utils.join_items(
-                *[(mode_name, mode.high_score) for mode_name, mode in self.modes.items()],
-                is_description=True
-            )
-        elif self.state == "reserved":
-            self.text += utils.join_items(*Game.reserved_words, seperator=", ")
-        elif self.state == "move":
-            self.text += utils.join_items(
-                *[[direction] + list(commands) for direction, commands in Game.movement.items()],
-                is_description=True
-            )
         self.state = None
 
         self.text = utils.newline(self.text, 2)
@@ -298,10 +275,10 @@ class Game():
         GameMode.shuffled.insert(0, 0)
         Game.modes["confusion"].values = GameMode.shuffled
 
-    def play_game(self, commands, command=""):
+    def play_game(self, commands):
         """runs the main game loop once"""
         self.text = ""
-        command = command if command else next(commands)
+        command = next(commands)
 
         # check player movement
         x = None

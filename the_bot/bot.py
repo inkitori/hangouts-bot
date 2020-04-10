@@ -80,7 +80,7 @@ class ConsoleBot():
 
         # sends message to hangouts
         if output_text:
-            print(output_text)
+            print(utils.newline(output_text, 2))
 
 
 bots = {

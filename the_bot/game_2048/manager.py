@@ -33,7 +33,6 @@ class Manager2048:
         """runs the game based on commands"""
         output_text = ""
         command = next(commands)
-        used_command = True
         play_game_name = ""
 
         # processing commands
@@ -77,9 +76,27 @@ class Manager2048:
         elif command in self.games:
             play_game_name = command
             self.games["current game"] = self.games[play_game_name]
-        else:
-            used_command = False
-        command = "" if used_command else command
+
+        elif command == "gamemodes":
+            output_text += "pick a gamemode or continue playing\n"
+            output_text += utils.join_items(
+                *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
+                is_description=True
+            )
+        elif command == "scores":
+            output_text += utils.join_items(
+                *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+                is_description=True
+            )
+        elif command == "reserved":
+            output_text += utils.join_items(*Game.reserved_words, seperator=", ")
+        elif command == "move":
+            output_text += utils.join_items(
+                *[[direction] + list(commands) for direction, commands in Game.movement.items()],
+                is_description=True
+            )
+        elif command == "help":
+            output_text += utils.join_items(*list(Game.commands.items()) + list(Game.extra_commands.items()), is_description=True)
 
         if not play_game_name:
             play_game_name = "current game"
@@ -88,7 +105,7 @@ class Manager2048:
 
         if not output_text:
             if type(self.games[play_game_name]) == Game:
-                output_text = self.games[play_game_name].play_game(commands, command=command)
+                output_text = self.games[play_game_name].play_game(commands)
             else:
                 output_text = "no game selected"
         return output_text
