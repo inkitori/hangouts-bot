@@ -21,7 +21,7 @@ parser.add_options([bot_option, id_option])
 def choose_bot_arguments():
     (options, args) = parser.parse_args()
     optparse.check_choice(bot_option, "bot", options.bot)
-    return bots[options.bot](options.userid)
+    return bots[options.bot](userID=options.userid)
 
 
 bot = choose_bot_arguments()

@@ -22,6 +22,29 @@
             "has won": false,
             "mode": "confusion",
             "score": 0
+        },
+        "q": {
+            "board": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "has won": false,
+            "mode": "normal",
+            "score": 0
         }
     },
     "scores": {

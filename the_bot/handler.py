@@ -91,6 +91,7 @@ class Handler:
 
     async def rename_conv(self, bot, user, conv, commands):
         """renames a conversation"""
+        # TODO: take multiple words
         new_name = next(commands)
         if not new_name:
             return "Format: /rename {name}"

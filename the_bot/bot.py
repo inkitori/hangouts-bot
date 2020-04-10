@@ -18,7 +18,7 @@ class Bot:
         104687919952293193271,  # Ether(chendibot)
     )
 
-    def __init__(self):
+    def __init__(self, userID=None):
         self.cookies = hangups.get_auth_stdin("./token.txt", True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
