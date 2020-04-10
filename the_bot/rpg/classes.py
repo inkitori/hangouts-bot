@@ -130,6 +130,11 @@ class Player():
     def unequip(self, item):
         pass
 
+    def get_equipped(self, type_):
+        item_name = self.inventory[self.equipped[type_]]
+        item = RPG.all_items[item_name]
+        return item
+
     def print_inventory(self):
         """returns string representation of inventory"""
         inventory_text = ""
