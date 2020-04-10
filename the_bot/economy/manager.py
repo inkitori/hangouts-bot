@@ -9,20 +9,44 @@ import utils
 class EconomyManager():
     """manager for economy"""
 
-    users = {}
+    save_file = "the_bot/economy/save_data.json"
 
     def __init__(self):
-        pass
+        self.load_game()
+        self.users = classes.users
 
     def run_game(self, userID, commands):
         """runs the game"""
-        if userID not in self.users:
-            return "You are not registered! Use /register"
         command = next(commands)
+        output_text = ""
+        if command == "register":
+            self.register(userID, commands)
+        elif userID not in self.users:
+            return "You are not registered! Use register"
 
-        # use commands
+        user = self.users[userID]
+        if command == "leaderboard":
+            output_text = self.leaderboard()
+        elif command == "shop":
+            output_text = self.shop()
+        elif command == "give":
+            output_text = self.give(user, commands)
+        elif command == "profile":
+            output_text = self.profile(commands)
+        elif command == "mine":
+            output_text = user.mine()
+        elif command == "buy":
+            output_text = user.buy(commands)
+        elif command == "prestige":
+            output_text = user.prestige()
+        elif command == "prestige_confirm":
+            output_text = user.prestige_confirm()
+        elif command == "prestige_cancel":
+            output_text = user.prestige_cancel()
 
-    def leaderboard(self, bot, event):
+        return output_text
+
+    def leaderboard(self):
         """returns leaderboard"""
         user_balances = {user: user.lifetime_balance for user in self.users}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
@@ -45,14 +69,28 @@ class EconomyManager():
 
     def save_game(self):
         """saves the game"""
-        utils.save(self.save_file, self.data)
+        data = {player.__dict__ for player in self.users}
+        utils.save(self.save_file, data)
 
     def load_game(self):
         """loads the game"""
-        pass
+        data = utils.load(self.save_file)
+        for userID, user_data in data.items():
+            self.users[userID] = classes.EconomyUser(
+                name=user_data["name"],
+                balance=user_data["balance"],
+                lifetime_balance=user_data["lifetime_balance"],
+                prestige=user_data["prestige"],
+                items=user_data["items"],
+                confirmed_prestige=user_data["confirmed_prestige"],
+                prestige_upgrade=user_data["prestige_upgrade"],
+            )
 
-    def register(self, userID):
+    def register(self, userID, commands):
         """registers a user"""
+        name = next(commands)
+        if not name:
+            return "you must provide a name"
         if userID in self.users:
             return "You are already registered!"
         self.users[userID] = classes.User()
@@ -70,7 +108,7 @@ class EconomyManager():
             output_text = "You must specify an amount"
 
         for user in self.users.values():
-            if reciveing_user in user.name:
+            if reciveing_user == user.name:
                 reciving_user = user
                 break
 
@@ -101,7 +139,7 @@ class EconomyManager():
         user_name = next(commands)
         possible_users = []
 
-        for user in self.data["users"].values():
+        for user in self.users:
             if user_name in user.name:
                 possible_users.append(user)
 
@@ -113,5 +151,4 @@ class EconomyManager():
 
         for user in possible_users:
             output_text += user.profile()
-
         return utils.newline(output_text)

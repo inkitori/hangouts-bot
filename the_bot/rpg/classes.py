@@ -126,6 +126,8 @@ class Player():
     def equip(self, item):
         """equips an item"""
         pass
+    def unequip(self, item):
+        pass
 
     def print_inventory(self):
         """returns string representation of inventory"""
@@ -295,6 +297,9 @@ class Player():
             text += enemy.stats.print_stats()
             self.fighting = enemy
         return text
+
+    def print_profile(self):
+        pass
 
 
 class Enemy():

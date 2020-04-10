@@ -49,14 +49,14 @@ class EconomyUser():
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
 
-    def __init__(self, name):
+    def __init__(self, name, balance=0, lifetime_balance=0, prestige=0, items={"pick": 0}, confirmed_prestige=False, prestige_upgrade=0):
         self.name = name
-        self.balance = 0
-        self.lifetime_balance = 0
-        self.prestige = 0
-        self.items = {"pick": 0}
-        self.confirmed_prestige = False
-        self.prestige_upgrade = 0
+        self.balance = balance
+        self.lifetime_balance = lifetime_balance
+        self.prestige = prestige
+        self.items = items
+        self.confirmed_prestige = confirmed_prestige
+        self.prestige_upgrade = prestige_upgrade
 
     def change_balance(self, money):
         """increases money"""
@@ -194,3 +194,5 @@ class EconomyUser():
 
     def id(self):
         return utils.get_key(users, self)
+
+users = {}
