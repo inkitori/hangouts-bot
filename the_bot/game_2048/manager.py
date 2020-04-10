@@ -32,14 +32,16 @@ class Manager2048:
             *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
             is_description=True
         ),
-        "reserved": utils.description("reserved", *Game.reserved_words)
+        "reserved": utils.description("reserved", *reserved_words)
     }
     help_texts["help"] = utils.join_items(
         ("in-game commands", *list(Game.game_commands)),
-        ("game management", *Game.game_management_commands),
+        ("game management", *game_management_commands),
         ("informational", *list(help_texts)),
         is_description=True, description_mode="long"
     )
+    # needs to be here because resereved_words is declared first
+    reserved_words += list(help_texts)
 
     def __init__(self):
         self.load_game()
@@ -52,7 +54,7 @@ class Manager2048:
     def verify_name(self, *names):
         """verifies a name for a game"""
         for name in names:
-            if name in Game.reserved_words:
+            if name in self.reserved_words:
                 return "game names cannot be reserved words"
             elif not name:
                 return "games must have names"

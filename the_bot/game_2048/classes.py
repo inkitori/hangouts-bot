@@ -265,7 +265,6 @@ class Game():
         positive = None
         for direction in self.movement:
             if command in self.movement[direction]:
-                print("moving")
                 self.move(*self.directions[direction])
                 break
         else:
