@@ -59,8 +59,9 @@ class Bot:
 
 class ConsoleBot():
     """console based bot (for testing)"""
-    def __init__(self):
+    def __init__(self, userID=101):
         self.handler = Handler()
+        self.userID = userID
 
     def run(self):
         """main bot loop"""
@@ -71,11 +72,11 @@ class ConsoleBot():
             asyncio.run(self.main(text))
 
     async def main(self, text):
-        """called when there is an event in hangouts"""
+        """sends inpput to handler and prints output"""
         output_text = ""
 
         # handles messages
-        output_text = await self.handler.handle_message(text, console=True)
+        output_text = await self.handler.handle_message(text, console=True, userID=self.userID)
 
         # sends message to hangouts
         if output_text:

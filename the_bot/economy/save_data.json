@@ -1,0 +1,24 @@
+{
+    "101": {
+        "name": "ether",
+        "balance": 0,
+        "lifetime_balance": 0,
+        "prestige": 0,
+        "items": {
+            "pick": 0
+        },
+        "confirmed_prestige": false,
+        "prestige_upgrade": 0
+    },
+    "102": {
+        "name": "ether",
+        "balance": 0,
+        "lifetime_balance": 10,
+        "prestige": 0,
+        "items": {
+            "pick": 0
+        },
+        "confirmed_prestige": false,
+        "prestige_upgrade": 0
+    }
+}

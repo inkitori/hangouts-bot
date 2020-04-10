@@ -2,7 +2,6 @@
 manager for economy
 """
 import economy.classes as classes
-import classes.shop as shop
 import utils
 
 
@@ -12,16 +11,16 @@ class EconomyManager():
     save_file = "the_bot/economy/save_data.json"
 
     def __init__(self):
-        self.load_game()
         self.users = classes.users
+        self.load_game()
 
     def run_game(self, userID, commands):
         """runs the game"""
         command = next(commands)
         output_text = ""
         if command == "register":
-            self.register(userID, commands)
-        elif userID not in self.users:
+            return self.register(userID, commands)
+        elif userID not in self.users.keys():
             return "You are not registered! Use register"
 
         user = self.users[userID]
@@ -43,40 +42,44 @@ class EconomyManager():
             output_text = user.prestige_confirm()
         elif command == "prestige_cancel":
             output_text = user.prestige_cancel()
+        else:
+            output_text = "Invalid command"
 
         return output_text
 
     def leaderboard(self):
         """returns leaderboard"""
-        user_balances = {user: user.lifetime_balance for user in self.users}
+        user_balances = {user: user.lifetime_balance for user in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
-        sorted_users = [(key, value) for key, value in sorted(user_balances.items(), key=lambda x: x[1], reverse=True)]
+        sorted_users = [(key, value) for key, value in sorted(user_balances.items(), reverse=True)]
+        print(sorted_users)
 
         for rank in range(5):
             user, balance = sorted_users[rank]
-            leaderboard_text += f"{rank + 1}. {user.name()}: {balance}\n"
+            leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
 
         return leaderboard_text
 
     def shop(self):
         """returns shop"""
         shop_text = ""
-        for type_ in shop:
+        for type_ in classes.shop_items:
             for item in type_:
+                # TODO: use jion items and is description
                 shop_text += f"{item.name()} - {item.price} Saber Dollars"
         return shop_text
 
     def save_game(self):
         """saves the game"""
-        data = {player.__dict__ for player in self.users}
+        data = {userID: player.__dict__ for userID, player in self.users.items()}
         utils.save(self.save_file, data)
 
     def load_game(self):
         """loads the game"""
         data = utils.load(self.save_file)
         for userID, user_data in data.items():
-            self.users[userID] = classes.EconomyUser(
+            self.users[int(userID)] = classes.EconomyUser(
                 name=user_data["name"],
                 balance=user_data["balance"],
                 lifetime_balance=user_data["lifetime_balance"],
@@ -89,11 +92,11 @@ class EconomyManager():
     def register(self, userID, commands):
         """registers a user"""
         name = next(commands)
-        if not name:
-            return "you must provide a name"
         if userID in self.users:
             return "You are already registered!"
-        self.users[userID] = classes.User()
+        if not name:
+            return "you must provide a name"
+        self.users[userID] = classes.EconomyUser(name)
         return "Successfully registered!"
 
     def give(self, giving_user, commands):
@@ -139,7 +142,7 @@ class EconomyManager():
         user_name = next(commands)
         possible_users = []
 
-        for user in self.users:
+        for user in self.users.values():
             if user_name in user.name:
                 possible_users.append(user)
 

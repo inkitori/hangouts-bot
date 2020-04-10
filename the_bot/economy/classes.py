@@ -20,7 +20,7 @@ class Item():
         return f"{self.modifer}{self.type_}".title().replace(" ", "_")
 
 
-shop = {
+shop_items = {
     "picks": (
         Item("pick", 100, "tin"),
         Item("pick", 250, "iron"),
@@ -71,7 +71,7 @@ class EconomyUser():
     def mine(self):
         """mines for saber dollars"""
 
-        player_pick = shop["picks"][self.items["pick"]]
+        player_pick = shop_items["picks"][self.items["pick"]]
         mined_amount = random.randint(*player_pick.mining_range)
         mined_amount += math.ceil(mined_amount * self.prestige / 100)
         mined_amount *= 2 ** self.prestige_upgrade
@@ -194,5 +194,6 @@ class EconomyUser():
 
     def id(self):
         return utils.get_key(users, self)
+
 
 users = {}
