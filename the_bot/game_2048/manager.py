@@ -9,9 +9,17 @@ class Manager2048:
     """manager for 2048 game"""
     games = {"current game": None}
     save_file = "the_bot/game_2048/save_data.json"
-
+    game_management_commands = [
+        "{direction}", "create {game_name}", "{game_name}", "rename {old_name} {new_name}", "delete {game_name}", "games",
+    ]
+    reserved_words = (
+        list(Game.game_commands.keys()) + list(Game.modes.keys()) +
+        [value for values in list(Game.movement.values()) for value in values] +
+        game_management_commands +
+        ["2048", "/2048", "current game"]
+    )
     help_texts = {
-        "help": utils.join_items(*list(Game.game_commands.items()) + list(Game.commands.items()), is_description=True),
+        "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
             *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
             is_description=True
@@ -26,6 +34,13 @@ class Manager2048:
         ),
         "reserved": utils.description("reserved", *Game.reserved_words)
     }
+    help_texts["help"] = utils.join_items(
+        ("in-game commands", *list(Game.game_commands)),
+        ("game management", *Game.game_management_commands),
+        ("informational", *list(help_texts)),
+        is_description=True, description_mode="long"
+    )
+
     def __init__(self):
         self.load_game()
 
@@ -95,7 +110,7 @@ class Manager2048:
 
         elif command in self.help_texts:
             output_text += self.help_texts[command]
-            
+
         else:
             used_command = False
 

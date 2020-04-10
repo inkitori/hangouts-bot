@@ -165,19 +165,6 @@ class Game():
         "restart": "restarts the game in the current gamemode",
     }
 
-    commands = {
-        "gamemodes": "lists the gamemodes",
-        "help": "prints this help text",
-        "scores": "prints the highscore for each mode",
-        "reserved": "prints reserved words",
-        "move": "prints valid {directions}",
-        "{direction}": "move the tiles in the given direction (use move to see valid {directions})",
-        "create {game_name}": "creates a new game with the given name (can be combined with other commands).",
-        "{game_name}": "loads the game named game_name (can be combined with other commands)",
-        "rename {old_name} {new_name}": "renames a game from old_name to new_name",
-        "delete {game_name}": "deletes the game named game_name",
-        "games": "prints all existing games, their mode and score",
-    }
     movement = {
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
         "down": ("down", "d", "v"), "right": ("right", "r", ">")
@@ -186,13 +173,6 @@ class Game():
         "up": (False, False), "left": (True, False),
         "down": (False, True), "right": (True, True)
     }
-
-    reserved_words = (
-        list(game_commands.keys()) + list(modes.keys()) +
-        [value for values in list(movement.values()) for value in values] +
-        list(commands.keys()) +
-        ["2048", "/2048", "current game"]
-    )
 
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
         self.score = score
