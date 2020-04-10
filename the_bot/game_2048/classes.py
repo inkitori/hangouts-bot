@@ -161,11 +161,11 @@ class Game():
         "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
-    commands = {
+    game_commands = {
         "restart": "restarts the game in the current gamemode",
     }
 
-    extra_commands = {
+    commands = {
         "gamemodes": "lists the gamemodes",
         "help": "prints this help text",
         "scores": "prints the highscore for each mode",
@@ -188,9 +188,9 @@ class Game():
     }
 
     reserved_words = (
-        list(commands.keys()) + list(modes.keys()) +
+        list(game_commands.keys()) + list(modes.keys()) +
         [value for values in list(movement.values()) for value in values] +
-        list(extra_commands.keys()) +
+        list(commands.keys()) +
         ["2048", "/2048", "current game"]
     )
 
@@ -275,23 +275,24 @@ class Game():
         GameMode.shuffled.insert(0, 0)
         Game.modes["confusion"].values = GameMode.shuffled
 
-    def play_game(self, commands):
+    def play_game(self, commands, command=""):
         """runs the main game loop once"""
         self.text = ""
-        command = next(commands)
+        command = command if command else next(commands)
 
         # check player movement
         x = None
         positive = None
         for direction in self.movement:
             if command in self.movement[direction]:
+                print("moving")
                 self.move(*self.directions[direction])
                 break
         else:
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
-                elif command in self.commands:
+                elif command in self.game_commands:
                     self.state = command
                 elif command != "":
                     self.text += "invalid command, use help to see commands\n"

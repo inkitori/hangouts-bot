@@ -10,6 +10,22 @@ class Manager2048:
     games = {"current game": None}
     save_file = "the_bot/game_2048/save_data.json"
 
+    help_texts = {
+        "help": utils.join_items(*list(Game.game_commands.items()) + list(Game.commands.items()), is_description=True),
+        "gamemodes": utils.join_items(
+            *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
+            is_description=True
+        ),
+        "move": utils.join_items(
+            *[[direction] + list(commands) for direction, commands in Game.movement.items()],
+            is_description=True
+        ),
+        "scores": utils.join_items(
+            *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+            is_description=True
+        ),
+        "reserved": utils.description("reserved", *Game.reserved_words)
+    }
     def __init__(self):
         self.load_game()
 
@@ -34,6 +50,7 @@ class Manager2048:
         output_text = ""
         command = next(commands)
         play_game_name = ""
+        used_command = True
 
         # processing commands
         if command == "create":
@@ -74,8 +91,7 @@ class Manager2048:
                     output_text += utils.description(game_name, game.mode.name(), game.score)  # f"{game_name} - {game.mode.name()} score: {game.score}\n"
 
         elif command in self.games:
-            play_game_name = command
-            self.games["current game"] = self.games[play_game_name]
+            self.games["current game"] = self.games[command]
 
         elif command == "gamemodes":
             output_text += "pick a gamemode or continue playing\n"
@@ -96,16 +112,18 @@ class Manager2048:
                 is_description=True
             )
         elif command == "help":
-            output_text += utils.join_items(*list(Game.commands.items()) + list(Game.extra_commands.items()), is_description=True)
+            output_text += utils.join_items(*list(Game.game_commands.items()) + list(Game.commands.items()), is_description=True)
+        else:
+            used_command = False
 
+        command = "" if used_command else command
         if not play_game_name:
             play_game_name = "current game"
-        else:
-            self.games["current game"] = self.games[play_game_name]
+        self.games["current game"] = self.games[play_game_name]
 
         if not output_text:
             if type(self.games[play_game_name]) == Game:
-                output_text = self.games[play_game_name].play_game(commands)
+                output_text = self.games[play_game_name].play_game(commands, command=command)
             else:
                 output_text = "no game selected"
         return output_text
