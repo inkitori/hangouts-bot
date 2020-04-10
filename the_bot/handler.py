@@ -72,7 +72,7 @@ class Handler:
             if console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                # function_cooldown_time = 0  # TODO: get the default cooldown for the function
+                # function_cooldown_time = 0
                 # if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
                 # output_text = "You are on cooldown"
                 # else:
@@ -91,7 +91,6 @@ class Handler:
 
     async def rename_conv(self, bot, user, conv, commands):
         """renames a conversation"""
-        # TODO: take multiple words
         new_name = next(commands)
         if not new_name:
             return "Format: /rename {name}"

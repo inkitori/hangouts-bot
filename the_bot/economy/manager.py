@@ -19,7 +19,6 @@ class EconomyManager():
         command = next(commands)
         output_text = ""
         if command == "help":
-            # TODO: Fill in help text
             return "help text"
         if command == "register":
             return self.register(userID, commands)

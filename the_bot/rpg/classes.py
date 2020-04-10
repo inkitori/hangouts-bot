@@ -126,6 +126,7 @@ class Player():
     def equip(self, item):
         """equips an item"""
         pass
+
     def unequip(self, item):
         pass
 
@@ -292,6 +293,7 @@ class Player():
 
         else:
             enemy_name = random.choice(rooms[self.room].enemies_list)
+            enemy = RPG.enemies[enemy_name]
 
             text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
