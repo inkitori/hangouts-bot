@@ -9,6 +9,39 @@ class Manager2048:
     """manager for 2048 game"""
     games = {"current game": None}
     save_file = "the_bot/game_2048/save_data.json"
+    game_management_commands = [
+        "{direction}", "create {game_name}", "{game_name}", "rename {old_name} {new_name}", "delete {game_name}", "games",
+    ]
+    reserved_words = (
+        list(Game.game_commands.keys()) + list(Game.modes.keys()) +
+        [value for values in list(Game.movement.values()) for value in values] +
+        game_management_commands +
+        ["2048", "/2048", "current game"]
+    )
+    help_texts = {
+        "help": "",  # avoids probelems with referencing itself
+        "gamemodes": utils.join_items(
+            *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
+            is_description=True
+        ),
+        "move": utils.join_items(
+            *[[direction] + list(commands) for direction, commands in Game.movement.items()],
+            is_description=True
+        ),
+        "scores": utils.join_items(
+            *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+            is_description=True
+        ),
+        "reserved": utils.description("reserved", *reserved_words)
+    }
+    help_texts["help"] = utils.join_items(
+        ("in-game commands", *list(Game.game_commands)),
+        ("game management", *game_management_commands),
+        ("informational", *list(help_texts)),
+        is_description=True, description_mode="long"
+    )
+    # needs to be here because resereved_words is declared first
+    reserved_words += list(help_texts)
 
     def __init__(self):
         self.load_game()
@@ -21,7 +54,7 @@ class Manager2048:
     def verify_name(self, *names):
         """verifies a name for a game"""
         for name in names:
-            if name in Game.reserved_words:
+            if name in self.reserved_words:
                 return "game names cannot be reserved words"
             elif not name:
                 return "games must have names"
@@ -33,8 +66,8 @@ class Manager2048:
         """runs the game based on commands"""
         output_text = ""
         command = next(commands)
-        used_command = True
         play_game_name = ""
+        used_command = True
 
         # processing commands
         if command == "create":
@@ -75,16 +108,18 @@ class Manager2048:
                     output_text += utils.description(game_name, game.mode.name(), game.score)  # f"{game_name} - {game.mode.name()} score: {game.score}\n"
 
         elif command in self.games:
-            play_game_name = command
-            self.games["current game"] = self.games[play_game_name]
+            self.games["current game"] = self.games[command]
+
+        elif command in self.help_texts:
+            output_text += self.help_texts[command]
+
         else:
             used_command = False
-        command = "" if used_command else command
 
+        command = "" if used_command else command
         if not play_game_name:
             play_game_name = "current game"
-        else:
-            self.games["current game"] = self.games[play_game_name]
+        self.games["current game"] = self.games[play_game_name]
 
         if not output_text:
             if type(self.games[play_game_name]) == Game:

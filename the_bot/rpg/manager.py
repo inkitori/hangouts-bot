@@ -11,10 +11,6 @@ class RPGManager:
     """manager for rpg"""
 
     save_file = "the_bot/rpg/save_data.json"
-    admins = (
-        114207595761187114730,  # joseph
-        106637925595968853122,  # chendi
-    )
     game = classes.RPG()
 
     def __init__(self):
@@ -30,12 +26,6 @@ class RPGManager:
             "atk": self.atk,
             "heal": self.heal
             """
-        }
-        self.admin_commands = {
-            "remove": self.remove,
-            "sync": self.sync,
-            "save": self.save_game,
-            "set": self.set_,
         }
 
         self.data = utils.load(self.save_file)
@@ -59,9 +49,6 @@ class RPGManager:
         elif command != "register" and userID not in classes.RPG.users:
             return "You are not registered! Use register"
 
-        if command in self.admin_commands and not utils.userIn(self.admins, userID):
-            return "bro wtf u cant use that"
-
         return self.commands[command](userID, commands)
 
     def load_game(self):
@@ -76,44 +63,3 @@ class RPGManager:
             save_data[userID] = player.to_dict()
 
         utils.save(self.save_file, save_data)
-
-    def sync(self, userID, commands):
-        """syncs value to save_file"""
-        key, value = next(commands), next(commands)
-
-        if value.isdigit():
-            value = int(value)
-
-        for player in self.userData:
-            self.userData[player][key] = value
-
-        self.save_game(self.save_file, self.data)
-
-        return "Synced all values!"
-
-    def remove(self, userID, commands):
-        """removes a key from data"""
-        key = next(commands)
-
-        for user in self.userData:
-            self.userData[user].pop(key, None)
-
-        self.save_game(self.save_file, self.data)
-
-        return "Removed key!"
-
-    def set_(self, userID, commands):
-        """sets a value"""
-        userID, key, value = utils.get_item_safe(commands, (0, 1, 2))
-
-        if value.isdigit():
-            value = int(value)
-
-        if userID in self.userData:
-            self.userData[userID][key] = value
-
-            utils.save(self.save_file, self.data)
-
-            return "Set value!"
-        else:
-            return "That user isn't registered!"

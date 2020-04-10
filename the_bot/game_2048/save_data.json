@@ -2,33 +2,9 @@
     "games": {
         "potato": {
             "board": [
-                1,
-                1,
-                1,
-                1,
+                0,
+                0,
                 2,
-                1,
-                1,
-                1,
-                2,
-                1,
-                1,
-                1,
-                0,
-                1,
-                0,
-                1
-            ],
-            "has won": false,
-            "mode": "confusion",
-            "score": 0
-        },
-        "q": {
-            "board": [
-                1,
-                1,
-                0,
-                0,
                 0,
                 0,
                 0,
@@ -39,12 +15,59 @@
                 0,
                 0,
                 1,
+                0,
                 0,
                 0
             ],
             "has won": false,
             "mode": "confusion",
-            "score": 0
+            "score": 4
+        },
+        "q": {
+            "board": [
+                3,
+                2,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                2,
+                0,
+                0,
+                0
+            ],
+            "has won": false,
+            "mode": "confusion",
+            "score": 20
+        },
+        "1": {
+            "board": [
+                0,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            "has won": false,
+            "mode": "normal",
+            "score": 4
         }
     },
     "scores": {
@@ -53,6 +76,6 @@
         "1048576": 0,
         "eleven": 0,
         "twenty": 0,
-        "confusion": 4
+        "confusion": 20
     }
 }

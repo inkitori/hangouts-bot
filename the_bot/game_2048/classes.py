@@ -161,23 +161,10 @@ class Game():
         "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
-    commands = {
+    game_commands = {
         "restart": "restarts the game in the current gamemode",
-        "gamemodes": "lists the gamemodes",
-        "help": "prints this help text",
-        "scores": "prints the highscore for each mode",
-        "reserved": "prints reserved words",
-        "move": "prints valid {directions}"
     }
 
-    extra_commands = {
-        "{direction}": "move the tiles in the given direction (use move to see valid {directions})",
-        "create {game_name}": "creates a new game with the given name (can be combined with other commands).",
-        "{game_name}": "loads the game named game_name (can be combined with other commands)",
-        "rename {old_name} {new_name}": "renames a game from old_name to new_name",
-        "delete {game_name}": "deletes the game named game_name",
-        "games": "prints all existing games, their mode and score",
-    }
     movement = {
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
         "down": ("down", "d", "v"), "right": ("right", "r", ">")
@@ -186,13 +173,6 @@ class Game():
         "up": (False, False), "left": (True, False),
         "down": (False, True), "right": (True, True)
     }
-
-    reserved_words = (
-        list(commands.keys()) + list(modes.keys()) +
-        [value for values in list(movement.values()) for value in values] +
-        list(extra_commands.keys()) +
-        ["2048", "/2048", "current game"]
-    )
 
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
         self.score = score
@@ -212,11 +192,6 @@ class Game():
 
     def update(self):
         """appends text based on current state"""
-
-        if self.state == "help":
-            self.text += utils.join_items(*list(self.commands.items()) + list(self.extra_commands.items()), is_description=True)
-            self.state = None
-
         if self.state == "won":
             self.has_won = True
             self.draw_game()
@@ -225,24 +200,6 @@ class Game():
             self.text += "you lost, use restart to restart, or gamemodes to get a list of gamemodes"
         elif self.state == "restart":
             self.restart()
-        elif self.state == "gamemodes":
-            self.text += "pick a gamemode or continue playing\n"
-            self.text += utils.join_items(
-                *[(mode_name, mode.description) for mode_name, mode in self.modes.items()],
-                is_description=True
-            )
-        elif self.state == "scores":
-            self.text += utils.join_items(
-                *[(mode_name, mode.high_score) for mode_name, mode in self.modes.items()],
-                is_description=True
-            )
-        elif self.state == "reserved":
-            self.text += utils.join_items(*Game.reserved_words, seperator=", ")
-        elif self.state == "move":
-            self.text += utils.join_items(
-                *[[direction] + list(commands) for direction, commands in Game.movement.items()],
-                is_description=True
-            )
         self.state = None
 
         self.text = utils.newline(self.text, 2)
@@ -314,7 +271,7 @@ class Game():
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
-                elif command in self.commands:
+                elif command in self.game_commands:
                     self.state = command
                 elif command != "":
                     self.text += "invalid command, use help to see commands\n"
