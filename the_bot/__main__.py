@@ -2,8 +2,6 @@
 hangouts bot with games
 """
 from bot import bots
-import utils
-import sys
 import optparse
 
 
