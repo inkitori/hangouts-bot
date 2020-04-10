@@ -52,12 +52,12 @@ class EconomyManager():
         user_balances = {user: user.lifetime_balance for user in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
-        sorted_users = [(key, value) for key, value in sorted(user_balances.items(), reverse=True)]
-        print(sorted_users)
+        sorted_users = [(key, value) for key, value in sorted(user_balances.items(), key=lambda x: x[1], reverse=True)]
 
         for rank in range(5):
-            user, balance = sorted_users[rank]
-            leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+            user, balance = utils.get_item_safe(sorted_users, (rank, ), default=("", ""))
+            if user:
+                leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
 
         return leaderboard_text
 
