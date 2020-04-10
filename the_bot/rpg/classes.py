@@ -207,7 +207,7 @@ class Player():
 
     def heal(self):
         """heal the player with their tome"""
-        tome_stats = self.equipped["tome"].stats
+        tome_stats = self.get_equipped["tome"].stats
         if self.stats.mana < tome_stats.mana:
             return "You do not have enough mana to heal!"
 
