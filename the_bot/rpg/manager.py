@@ -11,10 +11,6 @@ class RPGManager:
     """manager for rpg"""
 
     save_file = "the_bot/rpg/save_data.json"
-    admins = (
-        114207595761187114730,  # joseph
-        106637925595968853122,  # chendi
-    )
     game = classes.RPG()
 
     def __init__(self):
@@ -30,12 +26,6 @@ class RPGManager:
             "atk": self.atk,
             "heal": self.heal
             """
-        }
-        self.admin_commands = {
-            "remove": self.remove,
-            "sync": self.sync,
-            "save": self.save_game,
-            "set": self.set_,
         }
 
         self.data = utils.load(self.save_file)
@@ -58,9 +48,6 @@ class RPGManager:
 
         elif command != "register" and userID not in classes.RPG.users:
             return "You are not registered! Use register"
-
-        if command in self.admin_commands and not utils.userIn(self.admins, userID):
-            return "bro wtf u cant use that"
 
         return self.commands[command](userID, commands)
 
