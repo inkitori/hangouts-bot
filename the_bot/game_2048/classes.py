@@ -80,11 +80,12 @@ class Board():
         return False
 
     def check_full(self):
-        """Checks if the board is full"""
+        """Checks if the board is full and return number of empty spaces"""
+        empty = 0
         for cell in self.cells:
             if cell.value == 0:
-                return False
-        return True
+                empty += 1
+        return empty
 
     def make_new_block(self, mode):
         """Makes random new block"""
@@ -168,18 +169,6 @@ class Game():
         "reserved": "prints reserved words",
         "move": "prints valid {directions}"
     }
-    help_text = (
-        "this is a 2048 clone by chendi",
-        "how to play:",
-        "move the tiles",
-        "when 2 with the same value touch, they merge",
-        "try to get the highest value posible without filling up the board",
-        "commands:",
-        "prefix all commands with /2048",
-        "playing 2048 will not interfere with other bot commands",
-        "all commands must be spelled correctly but are NOT case-sensitive",
-        "note that the current game and highscores are reset when the bot resets",
-    )
 
     extra_commands = {
         "{direction}": "move the tiles in the given direction (use move to see valid {directions})",
@@ -212,8 +201,9 @@ class Game():
         self.state = None
         self.has_won = has_won
         self.board = Board(self.mode, board)
-        for i in range(2):
-            self.board.make_new_block(self.mode)
+        if self.board.check_full == self.mode.number_of_cells and not score:
+            for i in range(2):
+                self.board.make_new_block(self.mode)
 
     def name(self):
         """name of the game"""
@@ -225,7 +215,6 @@ class Game():
         """appends text based on current state"""
 
         if self.state == "help":
-            self.text += utils.newline(utils.join_items(*self.help_text))
             self.text += utils.join_items(*list(self.commands.items()) + list(self.extra_commands.items()), is_description=True)
             self.state = None
 
@@ -239,16 +228,22 @@ class Game():
             self.restart()
         elif self.state == "gamemodes":
             self.text += "pick a gamemode or continue playing\n"
-            for mode_name, mode in self.modes.items():
-                self.text += f"{mode_name} - {mode.description}\n"
+            self.text += utils.join_items(
+                *[(mode_name, mode.description) for mode_name, mode in self.modes.items()],
+                is_description=True
+            )
         elif self.state == "scores":
-            for mode_name, mode in self.modes.items():
-                self.text += f"{mode_name}: {mode.high_score}\n"
+            self.text += utils.join_items(
+                *[(mode_name, mode.high_score) for mode_name, mode in self.modes.items()],
+                is_description=True
+            )
         elif self.state == "reserved":
-            self.text += ", ".join(Game.reserved_words)
+            self.text += utils.join_items(*Game.reserved_words, seperator=", ")
         elif self.state == "move":
-            for direction, commands in Game.movement.items():
-                self.text += utils.newline(utils.description(direction, *commands))
+            self.text += utils.join_items(
+                *[[direction] + list(commands) for direction, commands in Game.movement.items()],
+                is_description=True
+            )
         self.state = None
 
         self.text = utils.newline(self.text, 2)
@@ -256,7 +251,7 @@ class Game():
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        self.text += f"{self.name()} - {self.mode.name()}\n"
+        self.text += utils.description(self.name(), self.mode.name())
         self.text += "score: " + str(self.score) + "\n"
         self.board.draw_board(self)
 
@@ -320,6 +315,7 @@ class Game():
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
+                    # TODO: these commands should work without a game selected
                 elif command in self.commands:
                     self.state = command
                 elif command != "":

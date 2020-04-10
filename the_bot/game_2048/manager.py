@@ -1,7 +1,6 @@
 """
 manager for 2048 games
 """
-import json
 import utils
 from game_2048.classes import Game
 

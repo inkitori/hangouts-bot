@@ -205,18 +205,15 @@ class Player():
 
     def heal(self):
         """heal the player with their tome"""
-        if self.stats.mana < "idk how i'd access tome stats":
+        tome_stats = self.equipped["tome"].stats
+        if self.stats.mana < tome_stats.mana:
             return "You do not have enough mana to heal!"
 
         else:
-            self.stats.mana -= "tome mana usage thingy"
-            self.stats.health += "tome health give thingy"
+            self.stats.mana -= tome_stats.mana
+            self.stats.change_health(tome_stats.health)
 
-            if self.stats.health > self.stats.max_health:
-                self.stats.health = self.stats.max_health
-                return "You have been healed to full health!"
-
-            return f"You have been healthed back up to {self.stats.health}"
+            return f"You have been healed back up to {self.stats.health}"
 
     def attack(self, enemy):
         """attacks an enemy"""

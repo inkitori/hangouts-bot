@@ -48,18 +48,17 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-def join_items(*items, seperator="\n", is_description=False, long=False):
+def join_items(*items, seperator="\n", is_description=False, description_mode="short"):
     """joins a list using seperator"""
 
     output_list = []
     if is_description:
         for item in items:
-            output_list.append(description(*item, long=long))
+            output_list.append(description(*item, mode=description_mode))
 
     else:
         output_list = convert_items(list(items), type_=str)
     return seperator.join(output_list)
-
 
 
 def newline(text, number=1):
@@ -67,14 +66,14 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def description(name, *description, long=False):
+def description(name, *description, mode="short"):
     description = convert_items(list(description), str)
-    if long:
-        description.insert(0, f"{name.title()}:")
-        full_description = join_items(*description, seperator="\n\t")
-    else:
+    if mode == "short":
         description = join_items(*description, seperator=", ")
         full_description = f"{name} - {description}"
+    if mode == "long":
+        description.insert(0, f"{name.title()}:")
+        full_description = join_items(*description, seperator="\n\t")
 
     return full_description
 
@@ -138,6 +137,7 @@ def command_parser(command_text, has_prefix=False):
         yield get_item_safe(commands)
         commands = trim(commands)
 
+
 # get things safely
 def get_item_safe(sequence, indexes=(0,), default=""):
     """
@@ -182,6 +182,7 @@ def get_value(dictionary, key, default=""):
     except KeyError:
         value = default
     return value
+
 
 # random
 def clamp(value, min_value, max_value):

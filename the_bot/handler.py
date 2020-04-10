@@ -44,10 +44,11 @@ class Handler:
         self.help_text = utils.join_items(
             "I'm a bot by Yeah and Chendi.",
             "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
-            # TODO: make this a loop
-            utils.description("keywords", *list(self.keywords), long=True),
-            utils.description("games", *list(self.game_managers), long=True),
-            utils.description("commands", *list(self.commands), long=True),
+        ) + utils.join_items(
+            ("keywords", *list(self.keywords)),
+            ("games", *list(self.game_managers)),
+            ("commands", *list(self.commands)),
+            is_description=True, description_mode="long"
         )
         self.keywords["/help"] = self.help_text
 
@@ -73,13 +74,15 @@ class Handler:
             else:
                 # function_cooldown_time = 0  # TODO: get the default cooldown for the function
                 # if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
-                    # output_text = "You are on cooldown"
+                # output_text = "You are on cooldown"
                 # else:
                 output_text = await function_(bot, user, conv, commands)
 
         elif command in self.game_managers:
             userID = userID if console else user.id_[0]
             output_text = self.play_game(userID, command, commands)
+            if console:
+                output_text = output_text.replace("  ", " ")
 
         else:
             output_text = "Invalid command" if console else ""
