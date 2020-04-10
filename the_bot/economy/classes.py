@@ -17,7 +17,7 @@ class Item():
 
     def name(self):
         """the name of the item"""
-        return f"{self.modifer}{self.type_}".title().replace(" ", "_")
+        return f"{self.modifer}_{self.type_}"
 
 
 shop_items = {
@@ -183,14 +183,14 @@ class EconomyUser():
     def profile(self):
         """returns user profile"""
         profile_text = utils.join_items(
-            f"Name: {self.name}",
-            f"Balance: {self.balance}",
-            f"Pick: {self.pick}",
-            f"Prestige: {self.prestige}",
-            f"Prestige Level: {self.prestige_level}",
-            f"ID: {self.id()}"
+            f"name: {self.name}",
+            f"balance: {self.balance}",
+            f"pick: {self.items['pick']}",
+            f"prestige: {self.prestige}",
+            f"prestige level: {self.prestige_upgrade}",
+            f"id: {self.id()}"
         )
-        return profile_text
+        return utils.newline(profile_text).title()
 
     def id(self):
         return utils.get_key(users, self)

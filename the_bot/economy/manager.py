@@ -18,6 +18,9 @@ class EconomyManager():
         """runs the game"""
         command = next(commands)
         output_text = ""
+        if command == "help":
+            # TODO: Fill in help text
+            return "help text"
         if command == "register":
             return self.register(userID, commands)
         elif userID not in self.users.keys():
@@ -64,10 +67,9 @@ class EconomyManager():
     def shop(self):
         """returns shop"""
         shop_text = ""
-        for type_ in classes.shop_items:
+        for type_ in classes.shop_items.values():
             for item in type_:
-                # TODO: use jion items and is description
-                shop_text += f"{item.name()} - {item.price} Saber Dollars"
+                shop_text += f"{utils.description(item.name().title(), item.price)} Saber Dollars\n"
         return shop_text
 
     def save_game(self):
@@ -106,34 +108,38 @@ class EconomyManager():
         output_text = ""
 
         if not reciveing_user:
-            output_text = "You must specfiy a user or ID"
+            output_text += "You must specfiy a user or ID"
         elif not money:
-            output_text = "You must specify an amount"
-
-        for user in self.users.values():
-            if reciveing_user == user.name:
-                reciving_user = user
-                break
-
-        if reciveing_user in self.users:
-            reciving_user = self.users[reciveing_user]
-        elif reciving_user.id_[0] not in self.users:
-            output_text = "That user has not registered!"
-        elif reciving_user.id_[0] == giving_user.id_[0]:
-            output_text = "That user is you!"
-
-        if money < 0:
-            output_text = "You can't give negative money!"
-        elif user.change_balance < money:
-            output_text = "You don't have enough money to do that!"
+            output_text += "You must specify an amount"
+        elif not money.isdigit():
+            output_text += "You must give an integer amount of Saber Dollars"
         else:
-            giving_user.change_balance(- money)
-            reciveing_user.change_balance(money)
+            money = int(money)
 
-            output_text = utils.join_items(
-                f"Successfully given {money} Saber Dollars to {reciving_user.name}.",
-                f"That user now has {reciveing_user.balance} Saber Dollars."
-            )
+            for user in self.users.values():
+                if reciveing_user == user.name:
+                    reciveing_user = user
+                    break
+
+            if reciveing_user.isdigit() and int(reciveing_user) in self.users:
+                reciveing_user = self.users[int(reciveing_user)]
+            if reciveing_user.id() not in self.users:
+                output_text += "That user has not registered!"
+            elif reciveing_user.id() == giving_user.id():
+                output_text += "That user is you!"
+            else:
+                if money < 0:
+                    output_text += "You can't give negative money!"
+                elif giving_user.balance < money:
+                    output_text += "You don't have enough money to do that!"
+                else:
+                    giving_user.change_balance(- money)
+                    reciveing_user.change_balance(money)
+
+                    output_text += utils.join_items(
+                        f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
+                        f"That user now has {reciveing_user.balance} Saber Dollars."
+                    )
         return output_text
 
     def profile(self, commands):
