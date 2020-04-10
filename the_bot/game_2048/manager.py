@@ -92,7 +92,6 @@ class Manager2048:
     def load_game(self):
         """loads games from a json file"""
         data = utils.load(self.save_file)
-        print(type(data))
         for game_name, game_data in data["games"].items():
             self.games[game_name] = Game(game_data["board"], game_data["has won"], game_data["mode"], game_data["score"])
         for mode_name, mode in Game.modes.items():
@@ -111,4 +110,5 @@ class Manager2048:
                 "score": game.score
             }
         high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
+        data = {"games": games_dict, "scores": high_scores}
         utils.save(self.save_file, data)
