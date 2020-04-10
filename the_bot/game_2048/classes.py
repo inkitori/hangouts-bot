@@ -64,7 +64,7 @@ class Board():
 
     def check_can_move(self):
         """Checks if the player can move"""
-        if not self.check_full():
+        if self.number_of_empty_cells():
             return True
 
         # checks if adjacent cells are the same
@@ -79,7 +79,7 @@ class Board():
                         return True
         return False
 
-    def check_full(self):
+    def number_of_empty_cells(self):
         """Checks if the board is full and return number of empty spaces"""
         empty = 0
         for cell in self.cells:
@@ -89,7 +89,7 @@ class Board():
 
     def make_new_block(self, mode):
         """Makes random new block"""
-        if self.check_full():
+        if not self.number_of_empty_cells():
             return
         empty_blocks = [cell for cell in self.cells if cell.value == 0]
         empty_cell = random.choice(empty_blocks)
@@ -201,14 +201,13 @@ class Game():
         self.state = None
         self.has_won = has_won
         self.board = Board(self.mode, board)
-        if self.board.check_full == self.mode.number_of_cells and not score:
+        if self.board.number_of_empty_cells() == self.mode.number_of_cells and not score:
             for i in range(2):
                 self.board.make_new_block(self.mode)
 
     def name(self):
         """name of the game"""
         return "placeholder, use command games to see games"
-        # TODO: make this work
         # return utils.get_key(games, self)
 
     def update(self):
@@ -276,7 +275,7 @@ class Game():
             self.board.move_blocks(x, positive, self)
 
             # does not create new block if board is full or the board did not change
-            if not self.board.check_full() and old_board_values != [cell.value for cell in self.board.cells]:
+            if old_board_values != [cell.value for cell in self.board.cells]:
                 self.board.make_new_block(self.mode)
 
         if self.score > self.mode.high_score:
@@ -315,7 +314,6 @@ class Game():
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
-                    # TODO: these commands should work without a game selected
                 elif command in self.commands:
                     self.state = command
                 elif command != "":

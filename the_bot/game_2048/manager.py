@@ -91,7 +91,6 @@ class Manager2048:
                 output_text = self.games[play_game_name].play_game(commands, command=command)
             else:
                 output_text = "no game selected"
-        self.save_game()
         return output_text
 
     def load_game(self):

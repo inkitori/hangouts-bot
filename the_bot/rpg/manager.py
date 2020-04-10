@@ -63,7 +63,6 @@ class RPGManager:
             return "bro wtf u cant use that"
 
         return self.commands[command](userID, commands)
-        self.save_game()
 
     def load_game(self):
         """loads the game"""
