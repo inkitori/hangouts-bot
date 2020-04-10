@@ -14,7 +14,6 @@ command = ""
 while command not in bots.keys():
     commands = utils.command_parser(input(bot_selection_text))
     command = next(commands)
-    print("your command is ", command)
     if command == "quit":
         break
 else:

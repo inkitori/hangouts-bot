@@ -66,6 +66,8 @@ class ConsoleBot():
         """main bot loop"""
         while True:
             text = input("Enter a command: ")
+            if utils.clean(text, split=False) == "quit":
+                break
             asyncio.run(self.main(text))
 
     async def main(self, text):
@@ -73,7 +75,7 @@ class ConsoleBot():
         output_text = ""
 
         # handles messages
-        output_text = await self.handler.handle_message(text)
+        output_text = await self.handler.handle_message(text, console=True)
 
         # sends message to hangouts
         if output_text:

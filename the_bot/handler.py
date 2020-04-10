@@ -44,38 +44,44 @@ class Handler:
         self.help_text = utils.join_items(
             "I'm a bot by Yeah and Chendi.",
             "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
+            # TODO: make this a loop
             utils.description("keywords", *list(self.keywords)),
-            utils.description("games", list(self.game_managers)),
-            utils.description("commands", list(self.commands)),
+            utils.description("games", *list(self.game_managers)),
+            utils.description("commands", *list(self.commands)),
         )
         self.keywords["/help"] = self.help_text
 
         self.cooldowns = defaultdict(dict)
         random.seed(datetime.now())
 
-    async def handle_message(self, event, hangouts=True):
+    async def handle_message(self, event, console=False, userID=101):
         """handles messages"""
-        text = event.text if hangouts else event
+        text = event if console else event.text
         commands = utils.command_parser(text)
         command = next(commands)
 
-        if command in self.handler.keywords:
-            output_text = self.handler.keywords[command]
+        if command in self.keywords:
+            output_text = self.keywords[command]
 
         elif command in self.commands:
             function_ = self.commands[command]
-            if hangouts:
+
+            if console:
+                output_text = f"command {command} is not available outside of hangouts"
+            else:
                 user, conv = utils.getUserConv(self, event)
                 function_cooldown_time = 0  # TODO: get the default cooldown for the function
                 if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
                     output_text = "You are on cooldown"
                 else:
                     output_text = await function_(self, user, conv, commands)
-            else:
-                output_text = f"command {command} is not available outside of hangouts"
 
-        elif command in self.games:
-            output_text = self.play_game(user, commands)
+        elif command in self.game_managers:
+            userID = userID if console else user.id_[0]
+            output_text = self.play_game(userID, command, commands)
+
+        else:
+            output_text = "Invalid command(s)"
 
         return output_text
 
@@ -124,11 +130,12 @@ class Handler:
         except Exception:
             output_text = "Yeah don't use this command lol"
 
-    def play_game(self, user, commands):
+        return output_text
+
+    def play_game(self, userID, game_name, commands):
         """plays a game"""
-        game_name = next(commands)
         manager = self.game_managers[game_name]
-        game_text = manager.run_game(user.id_[0], commands)
+        game_text = manager.run_game(userID, commands)
         manager.save_game()
         return game_text
 

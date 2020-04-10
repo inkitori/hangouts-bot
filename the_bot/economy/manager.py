@@ -14,9 +14,8 @@ class EconomyManager():
     def __init__(self):
         pass
 
-    def run_game(self, bot, user, conv, commands):
+    def run_game(self, userID, commands):
         """runs the game"""
-        userID = user.id_[0]
         if userID not in self.users:
             return "You are not registered! Use /register"
         command = next(commands)

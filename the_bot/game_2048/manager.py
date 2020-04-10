@@ -13,7 +13,6 @@ class Manager2048:
 
     def __init__(self):
         self.load_game()
-        self.text = ""
 
     def create_game(self, game_name):
         """creates a new game in games dict"""
@@ -31,10 +30,11 @@ class Manager2048:
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
-    def run_game(self, bot, user, conv, commands):
+    def run_game(self, user, commands):
         """runs the game based on commands"""
         output_text = ""
         command = next(commands)
+        play_game_name = ""
 
         # processing commands
         if command == "create":
@@ -82,8 +82,8 @@ class Manager2048:
             self.games["current game"] = self.games[play_game_name]
 
         if not output_text:
-            if type(self.games[game_name]) == Game:
-                output_text = self.games[game_name].play_game(commands)
+            if type(self.games[play_game_name]) == Game:
+                output_text = self.games[play_game_name].play_game(commands)
             else:
                 output_text = "no game selected"
         self.save_game()
@@ -92,6 +92,7 @@ class Manager2048:
     def load_game(self):
         """loads games from a json file"""
         data = utils.load(self.save_file)
+        print(type(data))
         for game_name, game_data in data["games"].items():
             self.games[game_name] = Game(game_data["board"], game_data["has won"], game_data["mode"], game_data["score"])
         for mode_name, mode in Game.modes.items():
@@ -110,5 +111,4 @@ class Manager2048:
                 "score": game.score
             }
         high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
-        data = json.dumps({"games": games_dict, "scores": high_scores})
         utils.save(self.save_file, data)

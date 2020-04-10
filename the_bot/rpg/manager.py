@@ -47,9 +47,8 @@ class RPGManager:
         """registers a user"""
         pass
 
-    def run_game(self, bot, user, conv, commands):
+    def run_game(self, userID, commands):
         """runs the game"""
-        userID = user.id_[0]
         command = next(commands)
         if not command:
             return "you must enter a command"
@@ -63,7 +62,7 @@ class RPGManager:
         if command in self.admin_commands and not utils.userIn(self.admins, userID):
             return "bro wtf u cant use that"
 
-        return self.commands[command](user, commands)
+        return self.commands[command](userID, commands)
         self.save_game()
 
     def load_game(self):

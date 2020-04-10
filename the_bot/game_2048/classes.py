@@ -216,7 +216,10 @@ class Game():
             self.board.make_new_block(self.mode)
 
     def name(self):
-        return utils.get_key(games, self)
+        """name of the game"""
+        return "placeholder, use command games to see games"
+        # TODO: make this work
+        # return utils.get_key(games, self)
 
     def update(self):
         """appends text based on current state"""
@@ -224,7 +227,7 @@ class Game():
         if self.state == "help":
             self.text += utils.newline("\n".join(self.help_text))
             for command, description in list(self.commands.items()) + list(self.extra_commands.items()):
-                self.text += f"{command} - {description}\n"
+                self.text += utils.newline(f"{command} - {description}")
             self.state = None
 
         if self.state == "won":

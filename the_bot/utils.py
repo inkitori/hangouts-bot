@@ -174,9 +174,10 @@ def is_yes(text):
 
 
 def description(name, *description):
+    description = list(description)
     if len(description) == 1:
         full_description = f"{name} - {description[0]}"
     else:
-        description = join_items(*description, seperator="\n\t")
-        full_description = f"{name.title()}:\n{description}"
+        description.insert(0, f"{name.title()}:")
+        full_description = join_items(*description, seperator="\n\t")
     return full_description
