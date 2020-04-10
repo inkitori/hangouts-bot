@@ -12,14 +12,14 @@ import utils
 
 from game_2048.manager import Manager2048
 # from economy.manager import EconomyManager
-from rpg.manager import RPGManager
+# from rpg.manager import RPGManager
 
 
 class Handler:
     """handler for bot"""
     game_managers = {
         "/2048": Manager2048(),
-        "/rpg": RPGManager(),
+        # "/rpg": RPGManager(),
         # "/economy": EconomyManager(),
     }
     admins = (
@@ -45,18 +45,20 @@ class Handler:
             "I'm a bot by Yeah and Chendi.",
             "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
             # TODO: make this a loop
-            utils.description("keywords", *list(self.keywords)),
-            utils.description("games", *list(self.game_managers)),
-            utils.description("commands", *list(self.commands)),
+            utils.description("keywords", *list(self.keywords), long=True),
+            utils.description("games", *list(self.game_managers), long=True),
+            utils.description("commands", *list(self.commands), long=True),
         )
         self.keywords["/help"] = self.help_text
 
         self.cooldowns = defaultdict(dict)
         random.seed(datetime.now())
 
-    async def handle_message(self, event, console=False, userID=101):
+    async def handle_message(self, event, console=False, userID=101, bot=None):
         """handles messages"""
         text = event if console else event.text
+        if not console:
+            user, conv = utils.getUserConv(bot, event)
         commands = utils.command_parser(text)
         command = next(commands)
 
@@ -69,19 +71,18 @@ class Handler:
             if console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                user, conv = utils.getUserConv(self, event)
-                function_cooldown_time = 0  # TODO: get the default cooldown for the function
-                if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
-                    output_text = "You are on cooldown"
-                else:
-                    output_text = await function_(self, user, conv, commands)
+                # function_cooldown_time = 0  # TODO: get the default cooldown for the function
+                # if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
+                    # output_text = "You are on cooldown"
+                # else:
+                output_text = await function_(bot, user, conv, commands)
 
         elif command in self.game_managers:
             userID = userID if console else user.id_[0]
             output_text = self.play_game(userID, command, commands)
 
         else:
-            output_text = "Invalid command(s)"
+            output_text = "Invalid command" if console else ""
 
         return output_text
 

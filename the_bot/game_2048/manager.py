@@ -34,6 +34,7 @@ class Manager2048:
         """runs the game based on commands"""
         output_text = ""
         command = next(commands)
+        used_command = True
         play_game_name = ""
 
         # processing commands
@@ -55,6 +56,7 @@ class Manager2048:
                 output_text = "that game does not exist"
             self.games[new_name] = self.games.pop(old_name)
             play_game_name = new_name
+            output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
             delete_game_name = next(commands)
@@ -63,19 +65,23 @@ class Manager2048:
             elif delete_game_name not in self.games.keys():
                 output_text = "that game does not exist"
             else:
+                if self.games["current game"] == self.games[delete_game_name]:
+                    self.games["current game"] = None
                 del self.games[delete_game_name]
                 output_text = f"{delete_game_name} deleted"
-            if self.games["current game"] == self.games[delete_game_name]:
-                self.games["current game"] = None
 
         elif command == "games":
             for game_name, game in self.games.items():
                 if game_name != "current game":
-                    output_text = f"{game_name} - {game.mode.name()} score: {game.score}\n"
+                    output_text += utils.description(game_name, game.mode.name(), game.score)  # f"{game_name} - {game.mode.name()} score: {game.score}\n"
 
-        elif command in self.games.keys():
+        elif command in self.games:
             play_game_name = command
             self.games["current game"] = self.games[play_game_name]
+        else:
+            used_command = False
+        command = "" if used_command else command
+
         if not play_game_name:
             play_game_name = "current game"
         else:
@@ -83,7 +89,7 @@ class Manager2048:
 
         if not output_text:
             if type(self.games[play_game_name]) == Game:
-                output_text = self.games[play_game_name].play_game(commands)
+                output_text = self.games[play_game_name].play_game(commands, command=command)
             else:
                 output_text = "no game selected"
         self.save_game()

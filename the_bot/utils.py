@@ -6,6 +6,7 @@ import json
 import inspect
 
 
+# hangouts
 def toSeg(text):
     """converts string to hangouts message"""
     return hangups.ChatMessageSegment.from_str(text)
@@ -41,11 +42,44 @@ def userIn(user_list, user):
     return int(user.id_[0]) in user_list
 
 
+# formatting
 def scientific(number):
     """returns a string in scientific number format"""
     return "{:.2e}".format(number)
 
 
+def join_items(*items, seperator="\n", is_description=False, long=False):
+    """joins a list using seperator"""
+
+    output_list = []
+    if is_description:
+        for item in items:
+            output_list.append(description(*item, long=long))
+
+    else:
+        output_list = convert_items(list(items), type_=str)
+    return seperator.join(output_list)
+
+
+
+def newline(text, number=1):
+    """adds number newlines to the end of text"""
+    return text.strip() + ("\n" * number)
+
+
+def description(name, *description, long=False):
+    description = convert_items(list(description), str)
+    if long:
+        description.insert(0, f"{name.title()}:")
+        full_description = join_items(*description, seperator="\n\t")
+    else:
+        description = join_items(*description, seperator=", ")
+        full_description = f"{name} - {description}"
+
+    return full_description
+
+
+# json
 def save(file_name, contents):
     """saves data into a json"""
     with open(file_name, "w") as file:
@@ -61,36 +95,7 @@ def load(file_name):
             return "could not load data"
 
 
-def join_items(*list, seperator="\n"):
-    """joins a list using seperator"""
-    return seperator.join(list)
-
-
-def newline(text, number=1):
-    """adds number newlines to the end of text"""
-    return text.strip() + ("\n" * number)
-
-
-def get_item_safe(sequence, indexes=(0,), default=""):
-    """
-    Retrives the items at the indexes in sequence
-    defaults to default if the item des not exist
-    """
-    if inspect.isgenerator(sequence):
-        return next(sequence)
-    items = []
-    for index in indexes:
-        try:
-            item = sequence[index]
-        except IndexError:
-            item = default
-        if len(indexes) == 1:
-            items = item
-        else:
-            items.append(item)
-    return items
-
-
+# processing strings
 def clean(text, split=True):
     """cleans user input and returns as a list"""
     if text:
@@ -133,6 +138,26 @@ def command_parser(command_text, has_prefix=False):
         yield get_item_safe(commands)
         commands = trim(commands)
 
+# get things safely
+def get_item_safe(sequence, indexes=(0,), default=""):
+    """
+    Retrives the items at the indexes in sequence
+    defaults to default if the item des not exist
+    """
+    if inspect.isgenerator(sequence):
+        return next(sequence)
+    items = []
+    for index in indexes:
+        try:
+            item = sequence[index]
+        except IndexError:
+            item = default
+        if len(indexes) == 1:
+            items = item
+        else:
+            items.append(item)
+    return items
+
 
 def get_key(dictionary, item, *ignore):
     """
@@ -158,14 +183,10 @@ def get_value(dictionary, key, default=""):
         value = default
     return value
 
-
-def clamp(value, min, max):
+# random
+def clamp(value, min_value, max_value):
     """clamps value inside min and max"""
-    if value < min:
-        value = min
-    elif value > max:
-        value = max
-    return value
+    return max(min_value, min(value, max_value))
 
 
 def is_yes(text):
@@ -173,11 +194,11 @@ def is_yes(text):
     return get_item_safe(clean(text, split=False)) == "y"
 
 
-def description(name, *description):
-    description = list(description)
-    if len(description) == 1:
-        full_description = f"{name} - {description[0]}"
-    else:
-        description.insert(0, f"{name.title()}:")
-        full_description = join_items(*description, seperator="\n\t")
-    return full_description
+def convert_items(items, type_, default=""):
+    """converts items to  atype, or replaces with default"""
+    for i in range(len(items)):
+        try:
+            items[i] = type_(items[i])
+        except ValueError:
+            items[i] = default
+    return items

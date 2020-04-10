@@ -77,7 +77,6 @@ class RPGManager:
             save_data[userID] = player.to_dict()
 
         utils.save(self.save_file, save_data)
-        print("Successfully saved!")
 
     def sync(self, userID, commands):
         """syncs value to save_file"""

@@ -45,7 +45,7 @@ class Bot:
 
         # handles messages
         if isinstance(event, hangups.ChatMessageEvent) and not user.is_self and not utils.userIn(self.ignore, user):
-            output_text = await self.handler.handle_message(event)
+            output_text = await self.handler.handle_message(event, bot=self)
 
         # new member
         elif isinstance(event, hangups.MembershipChangeEvent):

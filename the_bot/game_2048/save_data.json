@@ -2,7 +2,6 @@
     "games": {
         "potato": {
             "board": [
-                0,
                 1,
                 0,
                 0,
@@ -10,8 +9,9 @@
                 0,
                 0,
                 0,
-                0,
                 1,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -20,16 +20,16 @@
                 0
             ],
             "has won": false,
-            "mode": "normal",
+            "mode": "confusion",
             "score": 0
         }
     },
     "scores": {
-        "normal": 0,
+        "normal": 12,
         "65536": 0,
         "1048576": 0,
         "eleven": 0,
         "twenty": 0,
-        "confusion": 0
+        "confusion": 4
     }
 }
