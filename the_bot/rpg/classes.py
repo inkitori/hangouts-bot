@@ -2,8 +2,81 @@
 classes for rpg
 """
 import utils
-from player_class import Stats, Player
+import random
 
+class Stats():
+    """class for stats"""
+    def __init__(
+        self, alive=False, generate_stats=True, type_=None,
+        *, max_health=100, health=5, mana=5, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
+    ):
+        if alive:
+            self.health = self.max_health = max_health
+        if type_ == "player":
+            self.mana = self.max_mana = max_mana
+            self.lifetime_balance = self.balance = balance
+            self.xp = xp
+        elif type_ == "item":
+            self.mana = mana
+            self.health = health
+        if generate_stats:
+            attack, defense, health = self.generate_from_level(level)
+        self.attack = attack
+        self.defense = defense
+        self.level = level
+
+    def to_dict(self):
+        return self.__dict__
+
+    def generate_from_level(self, level):
+        """generates stats from level"""
+        # change this joseph
+        attack = round(5 * level ** 1.8)
+        defense = round(5 * level ** 1.5)
+        health = round(100 * level ** 2)
+        return attack, defense, health
+
+    def print_stats(self):
+        """returns text representation of stats"""
+        pass
+
+    def next_level_xp(self):
+        """returns next level xp"""
+        return round(4 * (((self.level + 1) ** 4) / 5))
+
+    def print_level_xp(self):
+        """returns string representation of level and xp"""
+        return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
+
+    def increase_balance(self, money):
+        """increases balance"""
+        self.balance += money
+        self.lifetime_balance += money
+
+    def give_xp(self, xp_earned):
+        """increases xp"""
+        notify = False
+        self.xp += xp_earned
+
+        xp_required = self.next_level_xp()
+
+        while self.xp > xp_required:
+            self.level += 1
+            self.xp -= xp_required
+            notify = True
+            xp_required = self.next_level_xp()
+        if notify:
+            return f"You are now level {self.level}!"
+
+        return ""
+
+    def change_health(self, amount):
+        """changes player health"""
+        if amount == "full":
+            self.health = self.max_health
+            return
+        self.health += amount
+        self.health = utils.clamp(self.health, 0, self.max_health)
 
 class Enemy():
     """represents an enemy"""
@@ -29,6 +102,11 @@ class Room():
     def name(self):
         return utils.get_key(RPG.rooms, self)
 
+    def generate_enemy(self):
+        enemy_name = random.choice(self.enemies_list)
+        enemy = RPG.enemies[enemy_name]
+        return enemy_name, enemy
+
 
 class Item():
     """represents an item"""
@@ -52,28 +130,3 @@ class Item():
         return utils.get_key(RPG.all_items, self)
 
 
-class RPG():
-    """the RPG"""
-
-    all_items = {
-        "starter armor": Item("armor"),
-        "starter weapon": Item("weapon"),
-        "clarity tome": Item("tome")
-    }
-    players = {}
-    rooms = {
-        "village": Room()
-    }
-    enemies = {}
-
-    def register(self, user):
-        """registers a user in the game"""
-        userID = user.id_[0]
-        if userID in self.players:
-            return "You are already registered!"
-        self.players[userID] = Player("placeholder name")
-
-        return "Successfully registered!"
-
-    def play_game(self, user, commands):
-        pass

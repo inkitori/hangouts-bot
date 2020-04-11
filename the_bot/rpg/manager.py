@@ -4,7 +4,7 @@ manager for rpg
 from datetime import datetime
 import random
 import utils
-import rpg.classes as classes
+import rpg.player_class as classes
 
 
 class RPGManager:
