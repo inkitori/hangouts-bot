@@ -8,20 +8,25 @@ import random
 
 class Item():
     """items"""
-    pick_prices = [
-        0, 100, 250, 625, 1565, 3910, 9775, 24440, 61100, 152750, 381875, 954687,
-        2386717, 5966792, 14916980, 37292450, 93231125, 233077812,
-    ]
-    pick_modifiers = (
-        "copper", "tin", "iron", "lead", "silver", "tungsten", "gold", "platinum", "molten",
-        "cobalt", "palladium", "mythril", "orichalcum", "adamantite", "titanium",
-        "chlorophyte", "spectre", "luminite",
-    )
+    prices = {
+        "pick": (
+            0, 100, 250, 625, 1565, 3910, 9775, 24440, 61100, 152750, 381875, 954687,
+            2386717, 5966792, 14916980, 37292450, 93231125, 233077812,
+        ),
+    }
+    modifiers = {
+        "pick": (
+            "copper", "tin", "iron", "lead", "silver", "tungsten", "gold", "platinum", "molten",
+            "cobalt", "palladium", "mythril", "orichalcum", "adamantite", "titanium",
+            "chlorophyte", "spectre", "luminite",
+        ),
+    }
 
     def __init__(self, type_, price, modifer="", level=0):
         self.type_ = type_
         self.price = price
         self.modifer = modifer
+        self.level = level
         if self.type_ == "pick":
             self.mining_range = self.generate_mining(level)
 
@@ -33,8 +38,16 @@ class Item():
         return (level ** 2 / 2, level ** 2)
 
 
+def generate_items(type_):
+    max_possible_items = min(len(Item.modifiers[type_]), len(Item.prices[type_]))
+    return [
+        Item(type_, Item.prices[type_][level], Item.modifiers[type_][level], level)
+        for level in range(max_possible_items)
+    ]
+
+
 shop_items = {
-    "pick": [Item("pick", Item.pick_prices[level], Item.pick_modifiers[level], level) for level in range(len(Item.pick_modifiers))]
+    "pick": generate_items("pick")
 }
 
 
@@ -67,7 +80,7 @@ class EconomyUser():
     def mine(self):
         """mines for saber dollars"""
 
-        player_pick = shop_items["picks"][self.items["pick"]]
+        player_pick = self.get_item("pick")
         mined_amount = random.randint(*player_pick.mining_range)
         mined_amount += math.ceil(mined_amount * self.prestige / 100)
         mined_amount *= 2 ** self.prestige_upgrade
@@ -82,13 +95,13 @@ class EconomyUser():
         item_type = next(commands)
 
         if modifier == "top":
-            if item_type not in self.shop_items:
+            if item_type not in shop_items:
                 return "That class doesn't exist!"
 
             possible_items = []
 
             for possible_item in shop_items[item_type]:
-                if shop_items[possible_item]["value"] > shop_items[self.pick] and shop_items[possible_item].price <= self.balance:
+                if possible_item.level > self.items["pick"] and possible_item.price <= self.balance:
                     possible_items.append(possible_item)
 
             if len(possible_items) == 0:
@@ -96,24 +109,26 @@ class EconomyUser():
 
             else:
                 purchase = possible_items[-1]
-                self.items[item_type] = shop_items[purchase].name()
+                self.items[item_type] = shop_items[item_type].index(purchase)
                 self.change_balance(- purchase.price)
 
-                return "Successful purchase of the {purchase}!"
+                return f"Successful purchase of the {purchase.name}!"
 
-        elif item_type not in shop_items or modifier not in shop_items[item_type]:
+        elif item_type not in shop_items or modifier not in Item.modifiers[item_type]:
             return "That item doesn't exist!"
 
         else:
-            if self.balance < shop_items[item_type][modifier].price:
+            item_index = Item.modifiers[item_type].index(modifier)
+            item = shop_items[item_type][item_index]
+            if self.balance < item.price:
                 return "You don't have enough money for that!"
-            elif self.shop_items[item_type][self.items[item_type]] == self.shop_items[item_type][modifier]:
+            elif item_index == self.items[item_type]:
                 return "You already have that item!"
-            elif self.shop_items[item_type][self.items[item_type]]["value"] > self.shop_items[item_type][modifier]["value"]:
+            elif self.get_item("pick").level > item.level:
                 return "You already have a pick better than that!"
             else:
-                self.items[item_type] = self.shop_items[item_type][item].name
-                self.change_balance(- self.shop_items[item_type][item].price)
+                self.items[item_type] = item_index
+                self.change_balance(- item.price)
 
                 return "Purchase successful!"
 

@@ -36,7 +36,7 @@ class EconomyManager():
         elif command == "give":
             output_text = self.give(user, commands)
         elif command == "profile":
-            output_text = self.profile(commands)
+            output_text = self.profile(user, commands)
         elif command == "mine":
             output_text = user.mine()
         elif command == "buy":
@@ -149,17 +149,19 @@ class EconomyManager():
                     )
         return output_text
 
-    def profile(self, commands):
+    def profile(self, user, commands):
         """returns user profiles"""
         output_text = ""
         user_name = next(commands)
         possible_users = []
 
-        for user in self.users.values():
-            if user_name in user.name:
-                possible_users.append(user)
+        for possible_user in self.users.values():
+            if user_name in possible_user.name:
+                possible_users.append(possible_user)
         if user_name.isdigit() and int(user_name) in self.users:
             possible_users.append(self.users[int(user_name)])
+        elif user_name == "self":
+            possible_users.append(user)
         if not possible_users:
             output_text += "No users go by that name!"
 
