@@ -82,18 +82,17 @@ class EconomyUser():
 
     def buy(self, commands):
         """buys a item"""
+        modifier = next(commands)
         item_type = next(commands)
-        item = next(commands)
 
-        if item == "top":
-            if item_type not in self.shop:
+        if modifier == "top":
+            if item_type not in self.shop_items:
                 return "That class doesn't exist!"
 
-            shopData = self.shop[item_type]
             possible_items = []
 
-            for possible_item in shopData:
-                if shopData[possible_item]["value"] > shopData[self.pick] and shopData[possible_item].price <= self.balance:
+            for possible_item in shop_items[item_type ]:
+                if shop_items[possible_item]["value"] > shop_items[self.pick] and shop_items[possible_item].price <= self.balance:
                     possible_items.append(possible_item)
 
             if len(possible_items) == 0:
@@ -101,40 +100,40 @@ class EconomyUser():
 
             else:
                 purchase = possible_items[-1]
-                self.items[item_type] = shopData[purchase].name()
+                self.items[item_type] = shop_items[purchase].name()
                 self.change_balance(- purchase.price)
 
                 return "Successful purchase of the {purchase}!"
 
-        elif item_type not in self.shop or item not in self.shop[item_type]:
+        elif item_type not in self.shop_items or modifier not in self.shop_items[item_type]:
             return "That item doesn't exist!"
 
         else:
-            if self.balance < self.shop[item_type][item].price:
+            if self.balance < self.shop_items[item_type][modifier].price:
                 return "You don't have enough money for that!"
-            elif self.shop[item_type][self.items[item_type]] == self.shop[item_type][item]:
-                return "You already have that pick!"
-            elif self.shop[item_type][self.items[item_type]]["value"] > self.shop[item_type][item]["value"]:
+            elif self.shop_items[item_type][self.items[item_type]] == self.shop_items[item_type][modifier]:
+                return "You already have that item!"
+            elif self.shop_items[item_type][self.items[item_type]]["value"] > self.shop_items[item_type][modifier]["value"]:
                 return "You already have a pick better than that!"
             else:
-                self.items[item_type] = self.shop[item_type][item].name
-                self.change_balance(- self.shop[item_type][item].price)
+                self.items[item_type] = self.shop_items[item_type][item].name
+                self.change_balance(- self.shop_items[item_type][item].price)
 
                 return "Purchase successful!"
 
-    def prestige(self):
+    def prestige_action(self):
         """prestiges"""
         output_text = ""
         earned_prestige = math.trunc(self.lifetime_balance / self.prestige_conversion)
-
+        self.confirmed_prestige = True
         output_text += utils.join_items(
             f"You currently have {self.prestige} prestige point(s).",
             f"If you prestige, you will earn {earned_prestige} more prestige point(s), or a " +
             f"{earned_prestige}% bonus, but will lose all your money and items.",
             f"Type prestige_confirm if you really do wish to prestige."
         )
+        return output_text
 
-        self.confirmed_prestige = True
 
     def prestige_cancel(self):
         self.confirmed_prestige = False

@@ -39,7 +39,7 @@ class EconomyManager():
         elif command == "buy":
             output_text = user.buy(commands)
         elif command == "prestige":
-            output_text = user.prestige()
+            output_text = user.prestige_action()
         elif command == "prestige_confirm":
             output_text = user.prestige_confirm()
         elif command == "prestige_cancel":

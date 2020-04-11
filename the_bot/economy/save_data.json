@@ -1,8 +1,8 @@
 {
     "101": {
         "name": "ether",
-        "balance": 999999997,
-        "lifetime_balance": 1000000108,
+        "balance": 0,
+        "lifetime_balance": 0,
         "prestige": 0,
         "items": {
             "pick": 0

@@ -58,7 +58,7 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
 
     else:
         output_list = convert_items(list(items), type_=str)
-    output_text = seperator.join(output_list)
+    output_text = seperator.join(output_list).strip()
     output_text += end if not output_text.endswith(end) else ""
     return output_text
 
@@ -76,7 +76,7 @@ def description(name, *description, mode="short", end="\n"):
     if mode == "long":
         description.insert(0, f"{name.title()}:")
         full_description = join_items(*description, seperator="\n\t", end=end)
-    return full_description
+    return full_description.strip()
 
 
 # json
