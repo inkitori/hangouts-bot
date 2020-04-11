@@ -162,7 +162,7 @@ class Game():
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
     game_commands = {
-        "restart": "restarts the game in the current gamemode",
+        "restart", "{direction}"
     }
 
     movement = {
@@ -270,7 +270,7 @@ class Game():
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
-                elif command in self.game_commands:
+                elif command in self.game_commands and not command.startswith("{"):
                     self.state = command
                 elif command != "":
                     self.text += "invalid command, use help to see commands\n"
