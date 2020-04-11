@@ -26,7 +26,7 @@ parser.add_options([bot_option, id_option, token_option, config_option])
 
 configurations = {
     # configuration_name: configuration_arguments in a list
-    "con": ["--bot=console"]
+    "con": ["--bot=console",]
 }
 
 

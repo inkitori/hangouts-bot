@@ -1,8 +1,12 @@
+#chendi's configuration stuff
 Pipfile
 Pipfile.lock
 .vscode/
-**token.txt
 my_stuff/
+
+# for privacy
+**token.txt
+**tokens/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
