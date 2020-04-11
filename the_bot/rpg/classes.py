@@ -4,6 +4,7 @@ classes for rpg
 import utils
 import random
 
+
 class Stats():
     """class for stats"""
     def __init__(
@@ -78,6 +79,7 @@ class Stats():
         self.health += amount
         self.health = utils.clamp(self.health, 0, self.max_health)
 
+
 class Enemy():
     """represents an enemy"""
 
@@ -85,7 +87,7 @@ class Enemy():
         self.stats = Stats(True, True, "enemy")
 
     def name(self):
-        return utils.get_key(RPG.enemies, self)
+        return utils.get_key(enemies, self)
 
     def to_dict(self):
         return {"stats": self.stats.to_dict()}
@@ -100,11 +102,11 @@ class Room():
         self.xp_range = xp_range
 
     def name(self):
-        return utils.get_key(RPG.rooms, self)
+        return utils.get_key(rooms, self)
 
     def generate_enemy(self):
         enemy_name = random.choice(self.enemies_list)
-        enemy = RPG.enemies[enemy_name]
+        enemy = enemies[enemy_name]
         return enemy_name, enemy
 
 
@@ -127,6 +129,15 @@ class Item():
         return f"{Item.rarities[self.rarity]} {self.modifier} {self.name()}\n"
 
     def name(self):
-        return utils.get_key(RPG.all_items, self)
+        return utils.get_key(all_items, self)
 
 
+all_items = {
+    "starter armor": Item("armor"),
+    "starter weapon": Item("weapon"),
+    "clarity tome": Item("tome")
+}
+rooms = {
+    "village": Room()
+}
+enemies = {}

@@ -3,12 +3,13 @@ import random
 import math
 import classes
 
+
 class Player():
     """represents a player in the rpg"""
 
     def __init__(self, name):
         self.name = name
-        self.stats = Stats(True, False, "player")
+        self.stats = classes.Stats(True, False, "player")
         self.room = "village"
         self.fighting = {}
         self.inventory = [None for i in range(8)]
@@ -234,23 +235,17 @@ class Player():
 class RPG():
     """the RPG"""
 
-    all_items = {
-        "starter armor": Item("armor"),
-        "starter weapon": Item("weapon"),
-        "clarity tome": Item("tome")
-    }
+    all_items = classes.all_items
     players = {}
-    rooms = {
-        "village": Room()
-    }
-    enemies = {}
+    rooms = classes.rooms
+    enemies = classes.enemies
 
     def register(self, user):
         """registers a user in the game"""
         userID = user.id_[0]
         if userID in self.players:
             return "You are already registered!"
-        self.players[userID] = Player("placeholder name")
+        self.players[userID] = classes.Player("placeholder name")
 
         return "Successfully registered!"
 
