@@ -97,6 +97,9 @@ class Enemy():
     def to_dict(self):
         return {"stats": self.stats.to_dict()}
 
+    def fight(self, player):
+        pass
+
 
 class Room():
     """represents a room in the world"""
@@ -129,7 +132,7 @@ class Item():
         self.modifier = modifier
         self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
 
-    def description(self):
+    def short_description(self):
         """returns text description of item"""
         return f"{Item.rarities[self.rarity]} {self.modifier} {self.name()}\n"
 

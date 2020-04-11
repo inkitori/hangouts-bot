@@ -46,7 +46,7 @@ class RPGManager:
         elif command not in list(self.commands) + list(self.admin_commands):
             return "That command doesn't exist!"
 
-        elif command != "register" and userID not in classes.RPG.users:
+        elif command != "register" and userID not in RPG.users:
             return "You are not registered! Use register"
 
         return self.commands[command](userID, commands)
