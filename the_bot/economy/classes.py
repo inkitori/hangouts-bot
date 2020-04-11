@@ -124,16 +124,14 @@ class EconomyUser():
     def prestige_action(self):
         """prestiges"""
         output_text = ""
-        earned_prestige = math.trunc(self.lifetime_balance / self.prestige_conversion)
         self.confirmed_prestige = True
         output_text += utils.join_items(
             f"You currently have {self.prestige} prestige point(s).",
-            f"If you prestige, you will earn {earned_prestige} more prestige point(s), or a " +
-            f"{earned_prestige}% bonus, but will lose all your money and items.",
+            f"If you prestige, you will earn {self.earned_prestige()} more prestige point(s), or a " +
+            f"{self.earned_prestige()}% bonus, but will lose all your money and items.",
             f"Type prestige_confirm if you really do wish to prestige."
         )
         return output_text
-
 
     def prestige_cancel(self):
         self.confirmed_prestige = False
@@ -146,6 +144,7 @@ class EconomyUser():
             output_text = "You have to use /prestige before using this command!"
         else:
             self.prestige_reset()
+            self.prestige += self.earned_prestige()
             output_text = "Successfully prestiged"
 
         return output_text
@@ -153,7 +152,6 @@ class EconomyUser():
     def prestige_reset(self):
         self.balance = 0
         self.lifetime_balance = 0
-        self.prestige = 0
         self.confirmed_prestige = False
         self.items = {"pick": 0}
 
@@ -188,6 +186,9 @@ class EconomyUser():
 
     def id(self):
         return utils.get_key(users, self)
+
+    def earned_prestige(self):
+        return math.trunc(self.lifetime_balance / self.prestige_conversion)
 
 
 users = {}
