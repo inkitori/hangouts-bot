@@ -35,7 +35,7 @@ class Item():
         return f"{self.modifer} {self.type_}"
 
     def generate_mining(self, level):
-        return (level ** 2 / 2, level ** 2)
+        return level ** 2 // 2, level ** 2
 
 
 def generate_items(type_):
@@ -77,7 +77,7 @@ class EconomyUser():
         """returns balance"""
         return f"{self.name}, you currently have {self.balance} Saber Dollars!"
 
-    def mine(self):
+    def mine(self, commands):
         """mines for saber dollars"""
 
         player_pick = self.get_item("pick")
@@ -132,7 +132,7 @@ class EconomyUser():
 
                 return "Purchase successful!"
 
-    def prestige_action(self):
+    def prestige_action(self, commands):
         """gives prestige information"""
         output_text = ""
         earned_prestige = math.trunc(self.lifetime_balance / self.prestige_conversion)
@@ -154,7 +154,7 @@ class EconomyUser():
             )
         return output_text
 
-    def prestige_upgrade_action(self):
+    def prestige_upgrade_action(self, commands):
         """upgrades prestige"""
         output_text = ""
         prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)

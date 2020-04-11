@@ -38,14 +38,14 @@ class EconomyManager():
         elif command == "profile":
             output_text = self.profile(user, commands)
         elif command == "mine":
-            output_text = user.mine()
+            output_text = user.mine(commands)
         elif command == "buy":
             output_text = user.buy(commands)
 
         elif command == "prestige":
-            output_text = user.prestige_action()
+            output_text = user.prestige_action(commands)
         elif command == "prestige_upgrade":
-            output_text = user.prestige_upgrade_action()
+            output_text = user.prestige_upgrade_action(commands)
         else:
             output_text = "Invalid command"
 
