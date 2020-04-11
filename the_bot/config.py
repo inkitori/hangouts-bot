@@ -1,5 +1,5 @@
 """
-sets up parser for command lne arguments
+sets up parser for arguments
 """
 import optparse
 import sys

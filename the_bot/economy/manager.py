@@ -26,6 +26,9 @@ class EconomyManager():
             return "You are not registered! Use register"
 
         user = self.users[userID]
+        if command not in ("prestige", "prestige_upgrade"):
+            user.confirmed_prestige = False
+            user.confirmed_upgrade = False
         if command == "leaderboard":
             output_text = self.leaderboard()
         elif command == "shop":
@@ -38,12 +41,11 @@ class EconomyManager():
             output_text = user.mine()
         elif command == "buy":
             output_text = user.buy(commands)
+
         elif command == "prestige":
             output_text = user.prestige_action()
-        elif command == "prestige_confirm":
-            output_text = user.prestige_confirm()
-        elif command == "prestige_cancel":
-            output_text = user.prestige_cancel()
+        elif command == "prestige_upgrade":
+            output_text = user.prestige_upgrade_action()
         else:
             output_text = "Invalid command"
 
@@ -89,8 +91,6 @@ class EconomyManager():
                 lifetime_balance=user_data["lifetime_balance"],
                 prestige=user_data["prestige"],
                 items=user_data["items"],
-                confirmed_prestige=user_data["confirmed_prestige"],
-                prestige_upgrade=user_data["prestige_upgrade"],
             )
 
     def register(self, userID, commands):
@@ -153,9 +153,10 @@ class EconomyManager():
         for user in self.users.values():
             if user_name in user.name:
                 possible_users.append(user)
-
+        if user_name.isdigit() and int(user_name) in self.users:
+            possible_users.append(self.users[int(user_name)])
         if not possible_users:
-            return "No users go by that name!"
+            output_text += "No users go by that name!"
 
         elif len(possible_users) > 1:
             output_text += f"{len(possible_users)} user(s) go by that name:\n"

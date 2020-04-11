@@ -7,39 +7,34 @@ import random
 
 
 class Item():
+    """items"""
+    pick_prices = [
+        0, 100, 250, 625, 1565, 3910, 9775, 24440, 61100, 152750, 381875, 954687,
+        2386717, 5966792, 14916980, 37292450, 93231125, 233077812,
+    ]
+    pick_modifiers = (
+        "copper", "tin", "iron", "lead", "silver", "tungsten", "gold", "platinum", "molten",
+        "cobalt", "palladium", "mythril", "orichalcum", "adamantite", "titanium",
+        "chlorophyte", "spectre", "luminite",
+    )
 
-    def __init__(self, type_, price, modifer="", mining_range=(0, 10)):
+    def __init__(self, type_, price, modifer="", level=0):
         self.type_ = type_
         self.price = price
         self.modifer = modifer
         if self.type_ == "pick":
-            self.mining_range = mining_range
+            self.mining_range = self.generate_mining(level)
 
     def name(self):
         """the name of the item"""
-        return f"{self.modifer}_{self.type_}"
+        return f"{self.modifer} {self.type_}"
+
+    def generate_mining(self, level):
+        return (level ** 2 / 2, level ** 2)
 
 
 shop_items = {
-    "picks": (
-        Item("pick", 100, "tin"),
-        Item("pick", 250, "iron"),
-        Item("pick", 625, "lead"),
-        Item("pick", 1565, "silver"),
-        Item("pick", 3910, "tungsten"),
-        Item("pick", 9775, "gold"),
-        Item("pick", 24440, "platinum"),
-        Item("pick", 61100, "molten"),
-        Item("pick", 152750, "cobalt"),
-        Item("pick", 381875, "palladium"),
-        Item("pick", 954687, "mythril"),
-        Item("pick", 2386717, "orichalcum"),
-        Item("pick", 5966792, "adamantite"),
-        Item("pick", 14916980, "titanium"),
-        Item("pick", 37292450, "chlorophyte"),
-        Item("pick", 93231125, "spectre"),
-        Item("pick", 233077812, "luminite"),
-    )
+    "picks": [Item("pick", Item.pick_prices[level], Item.pick_modifiers[level], level) for level in range(len(Item.pick_modifiers))]
 }
 
 
@@ -49,13 +44,14 @@ class EconomyUser():
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
 
-    def __init__(self, name, balance=0, lifetime_balance=0, prestige=0, items={"pick": 0}, confirmed_prestige=False, prestige_upgrade=0):
+    def __init__(self, name, balance=0, lifetime_balance=0, prestige=0, items={"pick": 0}, prestige_upgrade=0):
         self.name = name
         self.balance = balance
         self.lifetime_balance = lifetime_balance
         self.prestige = prestige
         self.items = items
-        self.confirmed_prestige = confirmed_prestige
+        self.confirmed_prestige = False
+        self.confirmed_upgrade = False
         self.prestige_upgrade = prestige_upgrade
 
     def change_balance(self, money):
@@ -91,7 +87,7 @@ class EconomyUser():
 
             possible_items = []
 
-            for possible_item in shop_items[item_type ]:
+            for possible_item in shop_items[item_type]:
                 if shop_items[possible_item]["value"] > shop_items[self.pick] and shop_items[possible_item].price <= self.balance:
                     possible_items.append(possible_item)
 
@@ -122,55 +118,45 @@ class EconomyUser():
                 return "Purchase successful!"
 
     def prestige_action(self):
-        """prestiges"""
+        """gives prestige information"""
         output_text = ""
-        self.confirmed_prestige = True
-        output_text += utils.join_items(
-            f"You currently have {self.prestige} prestige point(s).",
-            f"If you prestige, you will earn {self.earned_prestige()} more prestige point(s), or a " +
-            f"{self.earned_prestige()}% bonus, but will lose all your money and items.",
-            f"Type prestige_confirm if you really do wish to prestige."
-        )
-        return output_text
-
-    def prestige_cancel(self):
-        self.confirmed_prestige = False
-        return "Prestige canceled"
-
-    def prestige_confirm(self):
-        """confirms prestige"""
-        output_text = ""
-        if not self.confirmed_prestige:
-            output_text = "You have to use /prestige before using this command!"
-        else:
-            self.prestige_reset()
-            self.prestige += self.earned_prestige()
+        earned_prestige = math.trunc(self.lifetime_balance / self.prestige_conversion)
+        if self.confirmed_prestige:
+            self.balance = 0
+            self.lifetime_balance = 0
+            self.confirmed_prestige = False
+            self.confirmed_upgrade = False
+            self.items = {"pick": 0}
+            self.prestige += earned_prestige
             output_text = "Successfully prestiged"
-
+        else:
+            self.confirmed_prestige = True
+            output_text += utils.join_items(
+                f"You currently have {self.prestige} prestige point(s).",
+                f"If you prestige, you will earn {earned_prestige} more prestige point(s), or a " +
+                f"{earned_prestige}% bonus, but will lose all your money and items.",
+                f"Use prestige again if you really do wish to prestige."
+            )
         return output_text
 
-    def prestige_reset(self):
-        self.balance = 0
-        self.lifetime_balance = 0
-        self.confirmed_prestige = False
-        self.items = {"pick": 0}
-
-    def prestige_upgrade_info(self):
-        """returns information about prestige"""
-        prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)
-        return f"By prestiging, you will lose {prestige_upgrade_cost} prestige."
-
-    def prestige_upgrade(self, bot, event):
+    def prestige_upgrade_action(self):
         """upgrades prestige"""
+        output_text = ""
         prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)
-
-        if self.prestige < prestige_upgrade_cost:
-            return f"That costs {prestige_upgrade_cost} prestige, which you don't have enough of!"
-
-        self.prestige_upgrade += 1
-        self.prestige -= prestige_upgrade_cost
-        self.confirmed_prestige = False
-        return "Successfully upgraded prestige!"
+        if self.confirmed_upgrade:
+            if self.prestige < prestige_upgrade_cost:
+                output_text += f"That costs {prestige_upgrade_cost} prestige, which you don't have enough of!"
+            else:
+                self.prestige_upgrade += 1
+                self.prestige -= prestige_upgrade_cost
+                output_text += "Successfully upgraded prestige!"
+        else:
+            output_text += utils.join_items(
+                f"By upgrading, you will lose {prestige_upgrade_cost} prestige.",
+                f"Use prestige_upgrade again if you really do wish to upgrade.",
+            )
+            self.confirmed_upgrade = True
+        return output_text
 
     def profile(self):
         """returns user profile"""
@@ -186,9 +172,6 @@ class EconomyUser():
 
     def id(self):
         return utils.get_key(users, self)
-
-    def earned_prestige(self):
-        return math.trunc(self.lifetime_balance / self.prestige_conversion)
 
 
 users = {}
