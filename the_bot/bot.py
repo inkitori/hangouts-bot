@@ -18,8 +18,8 @@ class Bot:
         104687919952293193271,  # Ether(chendibot)
     )
 
-    def __init__(self, userID=None):
-        self.cookies = hangups.get_auth_stdin("./token.txt", True)
+    def __init__(self, options):
+        self.cookies = hangups.get_auth_stdin(options.token, True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
 
@@ -59,9 +59,9 @@ class Bot:
 
 class ConsoleBot():
     """console based bot (for testing)"""
-    def __init__(self, userID=101):
+    def __init__(self, options):
         self.handler = Handler()
-        self.userID = userID
+        self.userID = options.userID
 
     def run(self):
         """main bot loop"""
@@ -81,9 +81,3 @@ class ConsoleBot():
         # sends message to hangouts
         if output_text:
             print(utils.newline(output_text))
-
-
-bots = {
-    "hangouts": Bot,
-    "console": ConsoleBot
-}

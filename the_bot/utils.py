@@ -48,7 +48,7 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-def join_items(*items, seperator="\n", is_description=False, description_mode="short"):
+def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
     """joins a list using seperator"""
 
     output_list = []
@@ -58,7 +58,9 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
 
     else:
         output_list = convert_items(list(items), type_=str)
-    return seperator.join(output_list)
+    output_text = seperator.join(output_list).strip()
+    output_text += end if not output_text.endswith(end) else ""
+    return output_text
 
 
 def newline(text, number=1):
@@ -66,16 +68,15 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def description(name, *description, mode="short"):
+def description(name, *description, mode="short", end="\n"):
     description = convert_items(list(description), str)
     if mode == "short":
         description = join_items(*description, seperator=", ")
         full_description = f"{name} - {description}"
     if mode == "long":
         description.insert(0, f"{name.title()}:")
-        full_description = join_items(*description, seperator="\n\t")
-
-    return full_description
+        full_description = join_items(*description, seperator="\n\t", end=end)
+    return full_description.strip()
 
 
 # json

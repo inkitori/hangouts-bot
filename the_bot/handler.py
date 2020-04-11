@@ -39,7 +39,7 @@ class Handler:
             "pong": "ping",
             "saber": "hi",
             "meep": "meep",
-            "/help": "placeholder"  # this avoids errors where keywords and help_text reference eachother
+            "/help": ""  # this avoids errors where keywords and help_text reference eachother
         }
         self.help_text = utils.join_items(
             "I'm a bot by Yeah and Chendi.",

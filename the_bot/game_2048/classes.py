@@ -161,9 +161,7 @@ class Game():
         "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
-    game_commands = {
-        "restart": "restarts the game in the current gamemode",
-    }
+    game_commands = ["restart", "{direction}"]
 
     movement = {
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
@@ -207,8 +205,7 @@ class Game():
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        self.text += utils.description(self.name(), self.mode.name())
-        self.text += "score: " + str(self.score) + "\n"
+        self.text += utils.join_items(utils.description(self.name(), self.mode.name()), f"score: {self.score}\n")
         self.board.draw_board(self)
 
     def restart(self, mode=None):
@@ -271,7 +268,7 @@ class Game():
             if (x, positive) == (None, None):
                 if command in self.modes:
                     self.restart(Game.modes[command])
-                elif command in self.game_commands:
+                elif command in self.game_commands and not command.startswith("{"):
                     self.state = command
                 elif command != "":
                     self.text += "invalid command, use help to see commands\n"
