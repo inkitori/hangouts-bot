@@ -103,9 +103,12 @@ class Manager2048:
                 output_text = f"{delete_game_name} deleted"
 
         elif command == "games":
-            for game_name, game in self.games.items():
-                if game_name != "current game":
-                    output_text += utils.description(game_name, game.mode.name(), game.score)  # f"{game_name} - {game.mode.name()} score: {game.score}\n"
+            output_text += utils.join_items(
+                *[(game_name, game.mode.name(), game.score)
+                for game_name, game in self.games.items()
+                if game_name != "current game"],
+                is_description=True
+            )
 
         elif command in self.games:
             self.games["current game"] = self.games[command]
