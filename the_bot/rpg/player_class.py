@@ -86,8 +86,8 @@ class Player():
         self.stats = Stats(True, False, "player")
         self.room = "village"
         self.fighting = {}
-        self.inventory = [None for i in range(8)]
-        self.add_to_inventory("starter armor", "starter weapon", "clarity")
+        self.inventory = {key: None for i in range(8)}
+        self.add_to_inventory(RPG.all_items["starter_armor"], RPG.all_items["starter_weapon"], RPG.all_items["clarity tome"])
         self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
 
     def id(self):
@@ -104,12 +104,12 @@ class Player():
             return("you can only put in one item at a time if using a slot")
         output_text = ""
 
-        for item_name in items:
+        for item in items:
             added_text = f"put {item_name} in slot"
             if slot is not None:
                 replaced_item_name = self.inventory[slot]
                 try:
-                    self.inventory[slot] = item_name
+                    self.inventory[item.name] = item 
                 except IndexError:
                     return f"slot {slot} does not exist"
                 return added_text + f" {slot} replacing {replaced_item_name}"
