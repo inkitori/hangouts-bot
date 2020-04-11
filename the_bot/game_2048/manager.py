@@ -2,12 +2,11 @@
 manager for 2048 games
 """
 import utils
-from game_2048.classes import Game
+from game_2048.classes import Game, games
 
 
 class Manager2048:
     """manager for 2048 game"""
-    games = {"current game": None}
     save_file = "the_bot/game_2048/save_data.json"
     game_management_commands = [
         "create {game_name}", "{game_name}", "rename {old_name} {new_name}", "delete {game_name}", "games",
@@ -48,8 +47,8 @@ class Manager2048:
 
     def create_game(self, game_name):
         """creates a new game in games dict"""
-        self.games[game_name] = Game()
-        return self.games[game_name]
+        games[game_name] = Game()
+        return games[game_name]
 
     def verify_name(self, *names):
         """verifies a name for a game"""
@@ -58,7 +57,7 @@ class Manager2048:
                 return "game names cannot be reserved words"
             elif not name:
                 return "games must have names"
-            elif name in self.games.keys():
+            elif name in games.keys():
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
@@ -84,9 +83,9 @@ class Manager2048:
             valid = self.verify_name(new_name)
             if valid != "valid":
                 output_text = valid
-            if old_name not in self.games.keys():
+            if old_name not in games.keys():
                 output_text = "that game does not exist"
-            self.games[new_name] = self.games.pop(old_name)
+            games[new_name] = games.pop(old_name)
             play_game_name = new_name
             output_text = f"renamed {old_name} to {new_name}"
 
@@ -94,24 +93,24 @@ class Manager2048:
             delete_game_name = next(commands)
             if not delete_game_name:
                 output_text = "you must give the name of the game"
-            elif delete_game_name not in self.games.keys():
+            elif delete_game_name not in games.keys():
                 output_text = "that game does not exist"
             else:
-                if self.games["current game"] == self.games[delete_game_name]:
-                    self.games["current game"] = None
-                del self.games[delete_game_name]
+                if games["current game"] == games[delete_game_name]:
+                    games["current game"] = None
+                del games[delete_game_name]
                 output_text = f"{delete_game_name} deleted"
 
         elif command == "games":
             output_text += utils.join_items(
                 *[(game_name, game.mode.name(), game.score)
-                for game_name, game in self.games.items()
+                for game_name, game in games.items()
                 if game_name != "current game"],
                 is_description=True
             )
 
-        elif command in self.games:
-            self.games["current game"] = self.games[command]
+        elif command in games:
+            games["current game"] = games[command]
 
         elif command in self.help_texts:
             output_text += self.help_texts[command]
@@ -122,11 +121,11 @@ class Manager2048:
         command = "" if used_command else command
         if not play_game_name:
             play_game_name = "current game"
-        self.games["current game"] = self.games[play_game_name]
+        games["current game"] = games[play_game_name]
 
         if not output_text:
-            if type(self.games[play_game_name]) == Game:
-                output_text = self.games[play_game_name].play_game(commands, command=command)
+            if type(games[play_game_name]) == Game:
+                output_text = games[play_game_name].play_game(commands, command=command)
             else:
                 output_text = "no game selected"
         return output_text
@@ -135,14 +134,14 @@ class Manager2048:
         """loads games from a json file"""
         data = utils.load(self.save_file)
         for game_name, game_data in data["games"].items():
-            self.games[game_name] = Game(**game_data)
+            games[game_name] = Game(**game_data)
         for mode_name, mode in Game.modes.items():
             mode.high_score = data["scores"][mode_name]
 
     def save_game(self):
         """saves games to a json file"""
         games_dict = dict()
-        for game_name, game in self.games.items():
+        for game_name, game in games.items():
             if game_name == "current game" or (game is None):
                 continue
             games_dict[game_name] = {

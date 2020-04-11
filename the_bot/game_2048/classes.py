@@ -185,8 +185,7 @@ class Game():
 
     def name(self):
         """name of the game"""
-        return "placeholder, use command games to see games"
-        # return utils.get_key(games, self)
+        return utils.get_key(games, self, "current game")
 
     def update(self):
         """appends text based on current state"""
@@ -276,3 +275,5 @@ class Game():
 
         self.update()
         return utils.newline(self.text)
+
+games = {"current game": None}
