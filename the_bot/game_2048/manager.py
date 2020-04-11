@@ -132,7 +132,7 @@ class Manager2048:
         """loads games from a json file"""
         data = utils.load(self.save_file)
         for game_name, game_data in data["games"].items():
-            self.games[game_name] = Game(game_data["board"], game_data["has won"], game_data["mode"], game_data["score"])
+            self.games[game_name] = Game(**game_data)
         for mode_name, mode in Game.modes.items():
             mode.high_score = data["scores"][mode_name]
 
@@ -144,7 +144,7 @@ class Manager2048:
                 continue
             games_dict[game_name] = {
                 "board": [cell.value for cell in game.board.cells],
-                "has won": game.has_won,
+                "has_won": game.has_won,
                 "mode": game.mode.name(),
                 "score": game.score
             }

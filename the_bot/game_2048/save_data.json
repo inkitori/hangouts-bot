@@ -3,31 +3,7 @@
         "potato": {
             "board": [
                 0,
-                0,
                 2,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0
-            ],
-            "has won": false,
-            "mode": "confusion",
-            "score": 4
-        },
-        "q": {
-            "board": [
-                3,
-                2,
-                0,
                 0,
                 1,
                 0,
@@ -37,35 +13,13 @@
                 0,
                 0,
                 0,
-                2,
+                0,
+                0,
                 0,
                 0,
                 0
             ],
-            "has won": false,
-            "mode": "confusion",
-            "score": 20
-        },
-        "1": {
-            "board": [
-                0,
-                2,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0
-            ],
-            "has won": false,
+            "has_won": false,
             "mode": "normal",
             "score": 4
         }

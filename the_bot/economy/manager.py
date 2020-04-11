@@ -93,13 +93,7 @@ class EconomyManager():
         """loads the game"""
         data = utils.load(self.save_file)
         for userID, user_data in data.items():
-            self.users[int(userID)] = classes.EconomyUser(
-                name=user_data["name"],
-                balance=user_data["balance"],
-                lifetime_balance=user_data["lifetime_balance"],
-                prestige=user_data["prestige"],
-                items=user_data["items"],
-            )
+            self.users[int(userID)] = classes.EconomyUser(**user_data)
 
     def register(self, userID, commands):
         """registers a user"""
@@ -108,7 +102,7 @@ class EconomyManager():
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.users[userID] = classes.EconomyUser(name)
+        self.users[userID] = classes.EconomyUser(name=name)
         return "Successfully registered!"
 
     def profile(self, user, commands):
