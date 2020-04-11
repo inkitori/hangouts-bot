@@ -35,9 +35,10 @@ class Item():
     rarities = ("common", "uncommon", "rare", "legendary")
 
     def __init__(
-        self, type_, rarity=0, modifier="boring",
+        self, name="", type_, rarity=0, modifier="boring",
         health=0, attack=0, defense=0, mana=0
     ):
+        self.name = name
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
