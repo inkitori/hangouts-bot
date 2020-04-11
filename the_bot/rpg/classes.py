@@ -3,19 +3,24 @@ classes for rpg
 """
 import utils
 import random
+import copy
 
 
 class Stats():
     """class for stats"""
     def __init__(
         self, alive=False, generate_stats=True, type_=None,
-        *, max_health=100, health=5, mana=5, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
+        *, max_health=100, health=100, mana=100, attack=5, defense=5,
+        max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
     ):
         if alive:
-            self.health = self.max_health = max_health
+            self.max_health = max_health
+            self.health = health
         if type_ == "player":
-            self.mana = self.max_mana = max_mana
-            self.lifetime_balance = self.balance = balance
+            self.mana = mana
+            self.max_mana = max_mana
+            self.lifetime_balance = lifetime_balance
+            self.balance = balance
             self.xp = xp
         elif type_ == "item":
             self.mana = mana
