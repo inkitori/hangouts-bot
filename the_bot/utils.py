@@ -58,7 +58,9 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
 
     else:
         output_list = convert_items(list(items), type_=str)
-    return seperator.join(output_list) + end
+    output_text = seperator.join(output_list)
+    output_text += end if not output_text.endswith(end) else ""
+    return output_text
 
 
 def newline(text, number=1):
@@ -66,15 +68,14 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def description(name, *description, mode="short"):
+def description(name, *description, mode="short", end="\n"):
     description = convert_items(list(description), str)
     if mode == "short":
         description = join_items(*description, seperator=", ")
         full_description = f"{name} - {description}"
     if mode == "long":
         description.insert(0, f"{name.title()}:")
-        full_description = join_items(*description, seperator="\n\t")
-
+        full_description = join_items(*description, seperator="\n\t", end=end)
     return full_description
 
 

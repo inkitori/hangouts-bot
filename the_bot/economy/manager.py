@@ -57,7 +57,7 @@ class EconomyManager():
         sorted_users = [(key, value) for key, value in sorted(user_balances.items(), key=lambda x: x[1], reverse=True)]
 
         for rank in range(5):
-            user, balance = utils.get_item_safe(sorted_users, (rank, ), default=("", ""))
+            user, balance = utils.get_item_safe(sorted_users, (rank, ))
             if user:
                 leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
 
@@ -65,11 +65,14 @@ class EconomyManager():
 
     def shop(self):
         """returns shop"""
-        shop_text = ""
-        for type_ in classes.shop_items.values():
-            for item in type_:
-                shop_text += f"{utils.description(item.name().title(), item.price)} Saber Dollars\n"
-        return shop_text
+        shop_list = []
+        for type_name, items in classes.shop_items.items():
+            items_text = [type_name]
+            for item in items:
+                items_text.append(utils.description(item.name().title(), f"{item.price} saber dollars"))
+            shop_list.append(items_text)
+
+        return utils.join_items(*shop_list, is_description=True, description_mode="long")
 
     def save_game(self):
         """saves the game"""

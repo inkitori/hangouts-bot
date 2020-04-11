@@ -8,7 +8,7 @@ import random
 
 class Item():
 
-    def __init__(self, type_, price, modifer="", mining_range=None):
+    def __init__(self, type_, price, modifer="", mining_range=(0, 10)):
         self.type_ = type_
         self.price = price
         self.modifer = modifer
@@ -82,50 +82,45 @@ class EconomyUser():
 
     def buy(self, commands):
         """buys a item"""
-        try:
-            item_type = next(commands)
-            item = next(commands)
+        item_type = next(commands)
+        item = next(commands)
 
-            if item == "top":
-                if item_type not in self.shop:
-                    return "That class doesn't exist!"
+        if item == "top":
+            if item_type not in self.shop:
+                return "That class doesn't exist!"
 
-                shopData = self.shop[item_type]
-                possible_items = []
+            shopData = self.shop[item_type]
+            possible_items = []
 
-                for possible_item in shopData:
-                    if shopData[possible_item]["value"] > shopData[self.pick] and shopData[possible_item].price <= self.balance:
-                        possible_items.append(possible_item)
+            for possible_item in shopData:
+                if shopData[possible_item]["value"] > shopData[self.pick] and shopData[possible_item].price <= self.balance:
+                    possible_items.append(possible_item)
 
-                if len(possible_items) == 0:
-                    return "No possible item of that class you can purchase!"
-
-                else:
-                    purchase = possible_items[-1]
-                    self.items[item_type] = shopData[purchase].name()
-                    self.change_balance(- purchase.price)
-
-                    return "Successful purchase of the {purchase}!"
-
-            elif item_type not in self.shop or item not in self.shop[item_type]:
-                return "That item doesn't exist!"
+            if len(possible_items) == 0:
+                return "No possible item of that class you can purchase!"
 
             else:
-                if self.balance < self.shop[item_type][item].price:
-                    return "You don't have enough money for that!"
-                elif self.shop[item_type][self.items[item_type]] == self.shop[item_type][item]:
-                    return "You already have that pick!"
-                elif self.shop[item_type][self.items[item_type]]["value"] > self.shop[item_type][item]["value"]:
-                    return "You already have a pick better than that!"
-                else:
-                    self.items[item_type] = self.shop[item_type][item].name
-                    self.change_balance(- self.shop[item_type][item].price)
+                purchase = possible_items[-1]
+                self.items[item_type] = shopData[purchase].name()
+                self.change_balance(- purchase.price)
 
-                    return "Purchase successful!"
+                return "Successful purchase of the {purchase}!"
 
-        except Exception as e:
-            return "Format: /buy {type} {item}"
-            print(e)
+        elif item_type not in self.shop or item not in self.shop[item_type]:
+            return "That item doesn't exist!"
+
+        else:
+            if self.balance < self.shop[item_type][item].price:
+                return "You don't have enough money for that!"
+            elif self.shop[item_type][self.items[item_type]] == self.shop[item_type][item]:
+                return "You already have that pick!"
+            elif self.shop[item_type][self.items[item_type]]["value"] > self.shop[item_type][item]["value"]:
+                return "You already have a pick better than that!"
+            else:
+                self.items[item_type] = self.shop[item_type][item].name
+                self.change_balance(- self.shop[item_type][item].price)
+
+                return "Purchase successful!"
 
     def prestige(self):
         """prestiges"""
