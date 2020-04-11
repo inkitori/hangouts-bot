@@ -4,6 +4,7 @@ classes for rpg
 import utils
 from player_class import Stats, Player
 
+
 class Enemy():
     """represents an enemy"""
 

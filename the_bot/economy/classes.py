@@ -58,7 +58,7 @@ class EconomyUser():
     prestige_upgrade_base = 2000
 
     def __init__(
-        self, name, balance=0, lifetime_balance=0, items={"pick": 0}, 
+        self, name, balance=0, lifetime_balance=0, items={"pick": 0},
         prestige=0, prestige_upgrade=0, confirmed_prestige=False, confirmed_upgrade=False
     ):
         self.name = name

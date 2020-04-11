@@ -276,4 +276,5 @@ class Game():
         self.update()
         return utils.newline(self.text)
 
+
 games = {"current game": None}

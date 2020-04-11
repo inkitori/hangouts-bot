@@ -103,9 +103,11 @@ class Manager2048:
 
         elif command == "games":
             output_text += utils.join_items(
-                *[(game_name, game.mode.name(), game.score)
-                for game_name, game in games.items()
-                if game_name != "current game"],
+                *[
+                    (game_name, game.mode.name(), game.score)
+                    for game_name, game in games.items()
+                    if game_name != "current game"
+                ],
                 is_description=True
             )
 
