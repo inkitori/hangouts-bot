@@ -207,8 +207,7 @@ class Game():
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        self.text += utils.description(self.name(), self.mode.name())
-        self.text += "score: " + str(self.score) + "\n"
+        self.text += utils.join_items(utils.description(self.name(), self.mode.name()), f"score: {self.score}\n")
         self.board.draw_board(self)
 
     def restart(self, mode=None):

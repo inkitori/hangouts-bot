@@ -48,7 +48,7 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-def join_items(*items, seperator="\n", is_description=False, description_mode="short"):
+def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
     """joins a list using seperator"""
 
     output_list = []
@@ -58,7 +58,7 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
 
     else:
         output_list = convert_items(list(items), type_=str)
-    return seperator.join(output_list)
+    return seperator.join(output_list) + end
 
 
 def newline(text, number=1):
