@@ -19,13 +19,18 @@ class EconomyManager():
             "give": self.give,
             "profile": self.profile
         }
+        self.help_text = utils.join_items(
+            ("informational", *self.commands, "help"),
+            ("commands", *classes.EconomyUser.commands),
+            is_description=True, description_mode="long"
+        )
 
     def run_game(self, userID, commands):
         """runs the game"""
         command = next(commands)
         output_text = ""
         if command == "help":
-            return "help text"
+            return self.help_text
         if command == "register":
             return self.register(userID, commands)
         elif userID not in self.users.keys():
@@ -52,7 +57,6 @@ class EconomyManager():
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
         sorted_users = [user for user in sorted(list(user_balances.items()), key=lambda x: x[1], reverse=True)]
-        print(sorted_users)
 
         for rank in range(5):
             user_balance = utils.get_item_safe(sorted_users, (rank, ))
