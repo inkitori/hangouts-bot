@@ -32,7 +32,7 @@ class EconomyManager():
         if command == "leaderboard":
             output_text = self.leaderboard()
         elif command == "shop":
-            output_text = self.shop()
+            output_text = self.shop(user)
         elif command == "give":
             output_text = self.give(user, commands)
         elif command == "profile":
@@ -65,13 +65,18 @@ class EconomyManager():
 
         return leaderboard_text
 
-    def shop(self):
+    def shop(self, user):
         """returns shop"""
         shop_list = []
         for type_name, items in classes.shop_items.items():
             items_text = [type_name]
-            for item in items:
-                items_text.append(utils.description(item.name().title(), f"{item.price} saber dollars"))
+            player_item = user.items[type_name]
+            if player_item == len(items):
+                items_text = f"You already have the highest level {type_name}"
+            else:
+                for i in range(player_item + 1, len(items)):
+                    item = items[i]
+                    items_text.append(utils.description(item.name().title(), f"{item.price} saber dollars"))
             shop_list.append(items_text)
 
         return utils.join_items(*shop_list, is_description=True, description_mode="long")

@@ -34,7 +34,7 @@ class Item():
 
 
 shop_items = {
-    "picks": [Item("pick", Item.pick_prices[level], Item.pick_modifiers[level], level) for level in range(len(Item.pick_modifiers))]
+    "pick": [Item("pick", Item.pick_prices[level], Item.pick_modifiers[level], level) for level in range(len(Item.pick_modifiers))]
 }
 
 
@@ -92,7 +92,7 @@ class EconomyUser():
                     possible_items.append(possible_item)
 
             if len(possible_items) == 0:
-                return "No possible item of that class you can purchase!"
+                return "No possible item of that type you can purchase!"
 
             else:
                 purchase = possible_items[-1]
@@ -101,11 +101,11 @@ class EconomyUser():
 
                 return "Successful purchase of the {purchase}!"
 
-        elif item_type not in self.shop_items or modifier not in self.shop_items[item_type]:
+        elif item_type not in shop_items or modifier not in shop_items[item_type]:
             return "That item doesn't exist!"
 
         else:
-            if self.balance < self.shop_items[item_type][modifier].price:
+            if self.balance < shop_items[item_type][modifier].price:
                 return "You don't have enough money for that!"
             elif self.shop_items[item_type][self.items[item_type]] == self.shop_items[item_type][modifier]:
                 return "You already have that item!"
@@ -163,7 +163,7 @@ class EconomyUser():
         profile_text = utils.join_items(
             f"name: {self.name}",
             f"balance: {self.balance}",
-            f"pick: {self.items['pick']}",
+            f"pick: {self.get_item('pick').name()}",
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
             f"id: {self.id()}"
@@ -172,6 +172,9 @@ class EconomyUser():
 
     def id(self):
         return utils.get_key(users, self)
+
+    def get_item(self, type_):
+        return shop_items[type_][self.items[type_]]
 
 
 users = {}
