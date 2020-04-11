@@ -13,7 +13,7 @@ class Manager2048:
         "create {game_name}", "{game_name}", "rename {old_name} {new_name}", "delete {game_name}", "games",
     ]
     reserved_words = (
-        list(Game.game_commands.keys()) + list(Game.modes.keys()) +
+        Game.game_commands + list(Game.modes.keys()) +
         [value for values in list(Game.movement.values()) for value in values] +
         game_management_commands +
         ["2048", "/2048", "current game"]

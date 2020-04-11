@@ -161,9 +161,7 @@ class Game():
         "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
         "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
     }
-    game_commands = {
-        "restart", "{direction}"
-    }
+    game_commands = ["restart", "{direction}"]
 
     movement = {
         "up": ("up", "u", "^"), "left": ("left", "l", "<"),
