@@ -16,7 +16,6 @@ class EconomyManager():
         self.commands = {
             "leaderboard": self.leaderboard,
             "shop": self.shop,
-            "give": self.give,
             "profile": self.profile
         }
         self.help_text = utils.join_items(
@@ -111,47 +110,6 @@ class EconomyManager():
             return "you must provide a name"
         self.users[userID] = classes.EconomyUser(name)
         return "Successfully registered!"
-
-    def give(self, giving_user, commands):
-        """gives money to another user"""
-        reciveing_user = next(commands)
-        money = next(commands)
-        output_text = ""
-
-        if not reciveing_user:
-            output_text += "You must specfiy a user or ID"
-        elif not money:
-            output_text += "You must specify an amount"
-        elif not money.isdigit():
-            output_text += "You must give an integer amount of Saber Dollars"
-        else:
-            money = int(money)
-
-            for user in self.users.values():
-                if reciveing_user == user.name:
-                    reciveing_user = user
-                    break
-
-            if reciveing_user.isdigit() and int(reciveing_user) in self.users:
-                reciveing_user = self.users[int(reciveing_user)]
-            if reciveing_user.id() not in self.users:
-                output_text += "That user has not registered!"
-            elif reciveing_user.id() == giving_user.id():
-                output_text += "That user is you!"
-            else:
-                if money < 0:
-                    output_text += "You can't give negative money!"
-                elif giving_user.balance < money:
-                    output_text += "You don't have enough money to do that!"
-                else:
-                    giving_user.change_balance(- money)
-                    reciveing_user.change_balance(money)
-
-                    output_text += utils.join_items(
-                        f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
-                        f"That user now has {reciveing_user.balance} Saber Dollars."
-                    )
-        return output_text
 
     def profile(self, user, commands):
         """returns user profiles"""

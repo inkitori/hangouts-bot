@@ -185,6 +185,47 @@ class EconomyUser():
         )
         return utils.newline(profile_text).title()
 
+    def give(self, commands):
+        """gives money to another user"""
+        reciveing_user = next(commands)
+        money = next(commands)
+        output_text = ""
+
+        if not reciveing_user:
+            output_text += "You must specfiy a user or ID"
+        elif not money:
+            output_text += "You must specify an amount"
+        elif not money.isdigit():
+            output_text += "You must give an integer amount of Saber Dollars"
+        else:
+            money = int(money)
+
+            for user in users.values():
+                if reciveing_user == user.name:
+                    reciveing_user = user
+                    break
+
+            if reciveing_user.isdigit() and int(reciveing_user) in users:
+                reciveing_user = users[int(reciveing_user)]
+            if reciveing_user.id() not in users:
+                output_text += "That user has not registered!"
+            elif reciveing_user.id() == self.id():
+                output_text += "That user is you!"
+            else:
+                if money < 0:
+                    output_text += "You can't give negative money!"
+                elif self.balance < money:
+                    output_text += "You don't have enough money to do that!"
+                else:
+                    self.change_balance(- money)
+                    reciveing_user.change_balance(money)
+
+                    output_text += utils.join_items(
+                        f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
+                        f"{reciveing_user.name} now has {reciveing_user.balance} Saber Dollars."
+                    )
+        return output_text
+
     def id(self):
         return utils.get_key(users, self)
 
@@ -195,7 +236,8 @@ class EconomyUser():
         "mine": mine,
         "buy": buy,
         "prestige": prestige_action,
-        "prestige_upgrade": prestige_upgrade_action
+        "prestige_upgrade": prestige_upgrade_action,
+        "give": give,
     }
 
 
