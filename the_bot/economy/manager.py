@@ -13,6 +13,12 @@ class EconomyManager():
     def __init__(self):
         self.users = classes.users
         self.load_game()
+        self.commands = {
+            "leaderboard": self.leaderboard,
+            "shop": self.shop,
+            "give": self.give,
+            "profile": self.profile
+        }
 
     def run_game(self, userID, commands):
         """runs the game"""
@@ -29,14 +35,9 @@ class EconomyManager():
         if command not in ("prestige", "prestige_upgrade"):
             user.confirmed_prestige = False
             user.confirmed_upgrade = False
-        if command == "leaderboard":
-            output_text = self.leaderboard(user. commands)
-        elif command == "shop":
-            output_text = self.shop(user, commands)
-        elif command == "give":
-            output_text = self.give(user, commands)
-        elif command == "profile":
-            output_text = self.profile(user, commands)
+        if command in self.commands:
+            function_ = self.commands[command]
+            output_text = function_(user, commands)
         elif command in classes.EconomyUser.commands:
             function_ = classes.EconomyUser.commands[command]
             output_text = function_(user, commands)
@@ -45,17 +46,22 @@ class EconomyManager():
 
         return output_text
 
-    def leaderboard(self, user, commands):
+    def leaderboard(self, playing_user, commands):
         """returns leaderboard"""
         user_balances = {user: user.lifetime_balance for user in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
-        sorted_users = [(key, value) for key, value in sorted(user_balances.items(), key=lambda x: x[1], reverse=True)]
+        sorted_users = [user for user in sorted(list(user_balances.items()), key=lambda x: x[1], reverse=True)]
+        print(sorted_users)
 
         for rank in range(5):
-            user, balance = utils.get_item_safe(sorted_users, (rank, ))
-            if user:
+            user_balance = utils.get_item_safe(sorted_users, (rank, ))
+            if user_balance:
+                user, balance = user_balance
                 leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+        playing_user_rank = sorted_users.index((playing_user, playing_user.lifetime_balance))
+        if playing_user_rank > 5:
+            leaderboard_text += f"\n{playing_user_rank + 1}. {playing_user.name}(you): {playing_user.lifetime_balance}\n"
 
         return leaderboard_text
 
