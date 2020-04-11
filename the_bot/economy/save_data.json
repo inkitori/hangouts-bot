@@ -1,14 +1,14 @@
 {
     "101": {
         "name": "ether",
-        "balance": 4478054829,
-        "lifetime_balance": 48611111111132736,
+        "balance": 4478045135,
+        "lifetime_balance": 48611111111132817,
         "prestige": 7999,
         "items": {
-            "pick": 17
+            "pick": 6
         },
-        "confirmed_prestige": false,
-        "confirmed_upgrade": false,
+        "confirmed_prestige": true,
+        "confirmed_upgrade": true,
         "prestige_upgrade": 0
     },
     "102": {

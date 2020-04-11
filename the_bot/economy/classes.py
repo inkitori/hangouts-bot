@@ -191,5 +191,12 @@ class EconomyUser():
     def get_item(self, type_):
         return shop_items[type_][self.items[type_]]
 
+    commands = {
+        "mine": mine,
+        "buy": buy,
+        "prestige": prestige_action,
+        "prestige_upgrade": prestige_upgrade_action
+    }
+
 
 users = {}

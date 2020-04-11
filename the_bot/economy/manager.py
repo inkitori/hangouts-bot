@@ -30,28 +30,22 @@ class EconomyManager():
             user.confirmed_prestige = False
             user.confirmed_upgrade = False
         if command == "leaderboard":
-            output_text = self.leaderboard()
+            output_text = self.leaderboard(user. commands)
         elif command == "shop":
-            output_text = self.shop(user)
+            output_text = self.shop(user, commands)
         elif command == "give":
             output_text = self.give(user, commands)
         elif command == "profile":
             output_text = self.profile(user, commands)
-        elif command == "mine":
-            output_text = user.mine(commands)
-        elif command == "buy":
-            output_text = user.buy(commands)
-
-        elif command == "prestige":
-            output_text = user.prestige_action(commands)
-        elif command == "prestige_upgrade":
-            output_text = user.prestige_upgrade_action(commands)
+        elif command in classes.EconomyUser.commands:
+            function_ = classes.EconomyUser.commands[command]
+            output_text = function_(user, commands)
         else:
             output_text = "Invalid command"
 
         return output_text
 
-    def leaderboard(self):
+    def leaderboard(self, user, commands):
         """returns leaderboard"""
         user_balances = {user: user.lifetime_balance for user in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
@@ -65,7 +59,7 @@ class EconomyManager():
 
         return leaderboard_text
 
-    def shop(self, user):
+    def shop(self, user, commands):
         """returns shop"""
         shop_list = []
         for type_name, items in classes.shop_items.items():
