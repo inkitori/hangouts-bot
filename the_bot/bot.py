@@ -19,7 +19,7 @@ class Bot:
     )
 
     def __init__(self, options):
-        self.cookies = hangups.get_auth_stdin("./token.txt", True)
+        self.cookies = hangups.get_auth_stdin(options.token, True)
         self.client = hangups.Client(self.cookies)
         self.handler = Handler()
 
