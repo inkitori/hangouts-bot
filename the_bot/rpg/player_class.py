@@ -1,44 +1,43 @@
 import utils
 import random
 import math
-import classes
+import rpg.classes as classes
 
 
 class Inventory():
     """player's inventory"""
     def __init__(
         self, items={}, max_items=8,
-        equipped={"armor": None, "weapon": None, "tome": None}
+        equipped={"armor": None, "weapon": None, "tome": None}  # value is item name
     ):
-        self.items = items
+        self.items = items  # item_name:item_object
         self.max_items = max_items
+        self.equipped = equipped
 
-    def add_to_inventory(self, items, slot=None):
+    def add(self, commands):
         """
-        puts an item into the first empty slot
-        if a slot is specifed, uses that slot instead
+        puts an item into the inventory
         """
-        if len(items) < 1:
-            return("you must pick an item")
-        elif len(items) > 1 and slot:
-            return("you can only put in one item at a time if using a slot")
+        item_name = next(commands)
         output_text = ""
-
-        for item_name in items:
-            added_text = f"put {item_name} in slot"
-            if slot is not None:
-                replaced_item_name = self.inventory[slot]
-                try:
-                    self.inventory[slot] = item_name
-                except IndexError:
-                    return f"slot {slot} does not exist"
-                return added_text + f"{slot} replacing {replaced_item_name}"
-            for i in range(len(self.inventory)):
-                if self.inventory[i] is None:
-                    self.inventory[i] = item_name
-                    output_text += utils.newline(added_text) + f" {i}"
-                output_text += "there are no empty slots, specify a slot"
+        if not item_name:
+            output_text = "you must pick an item"
+        elif len(self.items) >= self.max_items:
+            output_text = "your inventory is full, remove something first"
+        else:
+            self.items[item_name] = RPG.all_items[item_name]
+            output_text = f"added {item_name} to inventory"
         return output_text
+
+    def remove(self, commands):
+        item_name = utils.join_items(*list(commands), seperator=" ")
+        if not item_name:
+            return "you must specify an item"
+        elif item_name not in self.items:
+            return "you do not have that item"
+        else:
+            del self.items[item_name]
+            return f"{item_name} removed from inventory"
 
     def equip(self, item):
         """equips an item"""
@@ -48,9 +47,9 @@ class Inventory():
         pass
 
     def get_equipped(self, type_):
-        item_name = self.inventory[self.equipped[type_]]
+        item_name = self.equipped[type_]
         item = RPG.all_items[item_name]
-        return item
+        return item_name, item
 
     def print_inventory(self):
         """returns string representation of inventory"""
@@ -58,6 +57,13 @@ class Inventory():
         for item_name in self.inventory:
             inventory_text += RPG.all_items[item_name].description()
         return inventory_text
+
+    def to_dict(self):
+        return {
+            "items": {item_name: item.to_dict() for item_name, item in self.items.items()},
+            "max_items": self.max_items,
+            "equipped": self.equipped,
+        }
 
 
 class Player():
@@ -68,9 +74,7 @@ class Player():
         self.stats = classes.Stats(True, False, "player")
         self.room = "village"
         self.fighting = {}
-        self.inventory = [None for i in range(8)]
-        self.add_to_inventory("starter armor", "starter weapon", "clarity")
-        self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
+        self.inventory = Inventory()
 
     def id(self):
         return utils.get_key(RPG.players, self)
@@ -125,8 +129,7 @@ class Player():
             "stats": self.stats.to_dict(),
             "room": self.room,
             "fighting": {enemy_name: enemy.to_dict() for enemy_name, enemy in self.fighting.items()},
-            "inventory": self.inventory,
-            "equipped": self.equipped
+            "inventory": self.inventory.to_dict(),
         }
         return player_dict
 
@@ -250,14 +253,40 @@ class RPG():
     rooms = classes.rooms
     enemies = classes.enemies
 
-    def register(self, user):
+    def register(self, userID, commands):
         """registers a user in the game"""
-        userID = user.id_[0]
+        name = next(commands)
         if userID in self.players:
             return "You are already registered!"
-        self.players[userID] = classes.Player("placeholder name")
-
+        if not name:
+            return "you must provide a name"
+        self.players[userID] = Player(name=name)
         return "Successfully registered!"
 
-    def play_game(self, user, commands):
-        pass
+    def play_game(self, userID, commands, command=""):
+        """runs functions based on user command"""
+        command = command if command else next(commands)
+        output_text = ""
+        player = utils.get_value(self.players, userID)
+        if command == "register":
+            output_text = self.register(userID, commands)
+        elif command == "inventory":
+            output_text = player.inventory.print_inventory()
+        elif command == "warp":
+            output_text = player.warp()
+        elif command == "equip":
+            output_text = player.inventory.equip()
+        elif command == "stats":
+            output_text = player.print_stats()
+        elif command == "rest":
+            output_text = player.rest()
+        elif command == "fight":
+            output_text = player.fight()
+        elif command in ("atk", "attack"):
+            output_text = player.atk()
+        elif command == "heal":
+            output_text = player.heal()
+        else:
+            output_text = "invalid command"
+
+        return output_text

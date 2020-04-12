@@ -114,7 +114,7 @@ class Room():
 
     def generate_enemy(self):
         enemy_name = random.choice(self.enemies_list)
-        enemy = enemies[enemy_name]
+        enemy = copy.deepcopy(enemies[enemy_name])
         return enemy_name, enemy
 
 
@@ -138,6 +138,14 @@ class Item():
 
     def name(self):
         return utils.get_key(all_items, self)
+
+    def to_dict(self):
+        return {
+            "type_": self.type_,
+            "rarity": self.rarity,
+            "modifier": self.modifier,
+            "stats": self.stats.to_dict()
+        }
 
 
 all_items = {
