@@ -124,7 +124,7 @@ class Item():
     rarities = ("common", "uncommon", "rare", "legendary")
 
     def __init__(
-        self, type_, rarity=0, modifier="boring",
+        self, name, type_, rarity=0, modifier="boring",
         stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
     ):
         self.name = name
@@ -150,9 +150,9 @@ class Item():
 
 
 all_items = {
-    "starter armor": Item("armor"),
-    "starter weapon": Item("weapon"),
-    "clarity tome": Item("tome")
+    "starter armor": Item("starter armor", "armor"),
+    "starter weapon": Item("starter weapon", "weapon"),
+    "clarity tome": Item("clarity tome", "tome")
 }
 rooms = {
     "village": Room()
