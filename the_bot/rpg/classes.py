@@ -103,10 +103,11 @@ class Enemy():
 class Room():
     """represents a room in the world"""
 
-    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0)):
+    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0), can_rest=False):
         self.enemies_list = enemies_list
         self.min_level = min_level
         self.xp_range = xp_range
+        self.can_rest = can_rest
 
     def name(self):
         return utils.get_key(rooms, self)

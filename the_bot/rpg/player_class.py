@@ -1,6 +1,7 @@
 import utils
 import random
 import math
+import copy
 import rpg.classes as classes
 
 
@@ -10,7 +11,7 @@ class Inventory():
         self, items={}, max_items=8,
         equipped={"armor": None, "weapon": None, "tome": None}  # value is item name
     ):
-        self.items = {item_name: classes.Item(**item_data) for item_name, item_data in items.items()}  # item_name:item_object
+        self.items = {item_name: classes.Item(**item_data) for item_name, item_data in items.items()}
         self.max_items = max_items
         self.equipped = equipped
 
@@ -25,7 +26,7 @@ class Inventory():
         elif len(self.items) >= self.max_items:
             output_text = "your inventory is full, remove something first"
         else:
-            self.items[item_name] = RPG.all_items[item_name]
+            self.items[item_name] = copy.deepcopy(RPG.all_items[item_name])
             output_text = f"added {item_name} to inventory"
         return output_text
 
@@ -48,15 +49,29 @@ class Inventory():
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
-        item = RPG.all_items[item_name]
+        item = self.inventory[item_name]
         return item_name, item
 
     def print_inventory(self):
         """returns string representation of inventory"""
         inventory_text = ""
         for item_name in self.inventory:
-            inventory_text += RPG.all_items[item_name].description()
+            inventory_text += self.inventory[item_name].description()
         return inventory_text
+
+    def print_equipped(self):
+        """returns string representation of equipped items"""
+        equipped_text = utils.join_items(
+            *[
+                (type_, self.items[item_name].description)
+                for type_, item_name in self.equipped.items()
+            ], is_description=True
+        )
+        for type_, item_name in self.equipped.items():
+            item = self.inventory[item_name]
+            equipped_text += f"{type_}: {item.description()}"
+
+        return equipped.title()
 
     def to_dict(self):
         return {
@@ -94,16 +109,6 @@ class Player():
         # then return a stats obbjcet with those stats
         return
 
-    def print_equipped(self):
-        """returns string representation of equipped items"""
-        equipped = ""
-
-        for type_, index in self.equipped.items():
-            item = RPG.all_items[self.inventory[index]]
-            equipped += f"{type_}: {item.description()}"
-
-        return equipped.title()
-
     def warp(self, commands):
         """warps to rooms"""
         output_text = ""
@@ -140,14 +145,14 @@ class Player():
     def rest(self):
         """rests player"""
         text = ""
-        if self.room == "village":
+        if RPG.rooms[self.room].can_rest:
             self.stats.change_health("full")
             text += utils.join_items(
                 "You feel well rested...\n",
                 f"Your health is back up to {self.stats.hp}!",
             )
         else:
-            text = "You have to rest in the village!"
+            text = "You can't rest here!"
 
         return text
 
@@ -170,7 +175,7 @@ class Player():
         if not self.fighting:
             return "You need to be in a fight!"
 
-        enemy = RPG.enemies[self.fighting]
+        enemy = random.choice(self.fighting.values())
         user_damage = self.modified_stats().attack
         damage_dealt = (user_damage) * (user_damage / enemy.defense)
 
@@ -181,7 +186,7 @@ class Player():
         text += f"You dealt {damage_dealt} damage to {enemy.name()}!\n"
 
         if enemy.stats.health <= 0:
-            text = self.killed_enemy(enemy)
+            text += self.killed_enemy(enemy)
 
         else:
             # take damage
@@ -194,7 +199,7 @@ class Player():
 
             text += utils.join_list(
                 f"{enemy.name} dealt {damage_taken} to you!",
-                f"You have {self.stats.hp} hp left",
+                f"You have {self.stats.health} hp left",
                 f"{enemy.name} has {enemy.stats.health} left!"
             )
 
@@ -217,10 +222,9 @@ class Player():
         gold_earned = int(enemy.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
-        text += self.stats.give_xp(xp_earned)
-
+        self.stats.give_xp(xp_earned)
         self.stats.increase_balance(gold_earned)
-        self.fighting = ""
+        del self.fighting[enemy.name]
 
         return text
 
@@ -233,12 +237,15 @@ class Player():
         if self.room == "village":
             text = "Don't fight in the village..."
 
+        elif not RPG.rooms[self.room].enemies_list:
+            text = "There are no enemies"
+
         elif self.fighting:
             text = f"You are already fighting {self.fighting}!"
 
         else:
             enemy_name = random.choice(rooms[self.room].enemies_list)
-            enemy = RPG.enemies[enemy_name]
+            enemy = copy.deepcopy(RPG.enemies[enemy_name])
 
             text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
