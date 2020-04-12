@@ -10,7 +10,7 @@ class Inventory():
         self, items={}, max_items=8,
         equipped={"armor": None, "weapon": None, "tome": None}  # value is item name
     ):
-        self.items = items  # item_name:item_object
+        self.items = {item_name: classes.Item(**item_data) for item_name, item_data in items.items()}  # item_name:item_object
         self.max_items = max_items
         self.equipped = equipped
 
@@ -69,12 +69,16 @@ class Inventory():
 class Player():
     """represents a player in the rpg"""
 
-    def __init__(self, name):
+    def __init__(
+        self, name,
+        stats={},
+        room="village", fighting={}, inventory={}
+    ):
         self.name = name
-        self.stats = classes.Stats(True, False, "player")
-        self.room = "village"
-        self.fighting = {}
-        self.inventory = Inventory()
+        self.stats = classes.Stats(alive=True, generate_stats=False, type_="player", **stats)
+        self.room = room
+        self.fighting = {enemy_name: classes.Enemy(**enemy_data) for enemy_name, enemy_data in fighting}
+        self.inventory = Inventory(**inventory)
 
     def id(self):
         return utils.get_key(RPG.players, self)

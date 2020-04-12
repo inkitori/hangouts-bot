@@ -4,37 +4,19 @@ manager for rpg
 from datetime import datetime
 import random
 import utils
-from rpg.player_class import RPG
+import rpg.player_class as classes
 
 
 class RPGManager:
     """manager for rpg"""
 
     save_file = "the_bot/rpg/save_data.json"
-    game = RPG()
+    game = classes.RPG()
 
     def __init__(self):
-        self.commands = {
-            """
-            "register": self.register,
-            "inventory": self.inventory,
-            "warp": self.warp,
-            "equipped": self.equipped,
-            "stats": self.stats,
-            "rest": self.rest,
-            "fight": self.fight,
-            "atk": self.atk,
-            "heal": self.heal
-            """
-        }
-
         self.load_game()
 
         random.seed(datetime.now())
-
-    def register(self):
-        """registers a user"""
-        pass
 
     def run_game(self, userID, commands):
         """runs the game"""
@@ -43,9 +25,8 @@ class RPGManager:
         if not command:
             return "you must enter a command"
 
-        if command != "register" and userID not in RPG.players:
+        if command != "register" and userID not in self.game.players:
             return "You are not registered! Use register"
-        # more commands here?
         else:
             used_command = False
         command = "" if used_command else command
@@ -53,7 +34,9 @@ class RPGManager:
 
     def load_game(self):
         """loads the game"""
-        pass
+        save_data = utils.load(self.save_file)
+        for userID, player_data in save_data.items():
+            self.game.players[int(userID)] = classes.Player(**player_data)
 
     def save_game(self):
         """saves the game"""

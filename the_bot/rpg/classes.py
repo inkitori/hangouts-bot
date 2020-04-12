@@ -9,8 +9,8 @@ import copy
 class Stats():
     """class for stats"""
     def __init__(
-        self, alive=False, generate_stats=True, type_=None,
-        *, max_health=100, health=100, mana=100, attack=5, defense=5,
+        self, *, alive=False, generate_stats=True, type_=None,
+        max_health=100, health=100, mana=100, attack=5, defense=5,
         max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
     ):
         if alive:
@@ -36,7 +36,6 @@ class Stats():
 
     def generate_from_level(self, level):
         """generates stats from level"""
-        # change this joseph
         attack = round(5 * level ** 1.8)
         defense = round(5 * level ** 1.5)
         health = round(100 * level ** 2)
@@ -88,8 +87,8 @@ class Stats():
 class Enemy():
     """represents an enemy"""
 
-    def __init__(self):
-        self.stats = Stats(True, True, "enemy")
+    def __init__(self, stats={}):
+        self.stats = Stats(alive=True, generate_stats=True, type_="enemy", **stats)
 
     def name(self):
         return utils.get_key(enemies, self)
@@ -125,12 +124,12 @@ class Item():
 
     def __init__(
         self, type_, rarity=0, modifier="boring",
-        health=0, attack=0, defense=0, mana=0
+        stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
     ):
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
-        self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
+        self.stats = Stats(alive=False, generate_stats=False, type_="item", **stats)
 
     def short_description(self):
         """returns text description of item"""
