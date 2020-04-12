@@ -126,7 +126,7 @@ class Manager2048:
         games["current game"] = games[play_game_name]
 
         if not output_text:
-            if type(games[play_game_name]) == Game:
+            if games[play_game_name]:
                 output_text = games[play_game_name].play_game(commands, command=command)
             else:
                 output_text = "no game selected"

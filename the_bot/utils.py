@@ -104,8 +104,6 @@ def clean(text, split=True):
             if split:
                 text = text.split(' ')
             return text
-        elif isinstance(text, list):
-            return text
     else:
         return [""]
 

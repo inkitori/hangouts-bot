@@ -91,6 +91,14 @@ class Inventory():
         modified_defense = weapon.stats.defense + armor.stats.defense
         return classes.Stats(attack=modified_attack, defense=modified_defense)
 
+    commands = {
+        "add": add,
+        "remove": remove,
+        "equip": equip,
+        "unequip": unequip,
+        "inventory": print_inventory
+    }
+
 
 class Player():
     """represents a player in the rpg"""
@@ -304,16 +312,20 @@ class RPG():
             output_text = self.help_text
 
         # inventory commands
+        # this is disabled for easier testing of individual commands
+        # elif command in Inventory.commands:
+        #   function_ = Inventory.commands[command]
+        #   output_text = self.inventory.function_(commands)
         elif command == "inventory":
-            output_text = player.inventory.print_inventory()
+            output_text = player.inventory.print_inventory(commands)
         elif command == "add":
-            output_text = player.inventory.add()
+            output_text = player.inventory.add(commands)
         elif command == "remove":
-            output_text = player.inventory.remove()
+            output_text = player.inventory.remove(commands)
         elif command == "equip":
-            output_text = player.inventory.equip()
+            output_text = player.inventory.equip(commands)
         elif command == "unequip":
-            output_text = player.inventory.unequip()
+            output_text = player.inventory.unequip(commands)
 
         elif command == "warp":
             output_text = player.warp()
@@ -321,8 +333,6 @@ class RPG():
             output_text = player.print_profile()
         elif command == "equip":
             output_text = player.inventory.equip()
-        elif command == "stats":
-            output_text = player.print_stats()
         elif command == "rest":
             output_text = player.rest()
         elif command == "fight":
