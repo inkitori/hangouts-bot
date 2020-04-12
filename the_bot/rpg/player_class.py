@@ -195,7 +195,7 @@ class Player():
 
         enemy = random.choice(self.fighting.values())
         user_damage = self.modified_stats().attack
-        damage_dealt = (user_damage) * (user_damage / enemy.defense)
+        damage_dealt = user_damage * (user_damage / enemy.defense)
 
         multiplier = random.choice((1, -1))
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
@@ -236,7 +236,6 @@ class Player():
 
         xp_range = RPG.rooms[self.room].xp_range
         xp_earned = random.randint(*xp_range)
-
         gold_earned = int(enemy.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
@@ -279,6 +278,10 @@ class RPG():
     players = {}
     rooms = classes.rooms
     enemies = classes.enemies
+    help_text = "placeholder help text"
+
+    def __init__(self):
+        pass
 
     def register(self, userID, commands):
         """registers a user in the game"""
@@ -298,6 +301,8 @@ class RPG():
         player = utils.get_value(self.players, userID)
         if command == "register":
             output_text = self.register(userID, commands)
+        elif command == "help":
+            output_text = self.help_text
 
         # inventory commands
         elif command == "inventory":

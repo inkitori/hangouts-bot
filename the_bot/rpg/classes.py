@@ -154,6 +154,7 @@ all_items = {
     "clarity tome": Item("tome")
 }
 rooms = {
-    "village": Room()
+    "village": Room(can_rest=True),
+    "level1": Room(enemies_list=)
 }
 enemies = {}
