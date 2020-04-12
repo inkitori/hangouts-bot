@@ -43,6 +43,6 @@ class RPGManager:
         save_data = self.game.players.copy()
 
         for userID, player in save_data.items():
-            save_data[userID] = player.to_dict()
+            save_data[userID] = player._to_dict()
 
         utils.save(self.save_file, save_data)

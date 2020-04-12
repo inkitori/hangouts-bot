@@ -9,7 +9,7 @@ import copy
 class Stats():
     """class for stats"""
     def __init__(
-        self, *, alive=False, generate_stats=True, type_=None,
+        self, *, alive=False, generate_stats=False, type_=None,
         max_health=100, health=100, mana=100, attack=5, defense=5,
         max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
     ):
@@ -31,7 +31,7 @@ class Stats():
         self.defense = defense
         self.level = level
 
-    def to_dict(self):
+    def _to_dict(self):
         return self.__dict__
 
     def generate_from_level(self, level):
@@ -93,8 +93,8 @@ class Enemy():
     def name(self):
         return utils.get_key(enemies, self)
 
-    def to_dict(self):
-        return {"stats": self.stats.to_dict()}
+    def _to_dict(self):
+        return {"stats": self.stats._to_dict()}
 
     def fight(self, player):
         pass
@@ -139,12 +139,12 @@ class Item():
     def name(self):
         return utils.get_key(all_items, self)
 
-    def to_dict(self):
+    def _to_dict(self):
         return {
             "type_": self.type_,
             "rarity": self.rarity,
             "modifier": self.modifier,
-            "stats": self.stats.to_dict()
+            "stats": self.stats._to_dict()
         }
 
 
