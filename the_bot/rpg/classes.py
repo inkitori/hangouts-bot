@@ -9,8 +9,8 @@ import copy
 class Stats():
     """class for stats"""
     def __init__(
-        self, alive=False, generate_stats=True, type_=None,
-        *, max_health=100, health=100, mana=100, attack=5, defense=5,
+        self, *, alive=False, generate_stats=False, type_=None,
+        max_health=100, health=100, mana=100, attack=5, defense=5,
         max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
     ):
         if alive:
@@ -31,12 +31,11 @@ class Stats():
         self.defense = defense
         self.level = level
 
-    def to_dict(self):
+    def _to_dict(self):
         return self.__dict__
 
     def generate_from_level(self, level):
         """generates stats from level"""
-        # change this joseph
         attack = round(5 * level ** 1.8)
         defense = round(5 * level ** 1.5)
         health = round(100 * level ** 2)
@@ -88,14 +87,14 @@ class Stats():
 class Enemy():
     """represents an enemy"""
 
-    def __init__(self):
-        self.stats = Stats(True, True, "enemy")
+    def __init__(self, stats={}):
+        self.stats = Stats(alive=True, generate_stats=True, type_="enemy", **stats)
 
     def name(self):
         return utils.get_key(enemies, self)
 
-    def to_dict(self):
-        return {"stats": self.stats.to_dict()}
+    def _to_dict(self):
+        return {"stats": self.stats._to_dict()}
 
     def fight(self, player):
         pass
@@ -104,17 +103,18 @@ class Enemy():
 class Room():
     """represents a room in the world"""
 
-    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0)):
+    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0), can_rest=False):
         self.enemies_list = enemies_list
         self.min_level = min_level
         self.xp_range = xp_range
+        self.can_rest = can_rest
 
     def name(self):
         return utils.get_key(rooms, self)
 
     def generate_enemy(self):
         enemy_name = random.choice(self.enemies_list)
-        enemy = enemies[enemy_name]
+        enemy = copy.deepcopy(enemies[enemy_name])
         return enemy_name, enemy
 
 
@@ -124,14 +124,19 @@ class Item():
     rarities = ("common", "uncommon", "rare", "legendary")
 
     def __init__(
+<<<<<<< HEAD
         self, name="", type_, rarity=0, modifier="boring",
         health=0, attack=0, defense=0, mana=0
+=======
+        self, type_, rarity=0, modifier="boring",
+        stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
+>>>>>>> b7224e328897e91373df3a4a5af0028a47981d6b
     ):
         self.name = name
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier
-        self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
+        self.stats = Stats(alive=False, generate_stats=False, type_="item", **stats)
 
     def short_description(self):
         """returns text description of item"""
@@ -139,6 +144,14 @@ class Item():
 
     def name(self):
         return utils.get_key(all_items, self)
+
+    def _to_dict(self):
+        return {
+            "type_": self.type_,
+            "rarity": self.rarity,
+            "modifier": self.modifier,
+            "stats": self.stats._to_dict()
+        }
 
 
 all_items = {

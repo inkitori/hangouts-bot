@@ -12,14 +12,14 @@ import utils
 
 from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
-# from rpg.manager import RPGManager
+from rpg.manager import RPGManager
 
 
 class Handler:
     """handler for bot"""
     game_managers = {
         "/2048": Manager2048(),
-        # "/rpg": RPGManager(),
+        "/rpg": RPGManager(),
         "/economy": EconomyManager(),
     }
     admins = (
