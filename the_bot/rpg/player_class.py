@@ -4,21 +4,6 @@ import math
 import copy
 import rpg.classes as classes
 
-<<<<<<< HEAD
-class Player():
-    """represents a player in the rpg"""
-
-    def __init__(self, name):
-        self.name = name
-        self.stats = Stats(True, False, "player")
-        self.room = "village"
-        self.fighting = {}
-        self.inventory = {key: None for i in range(8)}
-        self.add_to_inventory(RPG.all_items["starter_armor"], RPG.all_items["starter_weapon"], RPG.all_items["clarity tome"])
-        self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
-=======
->>>>>>> a6f4921905a81d0ff706cb3e369e5c56c6eb6e58
-
 class Inventory():
     """player's inventory"""
     def __init__(
@@ -35,23 +20,6 @@ class Inventory():
         """
         item_name = next(commands)
         output_text = ""
-<<<<<<< HEAD
-
-        for item in items:
-            added_text = f"put {item_name} in slot"
-            if slot is not None:
-                replaced_item_name = self.inventory[slot]
-                try:
-                    self.inventory[item.name] = item 
-                except IndexError:
-                    return f"slot {slot} does not exist"
-                return added_text + f"{slot} replacing {replaced_item_name}"
-            for i in range(len(self.inventory)):
-                if self.inventory[i] is None:
-                    self.inventory[i] = item_name
-                    output_text += utils.newline(added_text) + f" {i}"
-                output_text += "there are no empty slots, specify a slot"
-=======
         if not item_name:
             output_text = "you must pick an item"
         elif len(self.items) >= self.max_items:
@@ -59,7 +27,6 @@ class Inventory():
         else:
             self.items[item_name] = copy.deepcopy(RPG.all_items[item_name])
             output_text = f"added {item_name} to inventory"
->>>>>>> b7224e328897e91373df3a4a5af0028a47981d6b
         return output_text
 
     def remove(self, commands):
