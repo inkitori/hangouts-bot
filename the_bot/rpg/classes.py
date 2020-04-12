@@ -124,13 +124,8 @@ class Item():
     rarities = ("common", "uncommon", "rare", "legendary")
 
     def __init__(
-<<<<<<< HEAD
-        self, name="", type_, rarity=0, modifier="boring",
-        health=0, attack=0, defense=0, mana=0
-=======
         self, type_, rarity=0, modifier="boring",
         stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
->>>>>>> b7224e328897e91373df3a4a5af0028a47981d6b
     ):
         self.name = name
         self.type_ = type_
