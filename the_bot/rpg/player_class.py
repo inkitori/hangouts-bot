@@ -4,7 +4,6 @@ import math
 import copy
 import rpg.classes as classes
 
-
 class Inventory():
     """player's inventory"""
     def __init__(
