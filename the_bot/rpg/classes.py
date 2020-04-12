@@ -3,18 +3,24 @@ classes for rpg
 """
 import utils
 import random
+import copy
+
 
 class Stats():
     """class for stats"""
     def __init__(
         self, alive=False, generate_stats=True, type_=None,
-        *, max_health=100, health=5, mana=5, attack=5, defense=5, max_mana=100, level=1, xp=0, balance=0
+        *, max_health=100, health=100, mana=100, attack=5, defense=5,
+        max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
     ):
         if alive:
-            self.health = self.max_health = max_health
+            self.max_health = max_health
+            self.health = health
         if type_ == "player":
-            self.mana = self.max_mana = max_mana
-            self.lifetime_balance = self.balance = balance
+            self.mana = mana
+            self.max_mana = max_mana
+            self.lifetime_balance = lifetime_balance
+            self.balance = balance
             self.xp = xp
         elif type_ == "item":
             self.mana = mana
@@ -78,6 +84,7 @@ class Stats():
         self.health += amount
         self.health = utils.clamp(self.health, 0, self.max_health)
 
+
 class Enemy():
     """represents an enemy"""
 
@@ -85,10 +92,13 @@ class Enemy():
         self.stats = Stats(True, True, "enemy")
 
     def name(self):
-        return utils.get_key(RPG.enemies, self)
+        return utils.get_key(enemies, self)
 
     def to_dict(self):
         return {"stats": self.stats.to_dict()}
+
+    def fight(self, player):
+        pass
 
 
 class Room():
@@ -100,11 +110,11 @@ class Room():
         self.xp_range = xp_range
 
     def name(self):
-        return utils.get_key(RPG.rooms, self)
+        return utils.get_key(rooms, self)
 
     def generate_enemy(self):
         enemy_name = random.choice(self.enemies_list)
-        enemy = RPG.enemies[enemy_name]
+        enemy = enemies[enemy_name]
         return enemy_name, enemy
 
 
@@ -123,11 +133,20 @@ class Item():
         self.modifier = modifier
         self.stats = Stats(False, False, "item", health=health, attack=attack, defense=defense, mana=mana)
 
-    def description(self):
+    def short_description(self):
         """returns text description of item"""
         return f"{Item.rarities[self.rarity]} {self.modifier} {self.name()}\n"
 
     def name(self):
-        return utils.get_key(RPG.all_items, self)
+        return utils.get_key(all_items, self)
 
 
+all_items = {
+    "starter armor": Item("armor"),
+    "starter weapon": Item("weapon"),
+    "clarity tome": Item("tome")
+}
+rooms = {
+    "village": Room()
+}
+enemies = {}

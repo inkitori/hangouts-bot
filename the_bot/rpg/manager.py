@@ -4,14 +4,14 @@ manager for rpg
 from datetime import datetime
 import random
 import utils
-import rpg.player_class as classes
+from rpg.player_class import RPG
 
 
 class RPGManager:
     """manager for rpg"""
 
     save_file = "the_bot/rpg/save_data.json"
-    game = classes.RPG()
+    game = RPG()
 
     def __init__(self):
         self.commands = {
@@ -46,7 +46,7 @@ class RPGManager:
         elif command not in list(self.commands) + list(self.admin_commands):
             return "That command doesn't exist!"
 
-        elif command != "register" and userID not in classes.RPG.users:
+        elif command != "register" and userID not in RPG.users:
             return "You are not registered! Use register"
 
         return self.commands[command](userID, commands)

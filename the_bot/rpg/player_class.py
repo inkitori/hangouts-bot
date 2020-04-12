@@ -3,6 +3,7 @@ import random
 import math
 import classes
 
+<<<<<<< HEAD
 class Player():
     """represents a player in the rpg"""
 
@@ -14,9 +15,17 @@ class Player():
         self.inventory = {key: None for i in range(8)}
         self.add_to_inventory(RPG.all_items["starter_armor"], RPG.all_items["starter_weapon"], RPG.all_items["clarity tome"])
         self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
+=======
+>>>>>>> a6f4921905a81d0ff706cb3e369e5c56c6eb6e58
 
-    def id(self):
-        return utils.get_key(RPG.players, self)
+class Inventory():
+    """player's inventory"""
+    def __init__(
+        self, items={}, max_items=8,
+        equipped={"armor": None, "weapon": None, "tome": None}
+    ):
+        self.items = items
+        self.max_items = max_items
 
     def add_to_inventory(self, items, slot=None):
         """
@@ -37,7 +46,7 @@ class Player():
                     self.inventory[item.name] = item 
                 except IndexError:
                     return f"slot {slot} does not exist"
-                return added_text + f" {slot} replacing {replaced_item_name}"
+                return added_text + f"{slot} replacing {replaced_item_name}"
             for i in range(len(self.inventory)):
                 if self.inventory[i] is None:
                     self.inventory[i] = item_name
@@ -63,6 +72,22 @@ class Player():
         for item_name in self.inventory:
             inventory_text += RPG.all_items[item_name].description()
         return inventory_text
+
+
+class Player():
+    """represents a player in the rpg"""
+
+    def __init__(self, name):
+        self.name = name
+        self.stats = classes.Stats(True, False, "player")
+        self.room = "village"
+        self.fighting = {}
+        self.inventory = [None for i in range(8)]
+        self.add_to_inventory("starter armor", "starter weapon", "clarity")
+        self.equipped = {"armor": 0, "weapon": 1, "tome": 2}
+
+    def id(self):
+        return utils.get_key(RPG.players, self)
 
     def print_stats(self):
         """returns string representation of stats"""
@@ -234,23 +259,17 @@ class Player():
 class RPG():
     """the RPG"""
 
-    all_items = {
-        "starter armor": Item("armor"),
-        "starter weapon": Item("weapon"),
-        "clarity tome": Item("tome")
-    }
+    all_items = classes.all_items
     players = {}
-    rooms = {
-        "village": Room()
-    }
-    enemies = {}
+    rooms = classes.rooms
+    enemies = classes.enemies
 
     def register(self, user):
         """registers a user in the game"""
         userID = user.id_[0]
         if userID in self.players:
             return "You are already registered!"
-        self.players[userID] = Player("placeholder name")
+        self.players[userID] = classes.Player("placeholder name")
 
         return "Successfully registered!"
 
