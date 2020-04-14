@@ -72,10 +72,12 @@ class Manager2048:
         if command == "create":
             new_game_name = next(commands)
             valid = self.verify_name(new_game_name)
-            if valid != "valid":
+            if valid == "valid":
+                self.create_game(new_game_name)
+                play_game_name = new_game_name
+            else:
                 output_text = valid
-            self.create_game(new_game_name)
-            play_game_name = new_game_name
+
 
         elif command == "rename":
             old_name = next(commands)
