@@ -1,4 +1,5 @@
 import utils
+import sys
 import random
 import math
 import copy
@@ -25,6 +26,9 @@ class Inventory():
             output_text = "you must pick an item"
         elif sum(self.items.values()) >= self.max_items:
             output_text = "your inventory is full, remove something first"
+        # this still lets the player add anything if they know the name
+        elif item_name not in RPG.all_items:
+            output_text = "that item does not exist"
         else:
             # increments the value
             self.items[item_name] = utils.get_value(self.items, item_name, default=0) + 1
@@ -32,7 +36,7 @@ class Inventory():
         return output_text
 
     def remove(self, commands):
-        item_name = utils.join_items(*list(commands), seperator=" ")
+        item_name = next(commands)
         if not item_name:
             return "you must specify an item"
         elif item_name not in self.items:
@@ -45,11 +49,11 @@ class Inventory():
                 del self.items[item_name]
             return f"{item_name} removed from inventory"
 
-    def equip(self, item):
+    def equip(self, commands):
         """equips an item"""
         pass
 
-    def unequip(self, item):
+    def unequip(self, commands):
         pass
 
     def get_equipped(self, type_):
@@ -57,13 +61,13 @@ class Inventory():
         item = self.inventory[item_name]
         return item_name, item
 
-    def print_inventory(self):
+    def print_inventory(self, commands):
         """returns string representation of inventory"""
         inventory_text = ""
         # change to use utils.join_items
         for item_name, item_count in self.items.items():
             item = RPG.all_items[item_name]
-            inventory_text += item.description()
+            inventory_text += item.short_description()
 
         inventory_text += self.print_equipped()
         return inventory_text
@@ -72,7 +76,7 @@ class Inventory():
         """returns string representation of equipped items"""
         equipped_text = utils.join_items(
             *[
-                (type_, RPG.all_items[item_name].description)
+                (type_, RPG.all_items[item_name].short_description())
                 for type_, item_name in self.equipped.items()
                 if item_name
             ], is_description=True
@@ -300,7 +304,10 @@ class RPG():
     help_text = "placeholder help text"
 
     def __init__(self):
-        pass
+        for item_name in self.all_items:
+            if len(utils.clean(item_name)) > 1:
+                print(f"invalid item name {item_name}, fix rpg.classes.all_items dict")
+                sys.exit()
 
     def register(self, userID, commands):
         """registers a user in the game"""
@@ -343,8 +350,6 @@ class RPG():
             output_text = player.warp()
         elif command == "profile":
             output_text = player.print_profile()
-        elif command == "equip":
-            output_text = player.inventory.equip()
         elif command == "rest":
             output_text = player.rest()
         elif command == "fight":
