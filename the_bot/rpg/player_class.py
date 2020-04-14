@@ -4,11 +4,12 @@ import math
 import copy
 import rpg.classes as classes
 
+
 class Inventory():
     """player's inventory"""
     def __init__(
         self, items={}, max_items=8,
-        equipped={"armor": None, "weapon": None, "tome": None}  # value is item name
+        equipped={"armor": None, "weapon": None, "tome": None}
     ):
         self.items = {item_name: classes.Item(**item_data) for item_name, item_data in items.items()}
         self.max_items = max_items
