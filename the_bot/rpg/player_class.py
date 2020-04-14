@@ -363,6 +363,29 @@ class RPG():
         self.players[userID] = Player(name=name)
         return "Successfully registered!"
 
+    def profile(self, player, commands):
+        """returns user profiles"""
+        output_text = ""
+        user_name = next(commands)
+        possible_players = []
+
+        for possible_player in self.players.values():
+            if user_name in possible_player.name:
+                possible_players.append(possible_player)
+        if user_name.isdigit() and int(user_name) in self.players:
+            possible_players.append(self.players[int(user_name)])
+        elif user_name == "self":
+            possible_players.append(player)
+        if not possible_players:
+            output_text += "No users go by that name!"
+
+        elif len(possible_players) > 1:
+            output_text += f"{len(possible_players)} player(s) go by that name:\n"
+
+        for user in possible_players:
+            output_text += user.print_profile()
+        return utils.newline(output_text)
+
     def play_game(self, userID, commands, command=""):
         """runs functions based on user command"""
         # will be cleaned once everything works for easier testing
@@ -394,7 +417,7 @@ class RPG():
         elif command == "warp":
             output_text = player.warp(commands)
         elif command == "profile":
-            output_text = player.print_profile()
+            output_text = self.profile(player, commands)
         elif command == "rest":
             output_text = player.rest()
         elif command == "fight":
