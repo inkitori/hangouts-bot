@@ -11,7 +11,7 @@ class Inventory():
         self, items={}, max_items=8,
         equipped={"armor": None, "weapon": None, "tome": None}
     ):
-        self.items = {item_name: classes.Item(**item_data) for item_name, item_data in items.items()}
+        self.items = items
         self.max_items = max_items
         self.equipped = equipped
 
@@ -23,10 +23,11 @@ class Inventory():
         output_text = ""
         if not item_name:
             output_text = "you must pick an item"
-        elif len(self.items) >= self.max_items:
+        elif sum(self.items.values()) >= self.max_items:
             output_text = "your inventory is full, remove something first"
         else:
-            self.items[item_name] = copy.deepcopy(RPG.all_items[item_name])
+            # increments the value
+            self.items[item_name] = utils.get_value(self.items, item_name, default=0) + 1
             output_text = f"added {item_name} to inventory"
         return output_text
 
@@ -39,7 +40,9 @@ class Inventory():
         elif item_name in self.equipped.values():
             return "you must unequip that item first"
         else:
-            del self.items[item_name]
+            self.items[item_name] -= 1
+            if self.items[item_name] == 0:
+                del self.items[item_name]
             return f"{item_name} removed from inventory"
 
     def equip(self, item):
@@ -57,8 +60,11 @@ class Inventory():
     def print_inventory(self):
         """returns string representation of inventory"""
         inventory_text = ""
-        for item_name, item in self.items.items():
+        # change to use utils.join_items
+        for item_name, item_count in self.items.items():
+            item = RPG.all_items[item_name]
             inventory_text += item.description()
+
         inventory_text += self.print_equipped()
         return inventory_text
 
@@ -66,24 +72,29 @@ class Inventory():
         """returns string representation of equipped items"""
         equipped_text = utils.join_items(
             *[
-                (type_, self.items[item_name].description)
+                (type_, RPG.all_items[item_name].description)
                 for type_, item_name in self.equipped.items()
                 if item_name
             ], is_description=True
         )
         """
+        this should be the same, but I havent been able to test it yet
         for type_, item_name in self.equipped.items():
             item = self.inventory[item_name]
             equipped_text += f"{type_}: {item.description()}"
         """
-        return equipped_text.title()
+        return equipped_text  # .title() not sure about title
 
     def _to_dict(self):
+        return self.__dict__
+        """
+        this is the same as __dict__, but im leaving it in case inventory gets more complicated
         return {
-            "items": {item_name: item._to_dict() for item_name, item in self.items.items()},
+            "items": self.items,
             "max_items": self.max_items,
             "equipped": self.equipped,
         }
+        """
 
     def modifers(self):
         weapon = self.inventory.get_equipped("weapon")[1]

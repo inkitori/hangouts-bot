@@ -156,6 +156,6 @@ all_items = {
 }
 rooms = {
     "village": Room(can_rest=True),
-    "level1": Room(enemies_list=)
+    "level1": Room(enemies_list=[])
 }
 enemies = {}
