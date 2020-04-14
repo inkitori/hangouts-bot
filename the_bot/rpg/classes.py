@@ -50,7 +50,10 @@ class Stats():
                 if stat_name not in ("level", "xp")
             ], is_description=True
         )
-        stats_text += self.print_level_xp()
+        try:
+            stats_text += self.print_level_xp()
+        except AttributeError:
+            pass
         return stats_text
 
     def next_level_xp(self):
@@ -170,5 +173,5 @@ rooms = {
     "potatoland": Room(enemies_list=["potato", ])
 }
 enemies = {
-    "potato": Enemy(stats={"health": 20, "attack": 1})
+    "potato": Enemy(stats={"health": 20, "max_health": 20, "attack": 1})
 }

@@ -214,12 +214,12 @@ class Player():
         }
         return player_dict
 
-    def rest(self):
+    def rest(self, commands):
         """rests player"""
         if RPG.rooms[self.room].can_rest:
             self.stats.change_health("full")
             text = utils.join_items(
-                "You feel well rested...\n",
+                "You feel well rested...",
                 f"Your health is back up to {self.stats.health}!",
             )
         else:
@@ -227,7 +227,7 @@ class Player():
 
         return text
 
-    def heal(self):
+    def heal(self, commands):
         """heal the player with their tome"""
         tome_name, tome = self.inventory.get_equipped("tome")
         if not tome_name:
@@ -240,7 +240,7 @@ class Player():
 
             return f"You have been healed back up to {self.stats.health}"
 
-    def attack(self):
+    def attack(self, commands):
         """attacks an enemy"""
         text = ""
 
@@ -300,19 +300,19 @@ class Player():
 
         return text
 
-    def fight(self):
+    def fight(self, commands):
         """starts a with an enemy"""
         text = ""
+        room = RPG.rooms[self.room]
 
-        if not RPG.rooms[self.room].enemies_list:
+        if not room.enemies_list:
             text = "There are no enemies here"
 
         elif self.fighting:
             text = f"You are already fighting {', '.join(self.fighting.keys())}!"
 
         else:
-            enemy_name = random.choice(RPG.rooms[self.room].enemies_list)
-            enemy = self.room.generate_enemy()
+            enemy_name, enemy = room.generate_enemy()
             text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
             self.fighting[enemy_name] = enemy
@@ -324,6 +324,13 @@ class Player():
             is_description=True,
         ) + self.stats.print_stats()
         return profile_text
+    commands = {
+        "rest": rest,
+        "warp": warp,
+        "attack": attack,
+        "fight": fight,
+        "heal": heal,
+    }
 
 
 class RPG():
@@ -380,8 +387,6 @@ class RPG():
 
     def play_game(self, userID, commands, command=""):
         """runs functions based on user command"""
-        # will be cleaned once everything works for easier testing
-        # clean later, ineed to test otehr stuff now
         command = command if command else next(commands)
         output_text = ""
         player = utils.get_value(self.players, userID)
@@ -389,22 +394,12 @@ class RPG():
             output_text = self.register(userID, commands)
         elif command == "help":
             output_text = self.help_text
-
         elif command in Inventory.commands:
             output_text = Inventory.commands[command](player.inventory, commands)
-
-        elif command == "warp":
-            output_text = player.warp(commands)
+        elif command in Player.commands:
+            output_text = Player.commands[command](player, commands)
         elif command == "profile":
             output_text = self.profile(player, commands)
-        elif command == "rest":
-            output_text = player.rest()
-        elif command == "fight":
-            output_text = player.fight()
-        elif command in ("atk", "attack"):
-            output_text = player.attack()
-        elif command == "heal":
-            output_text = player.heal()
         else:
             output_text = "invalid command"
 
