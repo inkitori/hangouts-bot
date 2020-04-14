@@ -122,11 +122,14 @@ class Item():
     """represents an item"""
 
     rarities = ("common", "uncommon", "rare", "legendary")
+    types =  ("weapon", "armor", "tome")
 
     def __init__(
         self, type_, rarity=0, modifier="boring",
         stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
     ):
+        if type_ not in self.types:
+            print(f"invalid item type {type_}")
         self.type_ = type_
         self.rarity = rarity
         self.modifier = modifier

@@ -51,14 +51,52 @@ class Inventory():
 
     def equip(self, commands):
         """equips an item"""
-        pass
+        output_text = ""
+        item_name = next(commands)
+        if not item_name:
+            output_text += "you must specify an item"
+        elif item_name not in self.items:
+            output_text += "you do not have that item"
+        else:
+            item_type = RPG.all_items[item_name].type_
+            current_equipped_item = self.get_equipped(item_type)[0]
+            if current_equipped_item == item_name:
+                output_text += "you already equipped that"
+            else:
+                output_text += f"equipping {item_name} as {item_type}"
+                self.equipped[item_type] = item_name
+                if current_equipped_item:
+                    output_text += f" replacing {current_equipped_item}"
+        return output_text
 
     def unequip(self, commands):
-        pass
+        output_text = ""
+        # accepts tiem name of type
+        # uses redundant variables make code more readable
+        name = type_ = next(commands)
+        if not name:
+            output_text = "you must specify an item name or type"
+        elif type_ in classes.Item.types:
+            if not self.equipped[type_]:
+                output_text = "you do not have anything equipped of that type"
+            else:
+                current_equipped_item = self.equipped[type_]
+                self.equipped[type_] = None
+                output_text = f"unequipped {current_equipped_item} as {type_}"
+        elif name in RPG.all_items:
+            item_type = RPG.all_items[name].type_
+            if self.equipped[item_type] != name:
+                output_text = "that item is not equipped"
+            else:
+                self.equipped[item_type] = None
+                output_text = f"unequipped {name} as {type_}"
+        else:
+            output_text = "invalid type or name"
+        return output_text
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
-        item = self.inventory[item_name]
+        item = RPG.all_items[item_name] if item_name else None
         return item_name, item
 
     def print_inventory(self, commands):
@@ -68,7 +106,7 @@ class Inventory():
         for item_name, item_count in self.items.items():
             item = RPG.all_items[item_name]
             inventory_text += item.short_description()
-
+        inventory_text = newline(inventory_text, 2)
         inventory_text += self.print_equipped()
         return inventory_text
 
@@ -81,12 +119,6 @@ class Inventory():
                 if item_name
             ], is_description=True
         )
-        """
-        this should be the same, but I havent been able to test it yet
-        for type_, item_name in self.equipped.items():
-            item = self.inventory[item_name]
-            equipped_text += f"{type_}: {item.description()}"
-        """
         return equipped_text  # .title() not sure about title
 
     def _to_dict(self):
