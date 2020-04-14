@@ -40,7 +40,7 @@ class Inventory():
             return "you must specify an item"
         elif item_name not in self.items:
             return "you do not have that item"
-        elif item_name in self.equipped.values():
+        elif item_name in self.equipped.values() and self.items[item_name] == 1:
             return "you must unequip that item first"
         else:
             self.items[item_name] -= 1
@@ -122,14 +122,6 @@ class Inventory():
 
     def _to_dict(self):
         return self.__dict__
-        """
-        this is the same as __dict__, but im leaving it in case inventory gets more complicated
-        return {
-            "items": self.items,
-            "max_items": self.max_items,
-            "equipped": self.equipped,
-        }
-        """
 
     def modifers(self):
         modifier_attack = 0
@@ -398,21 +390,8 @@ class RPG():
         elif command == "help":
             output_text = self.help_text
 
-        # inventory commands
-        # this is disabled for easier testing of individual commands
-        # elif command in Inventory.commands:
-        #   function_ = Inventory.commands[command]
-        #   output_text = self.inventory.function_(commands)
-        elif command == "inventory":
-            output_text = player.inventory.print_inventory(commands)
-        elif command == "add":
-            output_text = player.inventory.add(commands)
-        elif command == "remove":
-            output_text = player.inventory.remove(commands)
-        elif command == "equip":
-            output_text = player.inventory.equip(commands)
-        elif command == "unequip":
-            output_text = player.inventory.unequip(commands)
+        elif command in Inventory.commands:
+            output_text = Inventory.commands[command](player.inventory, commands)
 
         elif command == "warp":
             output_text = player.warp(commands)
