@@ -10,8 +10,8 @@ class Stats():
     """class for stats"""
     def __init__(
         self, *, alive=False, generate_stats=False, type_=None,
-        max_health=100, health=100, mana=100, attack=5, defense=5,
-        max_mana=100, level=1, xp=0, balance=0, lifetime_balance=0
+        max_health=0, health=0, mana=0, attack=0, defense=0,
+        max_mana=0, level=1, xp=0, balance=0, lifetime_balance=0
     ):
         if alive:
             self.max_health = max_health
@@ -41,9 +41,17 @@ class Stats():
         health = round(100 * level ** 2)
         return attack, defense, health
 
-    def print_stats(self):
+    def print_stats(self, modifiers=None):
         """returns text representation of stats"""
-        pass
+        stats_text = utils.join_items(
+            *[
+                (stat_name, stat_value)
+                for stat_name, stat_value in self.__dict__.items()
+                if stat_name not in ("level", "xp")
+            ], is_description=True
+        )
+        stats_text += self.print_level_xp()
+        return stats_text
 
     def next_level_xp(self):
         """returns next level xp"""
@@ -122,7 +130,7 @@ class Item():
     """represents an item"""
 
     rarities = ("common", "uncommon", "rare", "legendary")
-    types =  ("weapon", "armor", "tome")
+    types = ("weapon", "armor", "tome")
 
     def __init__(
         self, type_, rarity=0, modifier="boring",
@@ -153,12 +161,14 @@ class Item():
 
 all_items = {
     "starter_armor": Item(type_="armor"),
-    "starter_weapon": Item(type_="weapon"),
-    "clarity_tome": Item(type_="tome")
+    "starter_weapon": Item(type_="weapon", stats={}),
+    "clarity_tome": Item(type_="tome", stats={"health": 20})
 }
 
 rooms = {
     "village": Room(can_rest=True),
-    "level1": Room(enemies_list=[])
+    "potatoland": Room(enemies_list=["potato", ])
 }
-enemies = {}
+enemies = {
+    "potato": Enemy(stats={"health": 20, "attack": 1})
+}

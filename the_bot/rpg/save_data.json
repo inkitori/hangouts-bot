@@ -3,28 +3,29 @@
         "name": "ether",
         "stats": {
             "max_health": 100,
-            "health": 100,
-            "mana": 100,
+            "health": 18.0,
+            "mana": 0,
             "max_mana": 100,
-            "lifetime_balance": 0,
-            "balance": 0,
+            "lifetime_balance": 18,
+            "balance": 18,
             "xp": 0,
             "attack": 5,
             "defense": 5,
             "level": 1
         },
-        "room": "village",
+        "room": "potatoland",
         "fighting": {},
         "inventory": {
             "items": {
                 "starter_weapon": 1,
-                "starter_armor": 1
+                "starter_armor": 1,
+                "clarity_tome": 1
             },
             "max_items": 8,
             "equipped": {
                 "armor": null,
                 "weapon": null,
-                "tome": null
+                "tome": "clarity_tome"
             }
         }
     }

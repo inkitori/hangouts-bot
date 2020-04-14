@@ -2,7 +2,6 @@ import utils
 import sys
 import random
 import math
-import copy
 import rpg.classes as classes
 
 
@@ -106,7 +105,7 @@ class Inventory():
         for item_name, item_count in self.items.items():
             item = RPG.all_items[item_name]
             inventory_text += item.short_description()
-        inventory_text = newline(inventory_text, 2)
+        inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
         return inventory_text
 
@@ -133,11 +132,18 @@ class Inventory():
         """
 
     def modifers(self):
-        weapon = self.inventory.get_equipped("weapon")[1]
-        armor = self.inventory.get_equipped("armor")[1]
-        modified_attack = weapon.stats.attack + armor.stats.attack
-        modified_defense = weapon.stats.defense + armor.stats.defense
-        return classes.Stats(attack=modified_attack, defense=modified_defense)
+        modifier_attack = 0
+        modifier_defense = 0
+        # make this a loop later
+        weapon = self.get_equipped("weapon")[1]
+        armor = self.get_equipped("armor")[1]
+        if weapon:
+            modifier_attack += weapon.stats.attack
+            modifier_defense += weapon.stats.defense
+        if armor:
+            modifier_attack += armor.stats.attack
+            modifier_defense += armor.stats.defense
+        return classes.Stats(attack=modifier_attack, defense=modifier_defense)
 
     commands = {
         "add": add,
@@ -159,7 +165,7 @@ class Player():
         self.name = name
         self.stats = classes.Stats(alive=True, type_="player", **stats)
         self.room = room
-        self.fighting = {enemy_name: classes.Enemy(**enemy_data) for enemy_name, enemy_data in fighting}
+        self.fighting = {enemy_name: classes.Enemy(**enemy_data) for enemy_name, enemy_data in fighting.items()}
         self.inventory = Inventory(**inventory)
 
     def id(self):
@@ -222,7 +228,7 @@ class Player():
             self.stats.change_health("full")
             text = utils.join_items(
                 "You feel well rested...\n",
-                f"Your health is back up to {self.stats.hp}!",
+                f"Your health is back up to {self.stats.health}!",
             )
         else:
             text = "You can't rest here!"
@@ -231,81 +237,81 @@ class Player():
 
     def heal(self):
         """heal the player with their tome"""
-        tome_stats = self.equipped["tome"].stats
-        if self.stats.mana < tome_stats.mana:
+        tome_name, tome = self.inventory.get_equipped("tome")
+        if not tome_name:
+            return "you do not have a tome equipped"
+        if self.stats.mana < tome.stats.mana:
             return "You do not have enough mana to heal!"
-
         else:
-            self.stats.mana -= tome_stats.mana
-            self.stats.change_health(tome_stats.health)
+            self.stats.mana -= tome.stats.mana
+            self.stats.change_health(tome.stats.health)
 
             return f"You have been healed back up to {self.stats.health}"
 
-    def attack(self, enemy):
+    def attack(self):
         """attacks an enemy"""
         text = ""
 
         if not self.fighting:
             return "You need to be in a fight!"
 
-        enemy = random.choice(self.fighting.values())
+        enemy = random.choice(list(self.fighting.values()))
+        enemy_name = utils.get_key(self.fighting, enemy)
         user_damage = self.modified_stats().attack
-        damage_dealt = user_damage * (user_damage / enemy.defense)
+        damage_dealt = user_damage * (user_damage / enemy.stats.defense)
 
         multiplier = random.choice((1, -1))
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
         enemy.stats.change_health(- damage_dealt)
 
-        text += f"You dealt {damage_dealt} damage to {enemy.name()}!\n"
+        text += f"You dealt {damage_dealt} damage to {enemy_name}!\n"
 
         if enemy.stats.health <= 0:
-            text += self.killed_enemy(enemy)
+            text += self.killed_enemy(enemy_name, enemy)
 
         else:
             # take damage
-            damage_taken = enemy.attack / self.modified_stats().defense
+            damage_taken = enemy.stats.attack / self.modified_stats().defense
 
             multiplier = random.choice((1, -1))
             damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
 
             self.stats.change_health(- damage_taken)
 
-            text += utils.join_list(
-                f"{enemy.name} dealt {damage_taken} to you!",
+            text += utils.join_items(
+                f"{enemy_name} dealt {damage_taken} to you!",
                 f"You have {self.stats.health} hp left",
-                f"{enemy.name} has {enemy.stats.health} left!"
+                f"{enemy_name} has {enemy.stats.health} left!"
             )
 
             if self.stats.health <= 0:
-                text += f"You were killed by {enemy.name}..."
+                text += f"You were killed by {enemy_name}..."
 
                 self.fighting = ""
                 self.stats.change_health("full")
 
         return text
 
-    def killed_enemy(self, enemy):
+    def killed_enemy(self, enemy_name, enemy):
         """changes stuff based on enemy"""
         text = ""
-        text += f"{enemy.name} is now dead!\n"
+        text += f"{enemy_name} is now dead!\n"
 
         xp_range = RPG.rooms[self.room].xp_range
         xp_earned = random.randint(*xp_range)
-        gold_earned = int(enemy.max_health / 10) + random.randint(1, 10)
+        gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
         self.stats.give_xp(xp_earned)
         self.stats.increase_balance(gold_earned)
-        del self.fighting[enemy.name]
+        del self.fighting[enemy_name]
 
         return text
 
     def fight(self):
         """starts a with an enemy"""
-        rooms = RPG.rooms["rooms"]
         text = ""
 
-        # DO NOT let an if elif chain happen here
         if not RPG.rooms[self.room].enemies_list:
             text = "There are no enemies here"
 
@@ -313,17 +319,19 @@ class Player():
             text = f"You are already fighting {', '.join(self.fighting.keys())}!"
 
         else:
-            enemy_name = random.choice(rooms[self.room].enemies_list)
-            enemy = copy.deepcopy(RPG.enemies[enemy_name])
-
+            enemy_name = random.choice(RPG.rooms[self.room].enemies_list)
+            enemy = self.room.generate_enemy()
             text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
             self.fighting[enemy_name] = enemy
         return text
 
     def print_profile(self):
-        # print stats
-        pass
+        profile_text = utils.join_items(
+            ("name", self.name), ("id", self.id()),
+            is_description=True,
+        ) + self.stats.print_stats()
+        return profile_text
 
 
 class RPG():
@@ -340,6 +348,10 @@ class RPG():
             if len(utils.clean(item_name)) > 1:
                 print(f"invalid item name {item_name}, fix rpg.classes.all_items dict")
                 sys.exit()
+        for room_name in self.rooms:
+            for enemy_name in self.rooms[room_name].enemies_list:
+                if enemy_name not in self.enemies:
+                    print(f"invalid enemy {enemy_name} in room {room_name}")
 
     def register(self, userID, commands):
         """registers a user in the game"""
@@ -354,6 +366,7 @@ class RPG():
     def play_game(self, userID, commands, command=""):
         """runs functions based on user command"""
         # will be cleaned once everything works for easier testing
+        # clean later, ineed to test otehr stuff now
         command = command if command else next(commands)
         output_text = ""
         player = utils.get_value(self.players, userID)
@@ -379,7 +392,7 @@ class RPG():
             output_text = player.inventory.unequip(commands)
 
         elif command == "warp":
-            output_text = player.warp()
+            output_text = player.warp(commands)
         elif command == "profile":
             output_text = player.print_profile()
         elif command == "rest":
@@ -387,7 +400,7 @@ class RPG():
         elif command == "fight":
             output_text = player.fight()
         elif command in ("atk", "attack"):
-            output_text = player.atk()
+            output_text = player.attack()
         elif command == "heal":
             output_text = player.heal()
         else:
