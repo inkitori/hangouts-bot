@@ -25,7 +25,7 @@ class RPG():
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.players[userID] = player_class.player_class.Player(name=name)
+        self.players[userID] = player_class.Player(name=name)
         return "Successfully registered!"
 
     def profile(self, player, commands):
@@ -69,7 +69,7 @@ class RPG():
             output_text = self.profile(player, commands)
 
         elif command in player_class.Inventory.commands:
-            output_text = player_class.Inventory.commands[command](player.player_class.Inventory, commands)
+            output_text = player_class.Inventory.commands[command](player.inventory, commands)
         elif command in player_class.Player.commands:
             output_text = player_class.Player.commands[command](player, commands)
         else:

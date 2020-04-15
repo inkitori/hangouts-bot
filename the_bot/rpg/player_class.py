@@ -12,14 +12,13 @@ class Inventory():
     ):
         self.items = items
         self.max_items = max_items
-        self.equipped = equipped
+        self.equipped = {classes.ItemType(type_): item_name for type_, item_name in equipped.items()}
 
     def add(self, commands):
         """
         puts an item into the inventory
         """
         item_name = commands.send("remaining")
-        print(item_name)
         output_text = ""
         if not item_name:
             output_text = "you must pick an item"
@@ -35,7 +34,7 @@ class Inventory():
         return output_text
 
     def remove(self, commands):
-        item_name = next(commands)
+        item_name = commands.send("remaining")
         if not item_name:
             return "you must specify an item"
         elif item_name not in self.items:
@@ -51,7 +50,7 @@ class Inventory():
     def equip(self, commands):
         """equips an item"""
         output_text = ""
-        item_name = next(commands)
+        item_name = commands.send("remaining")
         if not item_name:
             output_text += "you must specify an item"
         elif item_name not in self.items:
@@ -62,7 +61,7 @@ class Inventory():
             if current_equipped_item == item_name:
                 output_text += "you already equipped that"
             else:
-                output_text += f"equipping {item_name} as {item_type}"
+                output_text += f"equipping {item_name} as {item_type.name.lower()}"
                 self.equipped[item_type] = item_name
                 if current_equipped_item:
                     output_text += f" replacing {current_equipped_item}"
@@ -70,25 +69,27 @@ class Inventory():
 
     def unequip(self, commands):
         output_text = ""
-        # accepts tiem name of type
-        # uses redundant variables make code more readable
-        name = type_ = next(commands)
+        name = commands.send("remaining")
+        try:
+            type_ = classes.ItemType(name)
+        except ValueError:
+            type_ = None
         if not name:
             output_text = "you must specify an item name or type"
-        elif type_ in classes.Item.types:
+        elif type_:
             if not self.equipped[type_]:
                 output_text = "you do not have anything equipped of that type"
             else:
                 current_equipped_item = self.equipped[type_]
                 self.equipped[type_] = None
-                output_text = f"unequipped {current_equipped_item} as {type_}"
+                output_text = f"unequipped {current_equipped_item} as {type_.name.lower()}"
         elif name in classes.all_items:
             item_type = classes.all_items[name].type_
             if self.equipped[item_type] != name:
                 output_text = "that item is not equipped"
             else:
                 self.equipped[item_type] = None
-                output_text = f"unequipped {name} as {type_}"
+                output_text = f"unequipped {name} as {item_type.name.lower()}"
         else:
             output_text = "invalid type or name"
         return output_text
@@ -113,7 +114,7 @@ class Inventory():
         """returns string representation of equipped items"""
         equipped_text = utils.join_items(
             *[
-                (type_, classes.all_items[item_name].short_description())
+                (type_.name.lower(), classes.all_items[item_name].short_description())
                 for type_, item_name in self.equipped.items()
                 if item_name
             ], is_description=True
@@ -121,7 +122,11 @@ class Inventory():
         return equipped_text  # .title() not sure about title
 
     def to_dict(self):
-        return self.__dict__
+        return {
+            "items": self.items,
+            "max_items": self.max_items,
+            "equipped": {type_.value: item_name for type_, item_name in self.equipped.items()},
+        }
 
     def modifers(self):
         modifier_attack = 0

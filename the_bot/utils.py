@@ -105,7 +105,7 @@ def load(file_name):
         try:
             return json.load(file)
         except json.decoder.JSONDecodeError:
-            return "could not load data"
+            print("could not load data")
 
 
 # processing strings

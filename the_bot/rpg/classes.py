@@ -135,32 +135,34 @@ class Rarity(enum.IntEnum):
     LEGENDARY = enum.auto()
 
 
+class ItemType(enum.Enum):
+    WEAPON = "weapon"
+    ARMOR = "armor"
+    TOME = "tome"
+
+
 class Item():
     """represents an item"""
 
-    types = ("weapon", "armor", "tome")
-
     def __init__(
-        self, type_, rarity=0, modifier="boring",
+        self, type_, rarity=1, modifier="boring",
         stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
     ):
-        if type_ not in self.types:
-            print(f"invalid item type {type_}")
-        self.type_ = type_
+        self.type_ = ItemType(type_)
         self.rarity = Rarity(rarity)
         self.modifier = modifier
         self.stats = Stats(alive=False, generate_stats=False, type_="item", **stats)
 
     def short_description(self):
         """returns text description of item"""
-        return f"{Item.rarities[self.rarity.name.lower()]} {self.modifier} {self.name()}\n"
+        return f"{self.rarity.name.lower()} {self.modifier} {self.name()}\n"
 
     def name(self):
         return utils.get_key(all_items, self)
 
     def to_dict(self):
         return {
-            "type_": self.type_,
+            "type_": self.type_.value,
             "rarity": self.rarity.value,
             "modifier": self.modifier,
             "stats": self.stats.to_dict()
