@@ -149,7 +149,7 @@ def command_parser(command_text):
             current_index += val
             item = None
         elif val == "remaining":
-            item = join_items(*commands[current_index:], seperator=" ")
+            item = join_items(*commands[current_index:], seperator=" ", end="")
         else:
             item = get_item(commands, indexes=(current_index, ))
             current_index += 1

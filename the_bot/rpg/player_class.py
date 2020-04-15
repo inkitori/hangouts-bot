@@ -1,5 +1,4 @@
 import utils
-import sys
 import random
 import math
 import rpg.classes as classes
@@ -19,7 +18,8 @@ class Inventory():
         """
         puts an item into the inventory
         """
-        item_name = next(commands)
+        item_name = commands.send("remaining")
+        print(item_name)
         output_text = ""
         if not item_name:
             output_text = "you must pick an item"
@@ -343,10 +343,6 @@ class RPG():
     help_text = "placeholder help text"
 
     def __init__(self):
-        for item_name in self.all_items:
-            if len(utils.clean(item_name)) > 1:
-                print(f"invalid item name {item_name}, fix rpg.classes.all_items dict")
-                sys.exit()
         for room_name in self.rooms:
             for enemy_name in self.rooms[room_name].enemies_list:
                 if enemy_name not in self.enemies:
