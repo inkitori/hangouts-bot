@@ -126,12 +126,10 @@ def trim(text, number=1, default=[""]):
     removes the first number items from a sequence
     returns default if number is greater than len(sequence)
     """
-    for i in range(number):
-        try:
-            text = text[number:]
-        except IndexError:
-            text = default
-            break
+    try:
+        text = text[number:]
+    except IndexError:
+        text = default
     return text
 
 
