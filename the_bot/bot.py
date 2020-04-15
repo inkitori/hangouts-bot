@@ -6,7 +6,6 @@ import asyncio
 from handler import Handler
 import utils
 import sys
-# import signal
 
 
 class Bot:
@@ -26,7 +25,6 @@ class Bot:
     def run(self):
         """main loop for running bot"""
         self.client.on_connect.add_observer(self._on_connect)
-        # self.client.on_disconnect.add_observer(self._on_disconnect)
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self.client.connect())

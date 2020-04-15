@@ -63,6 +63,7 @@ class Handler:
         commands = utils.command_parser(text)
         command = next(commands)
 
+        # deals with commands
         if command in self.keywords:
             output_text = self.keywords[command]
 
@@ -72,19 +73,18 @@ class Handler:
             if console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                # function_cooldown_time = 0
-                # if utils.cooldown(self.cooldowns, user, event, function_cooldown_time):
-                # output_text = "You are on cooldown"
-                # else:
                 output_text = await function_(bot, user, conv, commands)
 
         elif command in self.game_managers:
             userID = userID if console else user.id_[0]
             output_text = self.play_game(userID, command, commands)
             if console:
+                # 2048 is designed to print for hangouts, where each numeral is the same width as 2 spaces
+                # consoles are monospaced, so this fixes that
                 output_text = output_text.replace("  ", " ")
 
         else:
+            # if this printed in hangouts, it would respond to every single message
             output_text = "Invalid command" if console else ""
 
         return output_text
@@ -103,11 +103,15 @@ class Handler:
         try:
             output_text = user.id_[0]
         except Exception:
+            # not sure why this ould happen, but just in case
             output_text = "Could not get id"
         return output_text
 
     async def kick(self, bot, user, conv, commands):
-        """kicks a user"""
+        """
+        kicks a user
+        last i checked, this was broken
+        """
         kick_user_name = next(commands)
         users = conv.users
 

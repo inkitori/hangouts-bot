@@ -152,10 +152,10 @@ def command_parser(command_text, has_prefix=False):
 
 
 # get things without errors
-def get_item(sequence, indexes=(0,), default=""):
+def get_item(sequence, indexes=(0, ), default=""):
     """
     Retrives the items at the indexes in sequence
-    defaults to default if the item des not exist
+    defaults to default if the item does not exist
     """
     if inspect.isgenerator(sequence):
         return next(sequence)
