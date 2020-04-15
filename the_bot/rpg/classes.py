@@ -107,9 +107,6 @@ class Enemy():
     def to_dict(self):
         return {"stats": self.stats.to_dict()}
 
-    def fight(self, player):
-        pass
-
 
 class Room():
     """represents a room in the world"""
