@@ -136,17 +136,24 @@ def trim(text, number=1, default=[""]):
     return text
 
 
-def command_parser(command_text, has_prefix=False):
+def command_parser(command_text):
     """
     returns a generator of commands
     retunrs empty string if there are no more commands
     """
     commands = clean(command_text)
-    if has_prefix:
-        commands = trim(commands)
+    current_index = 0
+    val = None
     while True:
-        yield get_item(commands)
-        commands = trim(commands)
+        if isinstance(val, int):
+            current_index += val
+            item = None
+        elif val == "remaining":
+            item = join_items(*commands[current_index:], seperator=" ")
+        else:
+            item = get_item(commands, indexes=(current_index, ))
+            current_index += 1
+        val = yield item
 
 
 # get things without errors

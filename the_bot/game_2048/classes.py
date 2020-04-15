@@ -251,10 +251,10 @@ class Game():
         GameMode.shuffled.insert(0, 0)
         Game.modes["confusion"].values = GameMode.shuffled
 
-    def play_game(self, commands, command=""):
+    def play_game(self, commands):
         """runs the main game loop once"""
         self.text = ""
-        command = command if command else next(commands)
+        command = next(commands)
 
         # check player movement
         x = None

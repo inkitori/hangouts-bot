@@ -120,7 +120,7 @@ class Inventory():
         )
         return equipped_text  # .title() not sure about title
 
-    def _to_dict(self):
+    def to_dict(self):
         return self.__dict__
 
     def modifers(self):
@@ -204,13 +204,13 @@ class Player():
             output_text = "Successfully warped!"
         return output_text
 
-    def _to_dict(self):
+    def to_dict(self):
         player_dict = {
             "name": self.name,
-            "stats": self.stats._to_dict(),
+            "stats": self.stats.to_dict(),
             "room": self.room,
-            "fighting": {enemy_name: enemy._to_dict() for enemy_name, enemy in self.fighting.items()},
-            "inventory": self.inventory._to_dict(),
+            "fighting": {enemy_name: enemy.to_dict() for enemy_name, enemy in self.fighting.items()},
+            "inventory": self.inventory.to_dict(),
         }
         return player_dict
 
@@ -385,9 +385,9 @@ class RPG():
             output_text += user.print_profile()
         return utils.newline(output_text)
 
-    def play_game(self, userID, commands, command=""):
+    def play_game(self, userID, commands):
         """runs functions based on user command"""
-        command = command if command else next(commands)
+        command = next(commands)
         output_text = ""
         player = utils.get_value(self.players, userID)
         if command == "register":

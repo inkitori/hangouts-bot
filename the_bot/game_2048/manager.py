@@ -66,7 +66,6 @@ class Manager2048:
         output_text = ""
         command = next(commands)
         play_game_name = ""
-        used_command = True
 
         # processing commands
         if command == "create":
@@ -120,16 +119,16 @@ class Manager2048:
             output_text += self.help_texts[command]
 
         else:
-            used_command = False
-
-        command = "" if used_command else command
+            # moves the generator back one command because the command was not used
+            commands.send(-1)
+        
         if not play_game_name:
             play_game_name = "current game"
         games["current game"] = games[play_game_name]
 
         if not output_text:
             if games[play_game_name]:
-                output_text = games[play_game_name].play_game(commands, command=command)
+                output_text = games[play_game_name].play_game(commands)
             else:
                 output_text = "no game selected"
         return output_text

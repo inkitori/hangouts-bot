@@ -31,7 +31,7 @@ class Stats():
         self.defense = defense
         self.level = level
 
-    def _to_dict(self):
+    def to_dict(self):
         return self.__dict__
 
     def generate_from_level(self, level):
@@ -104,8 +104,8 @@ class Enemy():
     def name(self):
         return utils.get_key(enemies, self)
 
-    def _to_dict(self):
-        return {"stats": self.stats._to_dict()}
+    def to_dict(self):
+        return {"stats": self.stats.to_dict()}
 
     def fight(self, player):
         pass
@@ -153,12 +153,12 @@ class Item():
     def name(self):
         return utils.get_key(all_items, self)
 
-    def _to_dict(self):
+    def to_dict(self):
         return {
             "type_": self.type_,
             "rarity": self.rarity,
             "modifier": self.modifier,
-            "stats": self.stats._to_dict()
+            "stats": self.stats.to_dict()
         }
 
 

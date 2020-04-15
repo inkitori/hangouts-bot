@@ -19,7 +19,7 @@
             "items": {
                 "starter_weapon": 1,
                 "starter_armor": 1,
-                "clarity_tome": 2
+                "clarity_tome": 3
             },
             "max_items": 8,
             "equipped": {
