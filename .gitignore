@@ -7,6 +7,8 @@ my_stuff/
 # for privacy
 **token.txt
 **tokens/
+**token.pickle
+**credentials.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

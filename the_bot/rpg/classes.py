@@ -132,6 +132,7 @@ class Rarity(enum.IntEnum):
     COMMON = enum.auto()
     UNCOMMON = enum.auto()
     RARE = enum.auto()
+    EPIC = enum.auto()
     LEGENDARY = enum.auto()
 
 
