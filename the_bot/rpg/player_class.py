@@ -26,7 +26,7 @@ class Inventory():
         elif sum(self.items.values()) >= self.max_items:
             output_text = "your inventory is full, remove something first"
         # this still lets the player add anything if they know the name
-        elif item_name not in RPG.all_items:
+        elif item_name not in classes.all_items:
             output_text = "that item does not exist"
         else:
             # increments the value
@@ -57,7 +57,7 @@ class Inventory():
         elif item_name not in self.items:
             output_text += "you do not have that item"
         else:
-            item_type = RPG.all_items[item_name].type_
+            item_type = classes.all_items[item_name].type_
             current_equipped_item = self.get_equipped(item_type)[0]
             if current_equipped_item == item_name:
                 output_text += "you already equipped that"
@@ -82,8 +82,8 @@ class Inventory():
                 current_equipped_item = self.equipped[type_]
                 self.equipped[type_] = None
                 output_text = f"unequipped {current_equipped_item} as {type_}"
-        elif name in RPG.all_items:
-            item_type = RPG.all_items[name].type_
+        elif name in classes.all_items:
+            item_type = classes.all_items[name].type_
             if self.equipped[item_type] != name:
                 output_text = "that item is not equipped"
             else:
@@ -95,7 +95,7 @@ class Inventory():
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
-        item = RPG.all_items[item_name] if item_name else None
+        item = classes.all_items[item_name] if item_name else None
         return item_name, item
 
     def print_inventory(self, commands):
@@ -103,7 +103,7 @@ class Inventory():
         inventory_text = ""
         # change to use utils.join_items
         for item_name, item_count in self.items.items():
-            item = RPG.all_items[item_name]
+            item = classes.all_items[item_name]
             inventory_text += item.short_description()
         inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
@@ -113,7 +113,7 @@ class Inventory():
         """returns string representation of equipped items"""
         equipped_text = utils.join_items(
             *[
-                (type_, RPG.all_items[item_name].short_description())
+                (type_, classes.all_items[item_name].short_description())
                 for type_, item_name in self.equipped.items()
                 if item_name
             ], is_description=True
@@ -161,7 +161,7 @@ class Player():
         self.inventory = Inventory(**inventory)
 
     def id(self):
-        return utils.get_key(RPG.players, self)
+        return utils.get_key(players, self)
 
     def print_stats(self):
         """returns string representation of stats"""
@@ -184,7 +184,7 @@ class Player():
     def warp(self, commands):
         """warps to rooms"""
         output_text = ""
-        rooms = RPG.rooms
+        rooms = classes.rooms
         room = next(commands)
         if not room:
             output_text = "Invalid argument! use warp {room}"
@@ -216,7 +216,7 @@ class Player():
 
     def rest(self, commands):
         """rests player"""
-        if RPG.rooms[self.room].can_rest:
+        if classes.rooms[self.room].can_rest:
             self.stats.change_health("full")
             text = utils.join_items(
                 "You feel well rested...",
@@ -289,7 +289,7 @@ class Player():
         text = ""
         text += f"{enemy_name} is now dead!\n"
 
-        xp_range = RPG.rooms[self.room].xp_range
+        xp_range = classes.rooms[self.room].xp_range
         xp_earned = random.randint(*xp_range)
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
@@ -303,7 +303,7 @@ class Player():
     def fight(self, commands):
         """starts a with an enemy"""
         text = ""
-        room = RPG.rooms[self.room]
+        room = classes.rooms[self.room]
 
         if not room.enemies_list:
             text = "There are no enemies here"
@@ -333,75 +333,4 @@ class Player():
     }
 
 
-class RPG():
-    """the RPG"""
-
-    all_items = classes.all_items
-    players = {}
-    rooms = classes.rooms
-    enemies = classes.enemies
-
-    def __init__(self):
-        for room_name in self.rooms:
-            for enemy_name in self.rooms[room_name].enemies_list:
-                if enemy_name not in self.enemies:
-                    print(f"invalid enemy {enemy_name} in room {room_name}")
-
-    def register(self, userID, commands):
-        """registers a user in the game"""
-        name = next(commands)
-        if userID in self.players:
-            return "You are already registered!"
-        if not name:
-            return "you must provide a name"
-        self.players[userID] = Player(name=name)
-        return "Successfully registered!"
-
-    def profile(self, player, commands):
-        """returns user profiles"""
-        output_text = ""
-        user_name = next(commands)
-        possible_players = []
-
-        for possible_player in self.players.values():
-            if user_name in possible_player.name:
-                possible_players.append(possible_player)
-        if user_name.isdigit() and int(user_name) in self.players:
-            possible_players.append(self.players[int(user_name)])
-        elif user_name == "self":
-            possible_players.append(player)
-        if not possible_players:
-            output_text += "No users go by that name!"
-
-        elif len(possible_players) > 1:
-            output_text += f"{len(possible_players)} player(s) go by that name:\n"
-
-        for user in possible_players:
-            output_text += user.print_profile()
-        return utils.newline(output_text)
-
-    def play_game(self, userID, commands):
-        """runs functions based on user command"""
-        command = next(commands)
-        output_text = ""
-        player = utils.get_value(self.players, userID)
-        if command == "register":
-            output_text = self.register(userID, commands)
-        elif command == "help":
-            output_text = utils.join_items(
-                ("inventory", *Inventory.commands),
-                ("player", "register", "profile", *Player.commands),
-                ("other", "help"),
-                is_description=True, description_mode="long"
-            )
-        elif command == "profile":
-            output_text = self.profile(player, commands)
-
-        elif command in Inventory.commands:
-            output_text = Inventory.commands[command](player.inventory, commands)
-        elif command in Player.commands:
-            output_text = Player.commands[command](player, commands)
-        else:
-            output_text = "invalid command for rpg"
-
-        return output_text
+players = {}

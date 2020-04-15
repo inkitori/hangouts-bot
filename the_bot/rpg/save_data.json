@@ -13,8 +13,18 @@
             "defense": 5,
             "level": 1
         },
-        "room": "village",
-        "fighting": {},
+        "room": "potatoland",
+        "fighting": {
+            "potato": {
+                "stats": {
+                    "max_health": 20,
+                    "health": 20,
+                    "attack": 5,
+                    "defense": 5,
+                    "level": 1
+                }
+            }
+        },
         "inventory": {
             "items": {
                 "starter armor": 1

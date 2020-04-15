@@ -4,14 +4,15 @@ manager for rpg
 from datetime import datetime
 import random
 import utils
-import rpg.player_class as classes
+import rpg.rpg_class as rpg_class
+import rpg.player_class as player_class
 
 
 class RPGManager:
     """manager for rpg"""
 
     save_file = "the_bot/rpg/save_data.json"
-    game = classes.RPG()
+    game = rpg_class.RPG()
 
     def __init__(self):
         self.load_game()
@@ -34,7 +35,7 @@ class RPGManager:
         """loads the game"""
         save_data = utils.load(self.save_file)
         for userID, player_data in save_data.items():
-            self.game.players[int(userID)] = classes.Player(**player_data)
+            self.game.players[int(userID)] = player_class.Player(**player_data)
 
     def save_game(self):
         """saves the game"""
