@@ -4,6 +4,7 @@ classes for rpg
 import utils
 import random
 import copy
+import enum
 
 
 class Stats():
@@ -126,10 +127,17 @@ class Room():
         return enemy_name, enemy
 
 
+@enum.unique
+class Rarity(enum.IntEnum):
+    COMMON = enum.auto()
+    UNCOMMON = enum.auto()
+    RARE = enum.auto()
+    LEGENDARY = enum.auto()
+
+
 class Item():
     """represents an item"""
 
-    rarities = ("common", "uncommon", "rare", "legendary")
     types = ("weapon", "armor", "tome")
 
     def __init__(
@@ -139,13 +147,13 @@ class Item():
         if type_ not in self.types:
             print(f"invalid item type {type_}")
         self.type_ = type_
-        self.rarity = rarity
+        self.rarity = Rarity(rarity)
         self.modifier = modifier
         self.stats = Stats(alive=False, generate_stats=False, type_="item", **stats)
 
     def short_description(self):
         """returns text description of item"""
-        return f"{Item.rarities[self.rarity]} {self.modifier} {self.name()}\n"
+        return f"{Item.rarities[self.rarity.name.lower()]} {self.modifier} {self.name()}\n"
 
     def name(self):
         return utils.get_key(all_items, self)
@@ -153,7 +161,7 @@ class Item():
     def to_dict(self):
         return {
             "type_": self.type_,
-            "rarity": self.rarity,
+            "rarity": self.rarity.value,
             "modifier": self.modifier,
             "stats": self.stats.to_dict()
         }
