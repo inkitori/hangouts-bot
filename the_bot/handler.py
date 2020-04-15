@@ -1,13 +1,12 @@
 """
 handler for bots
 """
-import hangups
 from hangups import hangouts_pb2 as hangouts_pb2
 
 import asyncio
 import random
 from collections import defaultdict
-from datetime import datetime  # , tzinfo
+from datetime import datetime
 import utils
 
 from game_2048.manager import Manager2048
@@ -150,7 +149,7 @@ class Handler:
     async def quit_(self, bot, user, conv, comands):
         """makes the bot quit"""
         if utils.userIn(self.admins, user):
-            output_text = "Saber out!"
+            print("Saber out!")
             await bot.client.disconnect()
         else:
             output_text = "bro wtf u can't use that"
