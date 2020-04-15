@@ -340,7 +340,6 @@ class RPG():
     players = {}
     rooms = classes.rooms
     enemies = classes.enemies
-    help_text = "placeholder help text"
 
     def __init__(self):
         for room_name in self.rooms:
@@ -389,14 +388,20 @@ class RPG():
         if command == "register":
             output_text = self.register(userID, commands)
         elif command == "help":
-            output_text = self.help_text
+            output_text = utils.join_items(
+                ("inventory", *Inventory.commands),
+                ("player", "register", "profile", *Player.commands),
+                ("other", "help"),
+                is_description=True, description_mode="long"
+            )
+        elif command == "profile":
+            output_text = self.profile(player, commands)
+
         elif command in Inventory.commands:
             output_text = Inventory.commands[command](player.inventory, commands)
         elif command in Player.commands:
             output_text = Player.commands[command](player, commands)
-        elif command == "profile":
-            output_text = self.profile(player, commands)
         else:
-            output_text = "invalid command"
+            output_text = "invalid command for rpg"
 
         return output_text

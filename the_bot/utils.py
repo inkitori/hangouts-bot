@@ -143,7 +143,8 @@ def command_parser(command_text):
     val = None
     while True:
         if isinstance(val, int):
-            current_index += clamp(val, 0, len(commands))
+            current_index += val
+            current_index = clamp(current_index, 0, len(commands))
             item = None
         elif val == "remaining":
             item = join_items(*commands[current_index:], seperator=" ", end="")
