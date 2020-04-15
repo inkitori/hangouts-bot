@@ -59,7 +59,7 @@ class Handler:
         """handles messages"""
         text = event if console else event.text
         if not console:
-            user, conv = utils.getUserConv(bot, event)
+            user, conv = utils.get_user_and_conv(bot, event)
         commands = utils.command_parser(text)
         command = next(commands)
 

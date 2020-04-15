@@ -12,18 +12,17 @@ def toSeg(text):
     return hangups.ChatMessageSegment.from_str(text)
 
 
-def getUserConv(bot, event):
+def get_user_and_conv(bot, event):
     """gets user and conversation"""
     conv = bot._convo_list.get(event.conversation_id)
     user = conv.get_user(event.user_id)
-
     return user, conv
 
 
 def cooldown(cooldowns, user, event, cooldown):
     """checks cooldown for a command and user"""
     text = clean(event.text)
-    command = get_item_safe(text)
+    command = get_item(text)
     stripped_time = event.timestamp.replace(tzinfo=None)
     cooldown_time = cooldowns[user][command]
 
@@ -133,12 +132,12 @@ def command_parser(command_text, has_prefix=False):
     if has_prefix:
         commands = trim(commands)
     while True:
-        yield get_item_safe(commands)
+        yield get_item(commands)
         commands = trim(commands)
 
 
 # get things safely
-def get_item_safe(sequence, indexes=(0,), default=""):
+def get_item(sequence, indexes=(0,), default=""):
     """
     Retrives the items at the indexes in sequence
     defaults to default if the item des not exist
@@ -191,7 +190,7 @@ def clamp(value, min_value, max_value):
 
 def is_yes(text):
     """checks if a text input starts with y"""
-    return get_item_safe(clean(text, split=False)) == "y"
+    return get_item(clean(text, split=False)) == "y"
 
 
 def convert_items(items, type_, default=""):

@@ -40,7 +40,7 @@ class Bot:
 
     async def _on_event(self, event):
         """called when there is an event in hangouts"""
-        user, conv = utils.getUserConv(self, event)
+        user, conv = utils.get_user_and_conv(self, event)
         output_text = ""
 
         # handles messages
