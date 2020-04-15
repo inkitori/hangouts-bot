@@ -50,7 +50,6 @@ def scientific(number):
 def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
     """
     joins a list using seperator
-
     if is_description, passes each item to description before joining
     """
 
