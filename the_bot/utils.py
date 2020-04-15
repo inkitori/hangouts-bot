@@ -13,7 +13,7 @@ def toSeg(text):
 
 
 def get_user_and_conv(bot, event):
-    """gets user and conversation"""
+    """gets user and conversation from a hangouts event"""
     conv = bot._convo_list.get(event.conversation_id)
     user = conv.get_user(event.user_id)
     return user, conv
@@ -37,7 +37,7 @@ def cooldown(cooldowns, user, event, cooldown):
 
 
 def userIn(user_list, user):
-    """checks if the user is in user_List"""
+    """checks if the user is in user_list"""
     return int(user.id_[0]) in user_list
 
 
@@ -48,7 +48,11 @@ def scientific(number):
 
 
 def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
-    """joins a list using seperator"""
+    """
+    joins a list using seperator
+
+    if is_description, passes each item to description before joining
+    """
 
     output_list = []
     if is_description:
@@ -63,12 +67,23 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
 
 
 def newline(text, number=1):
-    """adds number newlines to the end of text"""
+    """returns text with esactly number newlines at the end"""
     return text.strip() + ("\n" * number)
 
 
 def description(name, *description, mode="short", end="\n"):
+    """
+    chendis stupid string formatting function
+
+    short - formats, like, this
+    long:
+        formats
+        like
+        this
+    """
+    # prevents errors
     description = convert_items(list(description), str)
+
     if mode == "short":
         description = join_items(*description, seperator=", ")
         full_description = f"{name} - {description}"
@@ -86,7 +101,7 @@ def save(file_name, contents):
 
 
 def load(file_name):
-    """loads a file from a json"""
+    """loads a dict from a json"""
     with open(file_name, "r") as file:
         try:
             return json.load(file)
@@ -101,7 +116,7 @@ def clean(text, split=True):
         if isinstance(text, str):
             text = text.strip().lower()
             if split:
-                text = text.split(' ')
+                text = text.split()
             return text
     else:
         return [""]
@@ -109,25 +124,25 @@ def clean(text, split=True):
 
 def trim(text, number=1, default=[""]):
     """
-    trims the front of a sequence by number
+    removes the first number items from a sequence
     returns default if number is greater than len(sequence)
     """
-    if type(text) == str:
+    if isinstance(text, str):
         text = clean(text)
-    if type(text) == list:
-        for i in range(number):
-            try:
-                text = text[number:]
-            except IndexError:
-                text = default
-                break
-        return text
-    else:
-        return["something is wrong"]
+    for i in range(number):
+        try:
+            text = text[number:]
+        except IndexError:
+            text = default
+            break
+    return text
 
 
 def command_parser(command_text, has_prefix=False):
-    """returns a generator of commands"""
+    """
+    returns a generator of commands
+    retunrs empty string if there are no more commands
+    """
     commands = clean(command_text)
     if has_prefix:
         commands = trim(commands)
@@ -136,7 +151,7 @@ def command_parser(command_text, has_prefix=False):
         commands = trim(commands)
 
 
-# get things safely
+# get things without errors
 def get_item(sequence, indexes=(0,), default=""):
     """
     Retrives the items at the indexes in sequence
@@ -150,6 +165,7 @@ def get_item(sequence, indexes=(0,), default=""):
             item = sequence[index]
         except IndexError:
             item = default
+
         if len(indexes) == 1:
             items = item
         else:
@@ -161,7 +177,7 @@ def get_key(dictionary, item, *ignore):
     """
     gets a key using a value
     assumes unique values
-    will ignore keys in ignore
+    ignores keys in ignore
     """
     dictionary = dictionary.copy()
     for key in ignore:
@@ -174,7 +190,10 @@ def get_key(dictionary, item, *ignore):
 
 
 def get_value(dictionary, key, default=""):
-    """safely gets the value of a key from a dictionary"""
+    """
+    gets the value of a key from a dictionary
+    returns default if the key does not exist
+    """
     try:
         value = dictionary[key]
     except KeyError:
@@ -184,17 +203,20 @@ def get_value(dictionary, key, default=""):
 
 # random
 def clamp(value, min_value, max_value):
-    """clamps value inside min and max"""
+    """makes value less than max and greater than min"""
     return max(min_value, min(value, max_value))
 
 
 def is_yes(text):
-    """checks if a text input starts with y"""
+    """
+    checks if text starts with y
+    because i am a lazy bum
+    """
     return get_item(clean(text, split=False)) == "y"
 
 
 def convert_items(items, type_, default=""):
-    """converts items to  atype, or replaces with default"""
+    """converts items to type or replaces with default"""
     for i in range(len(items)):
         try:
             items[i] = type_(items[i])
