@@ -23,7 +23,9 @@ class Handler:
     }
     admins = (
         114207595761187114730,  # joseph
+        117790385966808489693,  # joseph's new account
         106637925595968853122,  # chendi
+        103828905050116935505,  # bill
     )
 
     def __init__(self):
@@ -72,7 +74,7 @@ class Handler:
             if console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                output_text = await function_(bot, user, conv, commands)
+                output_text = await function_(bot, user, conv)
 
         elif command in self.game_managers:
             userID = userID if console else user.id_[0]
