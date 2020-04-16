@@ -121,7 +121,7 @@ class Manager2048:
         else:
             # moves the generator back one command because the command was not used
             commands.send(-1)
-        
+
         if not play_game_name:
             play_game_name = "current game"
         games["current game"] = games[play_game_name]
