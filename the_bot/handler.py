@@ -29,29 +29,8 @@ class Handler:
     )
 
     def __init__(self):
-        self.commands = {
-            "/rename": self.rename_conv,
-            "/quit": self.quit_,
-            "/id": self.id_,
-            "/kick": self.kick,
-        }
-        self.keywords = {
-            "ping": "pong",
-            "pong": "ping",
-            "saber": "hi",
-            "meep": "meep",
-            "/help": ""  # this avoids errors where keywords and help_text reference eachother
-        }
-        self.help_text = utils.join_items(
-            "I'm a bot by Yeah and Chendi.",
-            "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
-        ) + utils.join_items(
-            ("keywords", *list(self.keywords)),
-            ("games", *list(self.game_managers)),
-            ("commands", *list(self.commands)),
-            is_description=True, description_mode="long"
-        )
-        self.keywords["/help"] = self.help_text
+
+
 
         self.cooldowns = defaultdict(dict)
         random.seed(datetime.now())
@@ -69,12 +48,10 @@ class Handler:
             output_text = self.keywords[command]
 
         elif command in self.commands:
-            function_ = self.commands[command]
-
             if console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                output_text = await function_(bot, user, conv)
+                output_text = await self.commands[command](self, bot, user, conv, commands)
 
         elif command in self.game_managers:
             userID = userID if console else user.id_[0]
@@ -154,5 +131,28 @@ class Handler:
             print("Saber out!")
             await bot.client.disconnect()
         else:
-            output_text = "bro wtf u can't use that"
-        return output_text
+            return "bro wtf u can't use that"
+
+    commands = {
+        "/rename": rename_conv,
+        "/quit": quit_,
+        "/id": id_,
+        "/kick": kick,
+    }
+    keywords = {
+        "ping": "pong",
+        "pong": "ping",
+        "saber": "hi",
+        "meep": "meep",
+        "/help": ""  # this avoids errors where keywords and help_text reference eachother
+    }
+    help_text = utils.join_items(
+        "I'm a bot by Yeah and Chendi.",
+        "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
+    ) + utils.join_items(
+        ("keywords", *list(keywords)),
+        ("games", *list(game_managers)),
+        ("commands", *list(commands)),
+        is_description=True, description_mode="long"
+    )
+    keywords["/help"] = help_text
