@@ -77,7 +77,6 @@ class Manager2048:
             else:
                 output_text = valid
 
-
         elif command == "rename":
             old_name = next(commands)
             new_name = next(commands)
