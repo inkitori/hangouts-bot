@@ -13,10 +13,10 @@ class RPGManager:
 
     save_file = "the_bot/rpg/save_data.json"
     game = rpg_class.RPG()
+    sheets_service = utils.create_sheets_service()
 
     def __init__(self):
         self.load_game()
-
         random.seed(datetime.now())
 
     def run_game(self, userID, commands):
@@ -36,6 +36,8 @@ class RPGManager:
         save_data = utils.load(self.save_file)
         for userID, player_data in save_data.items():
             self.game.players[int(userID)] = player_class.Player(**player_data)
+        sheets = self.sheets_service.spreadsheets()
+        # load stuff from sheets here
 
     def save_game(self):
         """saves the game"""

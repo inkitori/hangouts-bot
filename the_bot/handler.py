@@ -27,7 +27,6 @@ class Handler:
         106637925595968853122,  # chendi
         103828905050116935505,  # bill
     )
-    sheets_service = utils.create_sheets_service()
 
     def __init__(self):
         self.cooldowns = defaultdict(dict)
