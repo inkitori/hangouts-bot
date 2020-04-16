@@ -3,12 +3,10 @@ runs the bot
 """
 import config
 import bot
+import test
 
-bots = {
-    "hangouts": bot.Bot,
-    "console": bot.ConsoleBot
-}
+test.test()
 
 options = config.parse_arguments()
-current_bot = bots[options.bot](options)
+current_bot = bot.bots[options.bot](options)
 current_bot.run()
