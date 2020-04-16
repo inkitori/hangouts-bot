@@ -1,11 +1,11 @@
 """
 for testing random stuff
 """
-import sheets
+import utils
 
 
 def test():
-    service = sheets.create_service()
+    service = utils.create_sheets_service()
     SAMPLE_SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
     SAMPLE_RANGE_NAME = 'Class Data!A2:E'
 
