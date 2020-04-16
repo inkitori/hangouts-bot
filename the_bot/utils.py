@@ -61,7 +61,7 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
     output_list = []
     if is_description:
         for item in items:
-            output_list.append(description(*item, mode=description_mode))
+            output_list.append(description(*(item if item else ""), mode=description_mode))
 
     else:
         output_list = convert_items(list(items), type_=str)
@@ -239,8 +239,8 @@ def create_sheets_service():
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists("token.pickle"):
+        with open("token.pickle", "rb") as token:
             creds = pickle.load(token)
 
     # If there are no (valid) credentials available, let the user log in.
@@ -250,13 +250,41 @@ def create_sheets_service():
         else:
             # delete token.pickle if changing scopes
             flow = InstalledAppFlow.from_client_secrets_file(
-                'my_stuff/credentials.json',
-                scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
+                "my_stuff/credentials.json",
+                scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
             )
             creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
-    return build('sheets', 'v4', credentials=creds)
+    return build("sheets", "v4", credentials=creds)
+
+
+def get_named_ranges(sheets):
+    sheet_data = sheets.get(spreadsheetId="1H9m57A7vcSvGnEIrAKAHjg-GmvKw1GqQqQdAMeuN5do").execute()
+    print(sheet_data)
+    named_ranges = sheet_data["namedRanges"]
+    named_ranges_dict = {}
+    for named_range in named_ranges:
+        range_name = named_range["name"]
+        range_notation = a1_notation(*[
+            named_range["range"][i] for i in ["startRowIndex", "endRowIndex", "startColumnIndex", "endColumnIndex"]
+        ])
+        named_ranges_dict[range_name] = f"{sheet_name}!{range_notation}"
+
+    return named_ranges_dict
+
+
+def a1_notation(first_row, last_row, first_column, last_column):
+    return f"{num_to_col_letters(first_column + 1)}{first_row + 1}:{num_to_col_letters(last_column)}{last_row}"
+
+
+def num_to_col_letters(num):
+    letters = ""
+    while num:
+        mod = (num - 1) % 26
+        letters += chr(mod + 65)
+        num = (num - 1) // 26
+    return "".join(reversed(letters))

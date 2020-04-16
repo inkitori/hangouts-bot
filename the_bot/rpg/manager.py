@@ -36,8 +36,20 @@ class RPGManager:
         save_data = utils.load(self.save_file)
         for userID, player_data in save_data.items():
             self.game.players[int(userID)] = player_class.Player(**player_data)
+        """
         sheets = self.sheets_service.spreadsheets()
-        # load stuff from sheets here
+        named_ranges = utils.get_named_ranges(sheets)
+
+        spreadsheet_data = sheets.values().get(
+            spreadsheetId='1H9m57A7vcSvGnEIrAKAHjg-GmvKw1GqQqQdAMeuN5do',
+            range=named_ranges["items"]
+        ).execute()
+        values = spreadsheet_data.get("values", [])
+        print(utils.join_items(
+            *[row for row in values if row],
+            is_description=True,
+        ))
+        """
 
     def save_game(self):
         """saves the game"""
