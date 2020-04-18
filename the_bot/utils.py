@@ -250,7 +250,7 @@ def create_sheets_service():
         else:
             # delete token.pickle if changing scopes
             flow = InstalledAppFlow.from_client_secrets_file(
-                "my_stuff/credentials.json",
+                "credentials.json",
                 scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
             )
             creds = flow.run_local_server(port=0)
@@ -270,7 +270,8 @@ def get_named_ranges(sheets):
     for named_range in named_ranges:
         range_name = named_range["name"]
         range_notation = a1_notation(*[
-            named_range["range"][i] for i in ["startRowIndex", "endRowIndex", "startColumnIndex", "endColumnIndex"]
+            named_range["range"][i]
+            for i in ["startRowIndex", "endRowIndex", "startColumnIndex", "endColumnIndex"]
         ])
         named_ranges_dict[range_name] = f"{sheet_name}!{range_notation}"
 
@@ -278,7 +279,9 @@ def get_named_ranges(sheets):
 
 
 def a1_notation(first_row, last_row, first_column, last_column):
-    return f"{num_to_col_letters(first_column + 1)}{first_row + 1}:{num_to_col_letters(last_column)}{last_row}"
+    start = f"{num_to_col_letters(first_column + 1)}{first_row + 1}"
+    end = f"{num_to_col_letters(last_column)}{last_row}"
+    return f"{start}:{end}"
 
 
 def num_to_col_letters(num):
