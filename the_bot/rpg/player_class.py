@@ -12,7 +12,10 @@ class Inventory():
     ):
         self.items = items
         self.max_items = max_items
-        self.equipped = {classes.ItemType(type_): item_name for type_, item_name in equipped.items()}
+        self.equipped = {
+            classes.ItemType(type_): item_name
+            for type_, item_name in equipped.items()
+        }
 
     def add(self, commands):
         """
@@ -220,7 +223,10 @@ class Player():
             "name": self.name,
             "stats": self.stats.to_dict(),
             "room": self.room,
-            "fighting": {enemy_name: enemy.to_dict() for enemy_name, enemy in self.fighting.items()},
+            "fighting": {
+                enemy_name: enemy.to_dict()
+                for enemy_name, enemy in self.fighting.items()
+            },
             "inventory": self.inventory.to_dict(),
         }
         return player_dict

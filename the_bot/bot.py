@@ -42,7 +42,10 @@ class Bot:
         output_text = ""
 
         # handles messages
-        if isinstance(event, hangups.ChatMessageEvent) and not user.is_self and not utils.userIn(self.ignore, user):
+        if (
+            isinstance(event, hangups.ChatMessageEvent)
+            and not user.is_self and not utils.userIn(self.ignore, user)
+        ):
             output_text = await self.handler.handle_message(event, bot=self)
 
         # new member
@@ -86,26 +89,21 @@ class TestBot():
         self.user_ID = options.user_ID
         self.commands = {
             "/rpg": (
-                "register testbot",
-                "profile",
-                "add starter armor",
-                "add starter weapon",
-                "equipd starter weapon",
-                "equip starter armor",
+                "register testbot", "profile",
+                "add starter armor", "add starter weapon",
+                "equip starter weapon", "equip starter armor",
                 "inventory",
-                "unequip starter armor",
-                "remove starter armor",
-                "warp village",
-                "rest",
-                "warp potatoland",
-                "fight",
-                "attack",
-                "attack",
-                "attack",
-                "attack",
-                "attack",
+                "unequip starter armor", "remove starter armor",
+                "warp village", "rest", "warp potatoland",
+                "fight", "attack", "attack", "attack", "attack", "attack",
                 "heal",
-                )
+            ),
+            "/economy": (
+                "register testbot",
+                "leaderboard", "shop", "profile",
+                "mine", "mine", "mine", "mine",
+                "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"
+            ),
         }
 
     def run(self):

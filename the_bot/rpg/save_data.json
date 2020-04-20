@@ -6,8 +6,8 @@
             "health": 96.0,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 15,
-            "balance": 15,
+            "lifetime_balance": 30,
+            "balance": 30,
             "xp": 0,
             "attack": 5,
             "defense": 5,
@@ -17,12 +17,12 @@
         "fighting": {},
         "inventory": {
             "items": {
-                "starter weapon": 2
+                "starter weapon": 4
             },
             "max_items": 8,
             "equipped": {
                 "armor": null,
-                "weapon": null,
+                "weapon": "starter weapon",
                 "tome": null
             }
         }

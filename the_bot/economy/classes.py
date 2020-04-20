@@ -35,7 +35,7 @@ class Item():
         return f"{self.modifer} {self.type_}"
 
     def generate_mining(self, level):
-        return level ** 2 // 2, level ** 2
+        return (level + 2) ** 2 // 2 , (level + 2)** 2
 
 
 def generate_items(type_):
@@ -163,7 +163,7 @@ class EconomyUser():
         prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)
         if self.confirmed_upgrade:
             if self.prestige < prestige_upgrade_cost:
-                output_text += f"That costs {prestige_upgrade_cost} prestige, which you don't have enough of!"
+                output_text += f"That costs {prestige_upgrade_cost} prestige, which you don't have!"
             else:
                 self.prestige_upgrade += 1
                 self.prestige -= prestige_upgrade_cost
