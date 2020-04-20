@@ -4,11 +4,20 @@ sets up parser for arguments
 import optparse
 import sys
 
+configurations = {
+    # configuration_name: configuration_arguments in a list
+    # feel free to add anything u want here, its fine
+    "": "",  # prevents errors when no config is selected
+    "con": ["--bot=console", ],
+    "alt": ["--bot=console", "--id=102"],
+    "test": ["--bot=test", "--id=102"],
+}
+
 # creating options
 bot_option = optparse.make_option(
     "-b", "--bot", dest="bot", default="hangouts", type="choice",
     choices=["hangouts", "console", "test"],
-    help="chooses a bot to run (hangouts(default) or console)",
+    help="chooses a bot to run",
 )
 id_option = optparse.make_option(
     "-i", "--id", dest="user_ID", default=101, type="int",
@@ -19,7 +28,8 @@ token_option = optparse.make_option(
     help="the token to use to login to hangouts",
 )
 config_option = optparse.make_option(
-    "-c", "--configuration", dest="config", default="",
+    "-c", "--configuration", dest="config", default="", type="choice",
+    choices=list(configurations),
     help="the configuration to use(overrides all other options)",
 )
 
@@ -27,13 +37,7 @@ config_option = optparse.make_option(
 parser = optparse.OptionParser(description=__doc__)
 parser.add_options([bot_option, id_option, token_option, config_option])
 
-configurations = {
-    # configuration_name: configuration_arguments in a list
-    # feel free to add anything u want here, its fine
-    "con": ["--bot=console", ],
-    "alt": ["--bot=console", "--id=102"],
-    "test": ["--bot=test", "--id=102"],
-}
+
 
 
 def parse_arguments(configuration=""):
@@ -41,16 +45,8 @@ def parse_arguments(configuration=""):
     options, args = parser.parse_args()
     options.config = configuration if configuration else options.config
 
-    # checks and setups up configuration
     if options.config:
-        try:
-            new_args = configurations[options.config]
-        except KeyError:
-            print("that configuration does not exist")
-            sys.exit()
+        new_args = configurations[options.config]
         options, args = parser.parse_args(args=new_args)
-
-    # checks the --bot argument
-    optparse.check_choice(bot_option, "bot", options.bot)
 
     return options
