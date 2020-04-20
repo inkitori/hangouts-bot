@@ -46,15 +46,17 @@ class RPGManager:
             sheet_name="RPG",
             )
 
-        spreadsheet_data = sheets.values().get(
+        item_data = sheets.values().get(
             spreadsheetId=self.sheet_ID,
             range=named_ranges["items"]
         ).execute()
-        values = spreadsheet_data.get("values", [])
+        item_data = item_data.get("values", [])
+        """
         print(utils.join_items(
-            *[row for row in values if row],
+            *[row for row in item_data if row],
             is_description=True,
         ))
+        """
 
     def save_game(self):
         """saves the game"""
