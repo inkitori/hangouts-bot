@@ -262,18 +262,19 @@ def create_sheets_service():
     return build("sheets", "v4", credentials=creds)
 
 
-def get_named_ranges(sheets):
-    sheet_data = sheets.get(spreadsheetId="1H9m57A7vcSvGnEIrAKAHjg-GmvKw1GqQqQdAMeuN5do").execute()
-    print(sheet_data)
+def get_named_ranges(sheets, spreadsheetID, sheet_name="Sheet1", included="all"):
+    """gets all the named ranges from a spreadsheet and converts to a1 notation"""
+    sheet_data = sheets.get(spreadsheetId=spreadsheetID).execute()
     named_ranges = sheet_data["namedRanges"]
     named_ranges_dict = {}
     for named_range in named_ranges:
         range_name = named_range["name"]
-        range_notation = a1_notation(*[
-            named_range["range"][i]
-            for i in ["startRowIndex", "endRowIndex", "startColumnIndex", "endColumnIndex"]
-        ])
-        named_ranges_dict[range_name] = f"{sheet_name}!{range_notation}"
+        if range_name in included or included == "all":
+            range_notation = a1_notation(*[
+                named_range["range"][i]
+                for i in ["startRowIndex", "endRowIndex", "startColumnIndex", "endColumnIndex"]
+            ])
+            named_ranges_dict[range_name] = f"{sheet_name}!{range_notation}"
 
     return named_ranges_dict
 

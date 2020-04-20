@@ -59,7 +59,7 @@ class ConsoleBot():
     """console based bot (for testing)"""
     def __init__(self, options):
         self.handler = Handler()
-        self.userID = options.userID
+        self.user_ID = options.user_ID
 
     def run(self):
         """main bot loop"""
@@ -74,7 +74,7 @@ class ConsoleBot():
         output_text = ""
 
         # handles messages
-        output_text = await self.handler.handle_message(text, console=True, userID=self.userID)
+        output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
 
         # sends message to hangouts
         if output_text:

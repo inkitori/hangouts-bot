@@ -24,18 +24,18 @@ class EconomyManager():
             is_description=True, description_mode="long"
         )
 
-    def run_game(self, userID, commands):
+    def run_game(self, user_ID, commands):
         """runs the game"""
         command = next(commands)
         output_text = ""
         if command == "help":
             return self.help_text
         if command == "register":
-            return self.register(userID, commands)
-        elif userID not in self.users.keys():
+            return self.register(user_ID, commands)
+        elif user_ID not in self.users.keys():
             return "You are not registered! Use register"
 
-        user = self.users[userID]
+        user = self.users[user_ID]
         if command not in ("prestige", "prestige_upgrade"):
             user.confirmed_prestige = False
             user.confirmed_upgrade = False
@@ -86,23 +86,23 @@ class EconomyManager():
 
     def save_game(self):
         """saves the game"""
-        data = {userID: player.__dict__ for userID, player in self.users.items()}
+        data = {user_ID: player.__dict__ for user_ID, player in self.users.items()}
         utils.save(self.save_file, data)
 
     def load_game(self):
         """loads the game"""
         data = utils.load(self.save_file)
-        for userID, user_data in data.items():
-            self.users[int(userID)] = classes.EconomyUser(**user_data)
+        for user_ID, user_data in data.items():
+            self.users[int(user_ID)] = classes.EconomyUser(**user_data)
 
-    def register(self, userID, commands):
+    def register(self, user_ID, commands):
         """registers a user"""
         name = next(commands)
-        if userID in self.users:
+        if user_ID in self.users:
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.users[userID] = classes.EconomyUser(name=name)
+        self.users[user_ID] = classes.EconomyUser(name=name)
         return "Successfully registered!"
 
     def profile(self, user, commands):

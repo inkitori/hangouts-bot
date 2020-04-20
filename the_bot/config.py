@@ -11,7 +11,7 @@ bot_option = optparse.make_option(
     help="chooses a bot to run (hangouts(default) or console)",
 )
 id_option = optparse.make_option(
-    "-i", "--id", dest="userID", default=101, type="int",
+    "-i", "--id", dest="user_ID", default=101, type="int",
     help="the id to use when using the console(default 101)",
 )
 token_option = optparse.make_option(

@@ -31,7 +31,7 @@ class Handler:
         self.cooldowns = defaultdict(dict)
         random.seed(datetime.now())
 
-    async def handle_message(self, event, console=False, userID=101, bot=None):
+    async def handle_message(self, event, console=False, user_ID=101, bot=None):
         """handles messages"""
         text = event if console else event.text
         if not console:
@@ -50,8 +50,8 @@ class Handler:
                 output_text = await self.commands[command](self, bot, user, conv, commands)
 
         elif command in self.game_managers:
-            userID = userID if console else user.id_[0]
-            output_text = self.play_game(userID, command, commands)
+            user_ID = user_ID if console else user.id_[0]
+            output_text = self.play_game(user_ID, command, commands)
             if console:
                 # 2048 is designed to print for hangouts, where each numeral is the same width as 2 spaces
                 # consoles are monospaced, so this fixes that
@@ -114,10 +114,10 @@ class Handler:
 
         return output_text
 
-    def play_game(self, userID, game_name, commands):
+    def play_game(self, user_ID, game_name, commands):
         """plays a game"""
         manager = self.game_managers[game_name]
-        game_text = manager.run_game(userID, commands)
+        game_text = manager.run_game(user_ID, commands)
         manager.save_game()
         return game_text
 
