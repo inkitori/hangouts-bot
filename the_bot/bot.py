@@ -73,9 +73,7 @@ class ConsoleBot():
             asyncio.run(self.main(text))
 
     async def main(self, text):
-        """sends inpput to handler and prints output"""
-
-        # handles messages
+        """sends input to handler and prints output"""
         output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
 
         if output_text:
@@ -104,6 +102,11 @@ class TestBot():
                 "mine", "mine", "mine", "mine",
                 "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"
             ),
+            "/2048": (
+                "create testgame", "rename testgame test", "games",
+                "create qwed", "delete qwed", "test u", "<", "v", "l",
+                "confusion", "eleven", "restart", "sggstaer"
+            )
         }
 
     def run(self):

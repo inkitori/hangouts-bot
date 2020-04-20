@@ -9,7 +9,8 @@ class Manager2048:
     """manager for 2048 game"""
     save_file = "the_bot/game_2048/save_data.json"
     game_management_commands = [
-        "create {game_name}", "{game_name}", "rename {old_name} {new_name}", "delete {game_name}", "games",
+        "create {game_name}", "{game_name}", "rename {old_name} {new_name}",
+        "delete {game_name}", "games",
     ]
     reserved_words = (
         Game.game_commands + list(Game.modes.keys()) +

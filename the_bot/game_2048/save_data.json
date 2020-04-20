@@ -114,6 +114,29 @@
             "has_won": false,
             "mode": "normal",
             "score": 0
+        },
+        "test": {
+            "board": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                1,
+                0
+            ],
+            "has_won": false,
+            "mode": "eleven",
+            "score": 0
         }
     },
     "scores": {
