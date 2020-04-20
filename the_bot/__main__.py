@@ -5,7 +5,8 @@ import config
 import bot
 import test
 
-test.test()
+test_options = config.parse_arguments("alt")
+test.test(bot.bots["console"](test_options))
 
 options = config.parse_arguments()
 current_bot = bot.bots[options.bot](options)

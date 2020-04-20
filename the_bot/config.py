@@ -35,10 +35,11 @@ configurations = {
 }
 
 
-def parse_arguments():
+def parse_arguments(configuration=""):
     """parses the arguments"""
     options, args = parser.parse_args()
-    
+    options.config = configuration if configuration else options.config
+
     # checks and setups up configuration
     if options.config:
         try:
