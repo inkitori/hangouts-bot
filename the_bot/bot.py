@@ -71,17 +71,59 @@ class ConsoleBot():
 
     async def main(self, text):
         """sends inpput to handler and prints output"""
-        output_text = ""
 
         # handles messages
         output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
 
-        # sends message to hangouts
         if output_text:
             print(utils.newline(output_text))
 
 
+class TestBot():
+    """bot for testing commands"""
+    def __init__(self, options):
+        self.handler = Handler()
+        self.user_ID = options.user_ID
+        self.commands = {
+            "/rpg": (
+                "register testbot",
+                "profile",
+                "add starter armor",
+                "add starter weapon",
+                "equipd starter weapon",
+                "equip starter armor",
+                "inventory",
+                "unequip starter armor",
+                "remove starter armor",
+                "warp village",
+                "rest",
+                "warp potatoland",
+                "fight",
+                "attack",
+                "attack",
+                "attack",
+                "attack",
+                "attack",
+                "heal",
+                )
+        }
+
+    def run(self):
+        """main bot loop"""
+        for prefix, commands in self.commands.items():
+            for command in commands:
+                command = f"{prefix} {command}"
+                print(f"running command {command}")
+                asyncio.run(self.main(command))
+
+    async def main(self, text):
+        """sends inpput to handler and prints output"""
+        output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
+        print(utils.newline(output_text))
+
+
 bots = {
     "hangouts": Bot,
-    "console": ConsoleBot
+    "console": ConsoleBot,
+    "test": TestBot
 }

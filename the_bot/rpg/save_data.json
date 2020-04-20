@@ -1,23 +1,23 @@
 {
-    "101": {
-        "name": "ether",
+    "102": {
+        "name": "testbot",
         "stats": {
-            "max_health": 0,
-            "health": 0,
-            "mana": 0,
-            "max_mana": 0,
-            "lifetime_balance": 0,
-            "balance": 0,
+            "max_health": 100,
+            "health": 96.0,
+            "mana": 100,
+            "max_mana": 100,
+            "lifetime_balance": 15,
+            "balance": 15,
             "xp": 0,
-            "attack": 0,
-            "defense": 0,
+            "attack": 5,
+            "defense": 5,
             "level": 1
         },
-        "room": "village",
+        "room": "potatoland",
         "fighting": {},
         "inventory": {
             "items": {
-                "starter armor": 1
+                "starter weapon": 2
             },
             "max_items": 8,
             "equipped": {

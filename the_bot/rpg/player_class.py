@@ -131,9 +131,9 @@ class Inventory():
     def modifers(self):
         modifier_attack = 0
         modifier_defense = 0
-        # make this a loop later
-        weapon = self.get_equipped("weapon")[1]
-        armor = self.get_equipped("armor")[1]
+        # TODO: make this a loop later
+        weapon = self.get_equipped(classes.ItemType.WEAPON)[1]
+        armor = self.get_equipped(classes.ItemType.ARMOR)[1]
         if weapon:
             modifier_attack += weapon.stats.attack
             modifier_defense += weapon.stats.defense
@@ -156,13 +156,19 @@ class Player():
 
     def __init__(
         self, name,
-        stats={},
+        stats={
+            "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
+            "health": 100, "max_health": 100
+        },
         room="village", fighting={}, inventory={}
     ):
         self.name = name
         self.stats = classes.Stats(alive=True, type_="player", **stats)
         self.room = room
-        self.fighting = {enemy_name: classes.Enemy(**enemy_data) for enemy_name, enemy_data in fighting.items()}
+        self.fighting = {
+            enemy_name: classes.Enemy(**enemy_data)
+            for enemy_name, enemy_data in fighting.items()
+        }
         self.inventory = Inventory(**inventory)
 
     def id(self):
@@ -234,7 +240,7 @@ class Player():
 
     def heal(self, commands):
         """heal the player with their tome"""
-        tome_name, tome = self.inventory.get_equipped("tome")
+        tome_name, tome = self.inventory.get_equipped(classes.ItemType.TOME)
         if not tome_name:
             return "you do not have a tome equipped"
         if self.stats.mana < tome.stats.mana:

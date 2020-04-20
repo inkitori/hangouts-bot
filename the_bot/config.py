@@ -7,7 +7,7 @@ import sys
 # creating options
 bot_option = optparse.make_option(
     "-b", "--bot", dest="bot", default="hangouts", type="choice",
-    choices=["hangouts", "console"],
+    choices=["hangouts", "console", "test"],
     help="chooses a bot to run (hangouts(default) or console)",
 )
 id_option = optparse.make_option(
@@ -31,7 +31,8 @@ configurations = {
     # configuration_name: configuration_arguments in a list
     # feel free to add anything u want here, its fine
     "con": ["--bot=console", ],
-    "alt": ["--bot=console", "--id=102"]
+    "alt": ["--bot=console", "--id=102"],
+    "test": ["--bot=test", "--id=102"],
 }
 
 

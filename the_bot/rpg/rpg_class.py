@@ -48,7 +48,7 @@ class RPG():
             output_text += f"{len(possible_players)} player(s) go by that name:\n"
 
         for user in possible_players:
-            output_text += user.print_profile()
+            output_text += utils.newline(user.print_profile(), 2)
         return utils.newline(output_text)
 
     def play_game(self, user_ID, commands):
