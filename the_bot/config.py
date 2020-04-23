@@ -2,7 +2,6 @@
 sets up parser for arguments
 """
 import optparse
-import sys
 
 configurations = {
     # configuration_name: configuration_arguments in a list
