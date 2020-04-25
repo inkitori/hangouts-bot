@@ -9,11 +9,14 @@ import enum
 
 class Stats():
     """class for stats"""
+    # TODO: fix this nonsense
     def __init__(
         self, *, alive=False, generate_stats=False, type_=None,
         max_health=0, health=0, mana=0, attack=0, defense=0,
         max_mana=0, level=1, xp=0, balance=0, lifetime_balance=0
     ):
+        # TODO: get rid of ifs and change default value to none
+        # TODO: then change print stats to skip values of None
         if alive:
             self.max_health = max_health
             self.health = health

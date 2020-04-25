@@ -20,6 +20,7 @@ class Handler:
         117790385966808489693,  # joseph's new account
         106637925595968853122,  # chendi
         103828905050116935505,  # bill
+        103,  # for console testing
     )
     game_managers = {
         "/2048": Manager2048(),
@@ -49,6 +50,7 @@ class Handler:
             if self.console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
+                # TODO: add cooldowns
                 output_text = await self.commands[command](self, bot, user, conv, commands)
 
         elif command in self.game_managers:
@@ -120,8 +122,11 @@ class Handler:
     def play_game(self, user_id, game_name, commands):
         """plays a game"""
         manager = self.game_managers[game_name]
-        game_text = manager.run_game(user_id, commands)
-        manager.save_game()
+        try:
+            game_text = manager.run_game(user_id, commands)
+            manager.save_game()
+        except AttributeError:
+            print(f"game manager {manager} does not have method save_game and/or run_game")
         return game_text
 
     async def quit_(self, bot, user, conv, comands):

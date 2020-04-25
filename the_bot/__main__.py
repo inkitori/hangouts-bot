@@ -6,4 +6,7 @@ import bot
 
 options = config.parse_arguments()
 current_bot = bot.bots[options.bot](options)
-current_bot.run()
+try:
+    current_bot.run()
+except AttributeError:
+    print("bot has no method run, add a run method")

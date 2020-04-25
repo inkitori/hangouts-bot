@@ -52,6 +52,7 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
+# TODO: get rid of is_description (fix the code before deleting here)
 def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
     """
     joins a list using seperator
@@ -202,6 +203,8 @@ def get_value(dictionary, key, default=""):
     gets the value of a key from a dictionary
     returns default if the key does not exist
     """
+    # TODO: replace all calls with builtin dict.get(key, default)
+    # TODO: then delete this function
     try:
         value = dictionary[key]
     except KeyError:

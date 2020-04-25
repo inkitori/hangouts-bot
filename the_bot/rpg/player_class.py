@@ -108,6 +108,7 @@ class Inventory():
         # change to use utils.join_items
         for item_name, item_count in self.items.items():
             item = classes.all_items[item_name]
+            # TODO: print amount of item
             inventory_text += item.short_description()
         inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
@@ -146,11 +147,13 @@ class Inventory():
         return classes.Stats(attack=modifier_attack, defense=modifier_defense)
 
     commands = {
+        # TODO: dont let player add anything to inventory
         "add": add,
         "remove": remove,
         "equip": equip,
         "unequip": unequip,
-        "inventory": print_inventory
+        "inventory": print_inventory,
+        # TODO: command to view stats of an item
     }
 
 
@@ -181,6 +184,7 @@ class Player():
         """returns string representation of stats"""
         stats_list = []
         for stat_name, stat in self.stats.__dict__.items():
+            # TODO: print modifiers from equipped items too
             stat_text = f"{stat_name}: {stat}"
             if utils.get_value(self.modiifer_stats.__dict__, stat_name):
                 stat_text += f" {self.modiifer_stats.__dict__[stat_name]}"
@@ -235,6 +239,7 @@ class Player():
         """rests player"""
         if classes.rooms[self.room].can_rest:
             self.stats.change_health("full")
+            # TODO: change mana to max
             text = utils.join_items(
                 "You feel well rested...",
                 f"Your health is back up to {self.stats.health}!",
@@ -257,6 +262,7 @@ class Player():
 
             return f"You have been healed back up to {self.stats.health}"
 
+    # TODO: merge with fight
     def attack(self, commands):
         """attacks an enemy"""
         text = ""
@@ -267,11 +273,11 @@ class Player():
         enemy = random.choice(list(self.fighting.values()))
         enemy_name = utils.get_key(self.fighting, enemy)
         user_damage = self.modified_stats().attack
-        damage_dealt = user_damage * (user_damage / enemy.stats.defense)
+        damage_dealt = int(user_damage * (user_damage / enemy.stats.defense))
 
         multiplier = random.choice((1, -1))
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
-        enemy.stats.change_health(- damage_dealt)
+        enemy.stats.change_health(-damage_dealt)
 
         text += f"You dealt {damage_dealt} damage to {enemy_name}!\n"
 
@@ -280,12 +286,12 @@ class Player():
 
         else:
             # take damage
-            damage_taken = enemy.stats.attack / self.modified_stats().defense
+            damage_taken = int(enemy.stats.attack / self.modified_stats().defense)
 
             multiplier = random.choice((1, -1))
             damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
 
-            self.stats.change_health(- damage_taken)
+            self.stats.change_health(-damage_taken)
 
             text += utils.join_items(
                 f"{enemy_name} dealt {damage_taken} to you!",

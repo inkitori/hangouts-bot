@@ -9,6 +9,7 @@ configurations = {
     "": "",  # prevents errors when no config is selected
     "con": ["--bot=console", ],
     "alt": ["--bot=console", "--id=102"],
+    "adm": ["--bot=console", "--id=103"],
     "test": ["--bot=test", "--id=102"],
 }
 

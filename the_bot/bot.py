@@ -32,7 +32,9 @@ class Bot:
 
     async def _on_connect(self):
         """called when bot connects to hangouts"""
-        self._user_list, self._convo_list = (await hangups.build_user_conversation_list(self.client))
+        self._user_list, self._convo_list = (
+            await hangups.build_user_conversation_list(self.client)
+        )
         self._convo_list.on_event.add_observer(self._on_event)
         print("Connected!")
 
