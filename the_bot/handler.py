@@ -122,11 +122,8 @@ class Handler:
     def play_game(self, user_id, game_name, commands):
         """plays a game"""
         manager = self.game_managers[game_name]
-        try:
-            game_text = manager.run_game(user_id, commands)
-            manager.save_game()
-        except AttributeError:
-            print(f"game manager {manager} does not have method save_game and/or run_game")
+        game_text = manager.run_game(user_id, commands)
+        manager.save_game()
         return game_text
 
     async def quit_(self, bot, user, conv, comands):

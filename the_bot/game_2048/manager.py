@@ -2,7 +2,7 @@
 manager for 2048 games
 """
 import utils
-from game_2048.classes import Game, games
+from game_2048.classes import Game, games, Directions
 
 
 class Manager2048:
@@ -14,7 +14,7 @@ class Manager2048:
     ]
     reserved_words = (
         Game.game_commands + list(Game.modes.keys()) +
-        [value for values in list(Game.movement.values()) for value in values] +
+        [command for direction in Directions for command in direction.value.commands] +
         game_management_commands +
         ["2048", "/2048", "current game"]
     )
@@ -25,7 +25,7 @@ class Manager2048:
             is_description=True
         ),
         "move": utils.join_items(
-            *[[direction] + list(commands) for direction, commands in Game.movement.items()],
+            *[(direction.name.lower(), direction.value.commands) for direction in Directions],
             is_description=True
         ),
         "scores": utils.join_items(

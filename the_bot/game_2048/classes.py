@@ -192,14 +192,6 @@ class Game():
     }
     game_commands = ["restart", "{direction}"]
 
-    movement = {
-        "up": ("up", "u", "^"), "left": ("left", "l", "<"),
-        "down": ("down", "d", "v"), "right": ("right", "r", ">")
-    }
-    directions = {
-        "up": (False, False), "left": (True, False),
-        "down": (False, True), "right": (True, True)
-    }
 
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
         self.score = score
@@ -290,9 +282,10 @@ class Game():
         # check player movement
         x = None
         positive = None
-        for direction in self.movement:
-            if command in self.movement[direction]:
-                self.move(*self.directions[direction])
+        for direction in Directions:
+            direction = direction.value
+            if command in direction.commands:
+                self.move(direction.x, direction.positive)
                 break
         else:
             if (x, positive) == (None, None):
