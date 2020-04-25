@@ -174,7 +174,7 @@ class Player():
         }
         self.inventory = Inventory(**inventory)
 
-    def id(self):
+    def get_id(self):
         return utils.get_key(players, self)
 
     def print_stats(self):
@@ -337,7 +337,7 @@ class Player():
 
     def print_profile(self):
         profile_text = utils.join_items(
-            ("name", self.name), ("id", self.id()),
+            ("name", self.name), ("id", self.get_id()),
             is_description=True,
         ) + self.stats.print_stats()
         return profile_text

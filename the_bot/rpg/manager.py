@@ -53,7 +53,6 @@ class RPGManager:
         ).execute()
         item_data = item_data.get("values", [])
 
-
     def save_game(self):
         """saves the game"""
         save_data = self.game.players.copy()

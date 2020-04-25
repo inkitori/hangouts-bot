@@ -35,7 +35,7 @@ class Item():
         return f"{self.modifer} {self.type_}"
 
     def generate_mining(self, level):
-        return (level + 2) ** 2 // 2 , (level + 2)** 2
+        return (level + 2) ** 2 // 2, (level + 2) ** 2
 
 
 def generate_items(type_):
@@ -101,21 +101,20 @@ class EconomyUser():
             if item_type not in shop_items:
                 return "That class doesn't exist!"
 
-            possible_items = []
+            possible_items = [
+                item for item in shop_items[item_type]
+                if item.level > self.items[item_type]
+                and item.price <= self.balance
+            ]
 
-            for possible_item in shop_items[item_type]:
-                if possible_item.level > self.items["pick"] and possible_item.price <= self.balance:
-                    possible_items.append(possible_item)
-
-            if len(possible_items) == 0:
+            if not possible_items:
                 return "No possible item of that type you can purchase!"
 
-            else:
-                purchase = possible_items[-1]
-                self.items[item_type] = shop_items[item_type].index(purchase)
-                self.change_balance(- purchase.price)
+            purchase = possible_items[-1]
+            self.items[item_type] = shop_items[item_type].index(purchase)
+            self.change_balance(- purchase.price)
 
-                return f"Successful purchase of the {purchase.name}!"
+            return f"Successful purchase of the {purchase.name}!"
 
         elif item_type not in shop_items or modifier not in Item.modifiers[item_type]:
             return "That item doesn't exist!"
@@ -160,7 +159,9 @@ class EconomyUser():
     def prestige_upgrade_action(self, commands):
         """upgrades prestige"""
         output_text = ""
-        prestige_upgrade_cost = math.floor(self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade)
+        prestige_upgrade_cost = math.floor(
+            self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade
+        )
         if self.confirmed_upgrade:
             if self.prestige < prestige_upgrade_cost:
                 output_text += f"That costs {prestige_upgrade_cost} prestige, which you don't have!"
@@ -184,52 +185,52 @@ class EconomyUser():
             f"pick: {self.get_item('pick').name()}",
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
-            f"id: {self.id()}"
+            f"id: {self.get_id()}"
         )
         return utils.newline(profile_text).title()
 
     def give(self, commands):
         """gives money to another user"""
+        # input validation
         reciveing_user = next(commands)
         money = next(commands)
-        output_text = ""
-
         if not reciveing_user:
-            output_text += "You must specfiy a user or ID"
+            return "You must specfiy a user or ID"
         elif not money:
-            output_text += "You must specify an amount"
+            return "You must specify an amount"
         elif not money.isdigit():
-            output_text += "You must give an integer amount of Saber Dollars"
-        else:
-            money = int(money)
+            return "You must give an integer amount of Saber Dollars"
 
-            for user in users.values():
-                if reciveing_user == user.name:
-                    reciveing_user = user
-                    break
+        money = int(money)
+        # get the user
+        for user in users.values():
+            if reciveing_user == user.name:
+                reciveing_user = user
+                break
+        if reciveing_user.isdigit() and int(reciveing_user) in users:
+            reciveing_user = users[int(reciveing_user)]
 
-            if reciveing_user.isdigit() and int(reciveing_user) in users:
-                reciveing_user = users[int(reciveing_user)]
-            if reciveing_user.id() not in users:
-                output_text += "That user has not registered!"
-            elif reciveing_user.id() == self.id():
-                output_text += "That user is you!"
-            else:
-                if money < 0:
-                    output_text += "You can't give negative money!"
-                elif self.balance < money:
-                    output_text += "You don't have enough money to do that!"
-                else:
-                    self.change_balance(- money)
-                    reciveing_user.change_balance(money)
+        # check user is valid
+        if reciveing_user.get_id() not in users:
+            return "That user has not registered!"
+        elif reciveing_user.get_id() == self.get_id():
+            return "That user is you!"
 
-                    output_text += utils.join_items(
-                        f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
-                        f"{reciveing_user.name} now has {reciveing_user.balance} Saber Dollars."
-                    )
-        return output_text
+        # check money is valid
+        if money < 0:
+            return "You can't give negative money!"
+        elif self.balance < money:
+            return "You don't have enough money to do that!"
 
-    def id(self):
+        self.change_balance(-money)
+        reciveing_user.change_balance(money)
+
+        return utils.join_items(
+            f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
+            f"{reciveing_user.name} now has {reciveing_user.balance} Saber Dollars."
+        )
+
+    def get_id(self):
         return utils.get_key(users, self)
 
     def get_item(self, type_):

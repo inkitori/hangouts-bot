@@ -81,6 +81,7 @@ class Manager2048:
         elif command == "rename":
             old_name = next(commands)
             new_name = next(commands)
+
             valid = self.verify_name(new_name)
             if valid != "valid":
                 output_text = valid
@@ -92,29 +93,19 @@ class Manager2048:
                 output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
-            delete_game_name = next(commands)
-            if not delete_game_name:
-                output_text = "you must give the name of the game"
-            elif delete_game_name not in games.keys():
-                output_text = "that game does not exist"
-            else:
-                if games["current game"] == games[delete_game_name]:
-                    games["current game"] = None
-                del games[delete_game_name]
-                output_text = f"{delete_game_name} deleted"
+            self.delete_game(commands)
+
+        elif command in games:
+            games["current game"] = games[command]
 
         elif command == "games":
             output_text += utils.join_items(
                 *[
-                    (game_name, game.mode.name(), game.score)
+                    utils.description(game_name, game.mode.name(), game.score)
                     for game_name, game in games.items()
                     if game_name != "current game"
-                ],
-                is_description=True
+                ]
             )
-
-        elif command in games:
-            games["current game"] = games[command]
 
         elif command in self.help_texts:
             output_text += self.help_texts[command]
@@ -123,8 +114,7 @@ class Manager2048:
             # moves the generator back one command because the command was not used
             commands.send(-1)
 
-        if not play_game_name:
-            play_game_name = "current game"
+        play_game_name = "current game"if not play_game_name else play_game_name
         games["current game"] = games[play_game_name]
 
         if not output_text:
@@ -154,6 +144,22 @@ class Manager2048:
                 "mode": game.mode.name(),
                 "score": game.score
             }
-        high_scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
-        data = {"games": games_dict, "scores": high_scores}
+        data = {
+            "games": games_dict,
+            "scores": {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
+        }
         utils.save(self.save_file, data)
+
+    def delete_game(self, commands):
+        """deletes a game"""
+        delete_game_name = next(commands)
+        if not delete_game_name:
+            output_text = "you must give the name of the game"
+        elif delete_game_name not in games.keys():
+            output_text = "that game does not exist"
+        else:
+            if games["current game"] == games[delete_game_name]:
+                games["current game"] = None
+            del games[delete_game_name]
+            output_text = f"{delete_game_name} deleted"
+        return output_text

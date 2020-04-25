@@ -70,7 +70,10 @@ class EconomyManager():
 
         playing_user_rank = sorted_users.index((playing_user, playing_user.lifetime_balance))
         if playing_user_rank > 5:
-            leaderboard_text += f"\n{playing_user_rank + 1}. {playing_user.name}(you): {playing_user.lifetime_balance}\n"
+            leaderboard_text += (
+                f"\n{playing_user_rank + 1}."
+                f"{playing_user.name}(you): {playing_user.lifetime_balance}"
+            )
 
         return leaderboard_text
 
@@ -85,7 +88,10 @@ class EconomyManager():
             else:
                 for i in range(player_item + 1, len(items)):
                     item = items[i]
-                    items_text.append(utils.description(item.name().title(), f"{item.price} saber dollars"))
+                    items_text.append(utils.description(
+                        item.name().title(),
+                        f"{item.price} saber dollars"
+                    ))
             shop_list.append(items_text)
 
         return utils.join_items(*shop_list, is_description=True, description_mode="long")
