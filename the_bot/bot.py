@@ -82,6 +82,7 @@ class TestBot():
     def __init__(self, options):
         self.handler = Handler(console=True)
         self.user_id = options.user_id
+        # TODO: add a way to only run some tests
         self.commands = {
             "/rpg": (
                 "register testbot", "profile",

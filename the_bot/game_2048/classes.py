@@ -5,6 +5,7 @@ Made by Chendi
 import random
 import utils
 import enum
+import collections
 
 
 class Cell():
@@ -158,6 +159,16 @@ class GameMode():
     def increase_score(self, value):
         """increases score based on gamemode"""
         return 2 ** value
+
+
+Direction = collections.namedtuple("Direction", "commands x positive")
+
+
+class Directions(enum.Enum):
+    UP = Direction(("up", "u", "^"), False, False)
+    LEFT = Direction(("left", "l", "<"), True, False)
+    DOWN = Direction(("down", "d", "v"), False, True)
+    RIGHT = Direction(("right", "r", ">"), True, True)
 
 
 class Game():
