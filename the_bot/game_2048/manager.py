@@ -84,11 +84,12 @@ class Manager2048:
             valid = self.verify_name(new_name)
             if valid != "valid":
                 output_text = valid
-            if old_name not in games.keys():
+            elif old_name not in games.keys():
                 output_text = "that game does not exist"
-            games[new_name] = games.pop(old_name)
-            play_game_name = new_name
-            output_text = f"renamed {old_name} to {new_name}"
+            else:
+                games[new_name] = games.pop(old_name)
+                play_game_name = new_name
+                output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
             delete_game_name = next(commands)

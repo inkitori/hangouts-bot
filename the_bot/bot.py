@@ -44,25 +44,20 @@ class Bot:
         # handles messages
         if (
             isinstance(event, hangups.ChatMessageEvent)
-            and not user.is_self and not utils.userIn(self.ignore, user)
+            and not user.is_self and not utils.user_in(self.ignore, user)
         ):
             output_text = await self.handler.handle_message(event, bot=self)
 
-        # new member
-        elif isinstance(event, hangups.MembershipChangeEvent):
-            if conv.get_user(event.participant_ids[0]).is_self and event.type_ == 1:
-                output_text = "Saber in!"
-
         # sends message to hangouts
         if output_text:
-            await conv.send_message(utils.toSeg(output_text))
+            await conv.send_message(utils.to_seg(output_text))
 
 
 class ConsoleBot():
     """console based bot (for testing)"""
     def __init__(self, options):
-        self.handler = Handler()
-        self.user_ID = options.user_ID
+        self.handler = Handler(console=True)
+        self.user_id = options.user_id
 
     def run(self):
         """main bot loop"""
@@ -74,7 +69,7 @@ class ConsoleBot():
 
     async def main(self, text):
         """sends input to handler and prints output"""
-        output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
+        output_text = await self.handler.handle_message(text, user_id=self.user_id)
 
         if output_text:
             print(utils.newline(output_text))
@@ -83,8 +78,8 @@ class ConsoleBot():
 class TestBot():
     """bot for testing commands"""
     def __init__(self, options):
-        self.handler = Handler()
-        self.user_ID = options.user_ID
+        self.handler = Handler(console=True)
+        self.user_id = options.user_id
         self.commands = {
             "/rpg": (
                 "register testbot", "profile",
@@ -119,7 +114,7 @@ class TestBot():
 
     async def main(self, text):
         """sends inpput to handler and prints output"""
-        output_text = await self.handler.handle_message(text, console=True, user_ID=self.user_ID)
+        output_text = await self.handler.handle_message(text, user_id=self.user_id)
         print(utils.newline(output_text))
 
 

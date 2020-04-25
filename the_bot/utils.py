@@ -12,7 +12,7 @@ from google.auth.transport.requests import Request
 
 
 # hangouts
-def toSeg(text):
+def to_seg(text):
     """converts string to hangouts message"""
     return hangups.ChatMessageSegment.from_str(text)
 
@@ -41,7 +41,7 @@ def cooldown(cooldowns, user, event, cooldown):
     cooldowns[user][command] = cooldown_time
 
 
-def userIn(user_list, user):
+def user_in(user_list, user):
     """checks if the user is in user_list"""
     return int(user.id_[0]) in user_list
 
@@ -234,13 +234,13 @@ def convert_items(items, type_, default=""):
 
 
 # google api
-def create_sheets_service():
+def create_sheets_service(pickled_token_file="token.pickle"):
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
+    if os.path.exists(pickled_token_file):
+        with open(pickled_token_file, "rb") as token:
             creds = pickle.load(token)
 
     # If there are no (valid) credentials available, let the user log in.
@@ -256,15 +256,15 @@ def create_sheets_service():
             creds = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
-        with open("token.pickle", "wb") as token:
+        with open(pickled_token_file, "wb") as token:
             pickle.dump(creds, token)
 
     return build("sheets", "v4", credentials=creds)
 
 
-def get_named_ranges(sheets, spreadsheetID, sheet_name="Sheet1", included="all"):
+def get_named_ranges(sheets, spreadsheet_id, sheet_name="Sheet1", included="all"):
     """gets all the named ranges from a spreadsheet and converts to a1 notation"""
-    sheet_data = sheets.get(spreadsheetId=spreadsheetID).execute()
+    sheet_data = sheets.get(spreadsheetId=spreadsheet_id).execute()
     named_ranges = sheet_data["namedRanges"]
     named_ranges_dict = {}
     for named_range in named_ranges:

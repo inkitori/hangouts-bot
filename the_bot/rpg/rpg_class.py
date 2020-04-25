@@ -18,14 +18,14 @@ class RPG():
                 if enemy_name not in self.enemies:
                     print(f"invalid enemy {enemy_name} in room {room_name}")
 
-    def register(self, user_ID, commands):
+    def register(self, user_id, commands):
         """registers a user in the game"""
         name = next(commands)
-        if user_ID in self.players:
+        if user_id in self.players:
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.players[user_ID] = player_class.Player(name=name)
+        self.players[user_id] = player_class.Player(name=name)
         return "Successfully registered!"
 
     def profile(self, player, commands):
@@ -51,13 +51,13 @@ class RPG():
             output_text += utils.newline(user.print_profile(), 2)
         return utils.newline(output_text)
 
-    def play_game(self, user_ID, commands):
+    def play_game(self, user_id, commands):
         """runs functions based on user command"""
         command = next(commands)
         output_text = ""
-        player = utils.get_value(self.players, user_ID)
+        player = utils.get_value(self.players, user_id)
         if command == "register":
-            output_text = self.register(user_ID, commands)
+            output_text = self.register(user_id, commands)
         elif command == "help":
             output_text = utils.join_items(
                 ("player_class.Inventory", *player_class.Inventory.commands),

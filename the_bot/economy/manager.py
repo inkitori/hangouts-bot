@@ -24,18 +24,18 @@ class EconomyManager():
             is_description=True, description_mode="long"
         )
 
-    def run_game(self, user_ID, commands):
+    def run_game(self, user_id, commands):
         """runs the game"""
         command = next(commands)
         output_text = ""
         if command == "help":
             return self.help_text
         if command == "register":
-            return self.register(user_ID, commands)
-        elif user_ID not in self.users.keys():
+            return self.register(user_id, commands)
+        elif user_id not in self.users.keys():
             return "You are not registered! Use register"
 
-        user = self.users[user_ID]
+        user = self.users[user_id]
         if command not in ("prestige", "prestige_upgrade"):
             user.confirmed_prestige = False
             user.confirmed_upgrade = False
@@ -55,13 +55,19 @@ class EconomyManager():
         user_balances = {user: user.lifetime_balance for user in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
-        sorted_users = [user for user in sorted(list(user_balances.items()), key=lambda x: x[1], reverse=True)]
+        sorted_users = [
+            user for user in sorted(
+                list(user_balances.items()),
+                key=lambda x: x[1], reverse=True
+            )
+        ]
 
         for rank in range(5):
             user_balance = utils.get_item(sorted_users, (rank, ))
             if user_balance:
                 user, balance = user_balance
                 leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+
         playing_user_rank = sorted_users.index((playing_user, playing_user.lifetime_balance))
         if playing_user_rank > 5:
             leaderboard_text += f"\n{playing_user_rank + 1}. {playing_user.name}(you): {playing_user.lifetime_balance}\n"
@@ -86,23 +92,23 @@ class EconomyManager():
 
     def save_game(self):
         """saves the game"""
-        data = {user_ID: player.__dict__ for user_ID, player in self.users.items()}
+        data = {user_id: player.__dict__ for user_id, player in self.users.items()}
         utils.save(self.save_file, data)
 
     def load_game(self):
         """loads the game"""
         data = utils.load(self.save_file)
-        for user_ID, user_data in data.items():
-            self.users[int(user_ID)] = classes.EconomyUser(**user_data)
+        for user_id, user_data in data.items():
+            self.users[int(user_id)] = classes.EconomyUser(**user_data)
 
-    def register(self, user_ID, commands):
+    def register(self, user_id, commands):
         """registers a user"""
         name = next(commands)
-        if user_ID in self.users:
+        if user_id in self.users:
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.users[user_ID] = classes.EconomyUser(name=name)
+        self.users[user_id] = classes.EconomyUser(name=name)
         return "Successfully registered!"
 
     def profile(self, user, commands):

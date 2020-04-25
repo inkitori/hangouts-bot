@@ -127,15 +127,38 @@
                 0,
                 0,
                 0,
-                0,
-                0,
+                1,
                 0,
                 1,
-                1,
+                0,
+                0,
                 0
             ],
             "has_won": false,
             "mode": "eleven",
+            "score": 0
+        },
+        "testgame": {
+            "board": [
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "has_won": false,
+            "mode": "normal",
             "score": 0
         }
     },
@@ -143,7 +166,7 @@
         "normal": 12,
         "65536": 0,
         "1048576": 0,
-        "eleven": 0,
+        "eleven": 8,
         "twenty": 0,
         "confusion": 20
     }

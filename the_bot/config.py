@@ -19,7 +19,7 @@ bot_option = optparse.make_option(
     help="chooses a bot to run",
 )
 id_option = optparse.make_option(
-    "-i", "--id", dest="user_ID", default=101, type="int",
+    "-i", "--id", dest="user_id", default=101, type="int",
     help="the id to use when using the console(default 101)",
 )
 token_option = optparse.make_option(
@@ -35,8 +35,6 @@ config_option = optparse.make_option(
 # creating and setting up parser
 parser = optparse.OptionParser(description=__doc__)
 parser.add_options([bot_option, id_option, token_option, config_option])
-
-
 
 
 def parse_arguments(configuration=""):

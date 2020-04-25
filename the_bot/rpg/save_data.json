@@ -3,11 +3,11 @@
         "name": "testbot",
         "stats": {
             "max_health": 100,
-            "health": 96.0,
+            "health": 97.0,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 48,
-            "balance": 48,
+            "lifetime_balance": 51,
+            "balance": 51,
             "xp": 0,
             "attack": 5,
             "defense": 5,
@@ -17,7 +17,7 @@
         "fighting": {},
         "inventory": {
             "items": {
-                "starter weapon": 6
+                "starter weapon": 7
             },
             "max_items": 8,
             "equipped": {

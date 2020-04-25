@@ -15,26 +15,28 @@ from rpg.manager import RPGManager
 
 class Handler:
     """handler for bot"""
-    game_managers = {
-        "/2048": Manager2048(),
-        "/rpg": RPGManager(),
-        "/economy": EconomyManager(),
-    }
     admins = (
         114207595761187114730,  # joseph
         117790385966808489693,  # joseph's new account
         106637925595968853122,  # chendi
         103828905050116935505,  # bill
     )
+    game_managers = {
+        "/2048": Manager2048(),
+        "/rpg": RPGManager(load_sheets=False),
+        "/economy": EconomyManager(),
+    }
 
-    def __init__(self):
+    def __init__(self, console=False):
         self.cooldowns = defaultdict(dict)
+        self.console = console
+        self.game_managers["/rpg"] = RPGManager(load_sheets=not console)
         random.seed(datetime.now())
 
-    async def handle_message(self, event, console=False, user_ID=101, bot=None):
+    async def handle_message(self, event, user_id=101, bot=None):
         """handles messages"""
-        text = event if console else event.text
-        if not console:
+        text = event if self.console else event.text
+        if not self.console:
             user, conv = utils.get_user_and_conv(bot, event)
         commands = utils.command_parser(text)
         command = next(commands)
@@ -44,22 +46,23 @@ class Handler:
             output_text = self.keywords[command]
 
         elif command in self.commands:
-            if console:
+            if self.console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
                 output_text = await self.commands[command](self, bot, user, conv, commands)
 
         elif command in self.game_managers:
-            user_ID = user_ID if console else user.id_[0]
-            output_text = self.play_game(user_ID, command, commands)
-            if console:
-                # 2048 is designed to print for hangouts, where each numeral is the same width as 2 spaces
+            user_id = user_id if self.console else user.id_[0]
+            output_text = self.play_game(user_id, command, commands)
+            if self.console:
+                # 2048 is designed to print for hangouts
+                # where each numeral is the same width as 2 spaces
                 # consoles are monospaced, so this fixes that
                 output_text = output_text.replace("  ", " ")
 
         else:
             # if this printed in hangouts, it would respond to every single message
-            output_text = "Invalid command" if console else ""
+            output_text = "Invalid command" if self.console else ""
 
         return output_text
 
@@ -114,16 +117,16 @@ class Handler:
 
         return output_text
 
-    def play_game(self, user_ID, game_name, commands):
+    def play_game(self, user_id, game_name, commands):
         """plays a game"""
         manager = self.game_managers[game_name]
-        game_text = manager.run_game(user_ID, commands)
+        game_text = manager.run_game(user_id, commands)
         manager.save_game()
         return game_text
 
     async def quit_(self, bot, user, conv, comands):
         """makes the bot quit"""
-        if utils.userIn(self.admins, user):
+        if utils.user_in(self.admins, user):
             print("Saber out!")
             await bot.client.disconnect()
         else:
@@ -144,7 +147,8 @@ class Handler:
     }
     help_text = utils.join_items(
         "I'm a bot by Yeah and Chendi.",
-        "You can view my source at https://github.com/YellowPapaya/hangouts-bot or suggest at https://saberbot.page.link/R6GT",
+        "You can view my source at https://github.com/YellowPapaya/hangouts-bot"
+        "or suggest at https://saberbot.page.link/R6GT",
     ) + utils.join_items(
         ("keywords", *list(keywords)),
         ("games", *list(game_managers)),
