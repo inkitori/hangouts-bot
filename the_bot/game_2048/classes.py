@@ -4,6 +4,7 @@ Made by Chendi
 """
 import random
 import utils
+import enum
 
 
 class Cell():
@@ -21,7 +22,7 @@ class Board():
         self.size = mode.size
         self.number_of_cells = self.size ** 2
         if not values:
-            values = [0 for i in range(self.number_of_cells)]
+            values = [0] * self.number_of_cells
         self.cells = [Cell(value) for value in values]
 
     def move_blocks(self, x, positive, game):
@@ -34,33 +35,35 @@ class Board():
                 indexes = list(range(i, self.number_of_cells, self.size))
             if positive:
                 indexes.reverse()
+            self.move_line(indexes, game)
 
-            for j in indexes:
-                current_cell = self.cells[j]
-                current_cell.has_merged = False
-                neighbor = self.cells[indexes[indexes.index(j) - 1]]
+    def move_line(self, line, game):
+        for j in line:
+            current_cell = self.cells[j]
+            current_cell.has_merged = False
+            neighbor = self.cells[line[line.index(j) - 1]]
 
-                if current_cell.value > 0:
-                    while current_cell is not self.cells[indexes[0]]:
-                        # moves if neighbor is empty
-                        if neighbor.value == 0:
-                            neighbor.value = current_cell.value
-                            neighbor.has_merged = current_cell.has_merged
-                            current_cell.value = 0
-                            j = indexes[indexes.index(j) - 1]
-                            current_cell = self.cells[j]
-                            neighbor = self.cells[indexes[indexes.index(j) - 1]]
-                        # merges blocks
-                        elif (
-                            current_cell.value == neighbor.value and not
-                            current_cell.has_merged and not neighbor.has_merged
-                        ):
-                            current_cell.value += 1
-                            game.score += game.mode.increase_score(current_cell.value)
-                            neighbor.value = 0
-                            current_cell.has_merged = True
-                        else:
-                            break
+            if current_cell.value:
+                while current_cell is not self.cells[line[0]]:
+                    # moves if neighbor is empty
+                    if not neighbor.value:
+                        neighbor.value = current_cell.value
+                        neighbor.has_merged = current_cell.has_merged
+                        current_cell.value = 0
+                        j = line[line.index(j) - 1]
+                        current_cell = self.cells[j]
+                        neighbor = self.cells[line[line.index(j) - 1]]
+                    # merges blocks
+                    elif (
+                        current_cell.value == neighbor.value and not
+                        current_cell.has_merged and not neighbor.has_merged
+                    ):
+                        current_cell.value += 1
+                        game.score += game.mode.increase_score(current_cell.value)
+                        neighbor.value = 0
+                        current_cell.has_merged = True
+                    else:
+                        break
 
     def check_can_move(self):
         """Checks if the player can move"""
@@ -113,24 +116,30 @@ class Board():
             game.text += "\n"
 
 
+class GameIncreaseModes(enum.Enum):
+    TIMES_2 = enum.auto()
+    PLUS_1 = enum.auto()
+    RANDOM = enum.auto()
+
+
 class GameMode():
     """class to represent different gamemodes"""
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
 
     def __init__(
-        self, start_value=2, increase_type="normal",
-        size=4, win_value=11, description="", shuffled=False
+        self, start_value=2, increase_type=GameIncreaseModes.TIMES_2,
+        size=4, win_value=11, description=""
     ):
         self.size = size
         self.number_of_cells = size ** 2
         self.increase_type = increase_type
         self.high_score = 0
-        if shuffled:
+        if increase_type == GameIncreaseModes.RANDOM:
             self.values = [0] + GameMode.shuffled
         else:
             self.values = [0, start_value]
-            for i in range(self.number_of_cells + 2):
+            for _ in range(self.number_of_cells + 2):
                 self.values.append(self.increase(self.values[-1]))
         self.win_value = win_value
         self.description = description
@@ -140,9 +149,9 @@ class GameMode():
 
     def increase(self, value):
         """Increases cell value based on game mode"""
-        if self.increase_type == "normal":
+        if self.increase_type == GameIncreaseModes.TIMES_2:
             next_value = value * 2
-        elif self.increase_type == "plus one":
+        elif self.increase_type == GameIncreaseModes.PLUS_1:
             next_value = value + 1
         return next_value
 
@@ -155,11 +164,20 @@ class Game():
     """class to represent each game of 2048"""
     modes = {
         "normal": GameMode(description="normal 2048"),
-        "65536": GameMode(size=5, win_value=16, description="5x5 board and higher win condition"),
-        str(2 ** 20): GameMode(size=6, win_value=20, description="6x6 board and higher win condition"),
-        "eleven": GameMode(1, "plus one", description="blocks increase by 1 when merging"),
-        "twenty": GameMode(1, "plus one", size=5, win_value=20, description="5x5 board with the rules of eleven"),
-        "confusion": GameMode(1, "random", shuffled=True, description="randomly generated block sequence")
+        "65536": GameMode(size=5, win_value=16, description="5x5 board"),
+        str(2 ** 20): GameMode(size=6, win_value=20, description="6x6 board"),
+        "eleven": GameMode(
+            1, GameIncreaseModes.PLUS_1,
+            description="blocks increase by 1 when merging"
+        ),
+        "twenty": GameMode(
+            1, GameIncreaseModes.PLUS_1, size=5, win_value=20,
+            description="eleven with a 5x5 board"
+        ),
+        "confusion": GameMode(
+            1, GameIncreaseModes.RANDOM,
+            description="randomly generated block sequence"
+        )
     }
     game_commands = ["restart", "{direction}"]
 
@@ -180,7 +198,7 @@ class Game():
         self.has_won = has_won
         self.board = Board(self.mode, board)
         if self.board.number_of_empty_cells() == self.mode.number_of_cells and not score:
-            for i in range(2):
+            for _ in range(2):
                 self.board.make_new_block(self.mode)
 
     def name(self):
@@ -204,7 +222,9 @@ class Game():
 
     def draw_game(self):
         """appends board and scores to self.text"""
-        self.text += utils.join_items(utils.description(self.name(), self.mode.name()), f"score: {self.score}\n")
+        self.text += utils.join_items(
+            utils.description(self.name(), self.mode.name()), f"score: {self.score}\n"
+        )
         self.board.draw_board(self)
 
     def restart(self, mode=None):
@@ -214,7 +234,7 @@ class Game():
         if self.mode == Game.modes["confusion"]:
             self.setup_confusion()
         self.board = Board(self.mode)
-        for i in range(2):
+        for _ in range(2):
             self.board.make_new_block(self.mode)
         self.state = None
         self.has_won = False
