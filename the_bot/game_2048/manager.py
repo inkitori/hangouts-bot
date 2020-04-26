@@ -46,6 +46,12 @@ class Manager2048:
     def __init__(self):
         self.load_game()
 
+    def update_high_scores(self):
+        self.help_texts["scores"] = utils.join_items(
+            *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+            is_description=True
+        )
+
     def create_game(self, game_name):
         """creates a new game in games dict"""
         games[game_name] = Game()

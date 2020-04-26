@@ -294,7 +294,7 @@ class Player():
             if self.stats.health <= 0:
                 text += f"You were killed by {enemy_name}..."
 
-                self.fighting = ""
+                self.fighting = {}
                 self.stats.change_health("full")
 
         return text
