@@ -2,7 +2,7 @@
     "102": {
         "name": "testbot",
         "stats": {
-            "health": 100,
+            "health": 64,
             "max_health": 100,
             "mana": 100,
             "max_mana": 100,
@@ -14,7 +14,18 @@
             "level": 1
         },
         "room": "potatoland",
-        "fighting": {},
+        "fighting": {
+            "potato": {
+                "stats": {
+                    "health": 900,
+                    "max_health": 900,
+                    "xp": null,
+                    "attack": 36,
+                    "defense": 26,
+                    "level": 3
+                }
+            }
+        },
         "options": {
             "autofight": false,
             "heal_percent": 50

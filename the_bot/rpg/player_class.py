@@ -342,7 +342,7 @@ class Player():
         # TODO: make this work
         pass
 
-    def set(self, commands):
+    def set_(self, commands):
         option = next(commands)
         value = next(commands)
 
@@ -389,7 +389,7 @@ class Player():
         "attack": attack,
         "fight": fight,
         "heal": heal,
-        # "set": set,
+        "set": set_,
     }
 
 
