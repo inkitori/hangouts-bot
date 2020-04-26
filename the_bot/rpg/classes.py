@@ -45,7 +45,7 @@ class Stats():
     def print_stats(self, modifiers=None):
         """returns text representation of stats"""
         # this mess adds a + modifed value if there is a modified stat
-        modifiers =  utils.default(modifiers, Stats())
+        modifiers = utils.default(modifiers, Stats())
         stats_text = utils.join_items(
             *[
                 (

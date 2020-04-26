@@ -2,7 +2,7 @@
     "102": {
         "name": "testbot",
         "stats": {
-            "health": 64,
+            "health": 100,
             "max_health": 100,
             "mana": 100,
             "max_mana": 100,
@@ -13,19 +13,8 @@
             "defense": 5,
             "level": 1
         },
-        "room": "potatoland",
-        "fighting": {
-            "potato": {
-                "stats": {
-                    "health": 900,
-                    "max_health": 900,
-                    "xp": null,
-                    "attack": 36,
-                    "defense": 26,
-                    "level": 3
-                }
-            }
-        },
+        "room": "village",
+        "fighting": {},
         "options": {
             "autofight": false,
             "heal_percent": 50
@@ -75,7 +64,7 @@
     "104456743203495898583": {
         "name": "tabi",
         "stats": {
-            "health": 97,
+            "health": 73,
             "max_health": 100,
             "mana": 100,
             "max_mana": 100,
@@ -90,16 +79,12 @@
         "fighting": {
             "potato": {
                 "stats": {
-                    "health": 100,
-                    "max_health": 100,
-                    "mana": 0,
-                    "max_mana": 0,
-                    "balance": 0,
-                    "lifetime_balance": 0,
-                    "xp": 0,
-                    "attack": 5,
-                    "defense": 5,
-                    "level": 1
+                    "health": 900,
+                    "max_health": 900,
+                    "xp": null,
+                    "attack": 36,
+                    "defense": 26,
+                    "level": 3
                 }
             }
         },
@@ -108,11 +93,14 @@
             "heal_percent": 50
         },
         "inventory": {
-            "items": {},
+            "items": {
+                "starter weapon": 1,
+                "starter armor": 1
+            },
             "max_items": 8,
             "equipped": {
-                "armor": null,
-                "weapon": null,
+                "armor": "starter armor",
+                "weapon": "starter weapon",
                 "tome": null
             }
         }

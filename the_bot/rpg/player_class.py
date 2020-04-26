@@ -164,8 +164,7 @@ class Player():
         self, name,
         stats={
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100, "level": 1, "lifetime_balance": 0,
-            "balance": 0, "xp": 0
+            "health": 100, "max_health": 100
         },
         room="village", fighting={}, inventory={},
         options={"autofight": False, "heal_percent": 50}
@@ -292,11 +291,18 @@ class Player():
             )
 
             if self.stats.health <= 0:
-                text += f"You were killed by {enemy_name}..."
+                text += self.died(enemy_name)
 
-                self.fighting = {}
-                self.stats.change_health("full")
+        return text
 
+    def died(self, cause):
+        text = utils.join_items(
+            f"You were killed by {cause}...",
+            "You woke up back in the village"
+        )
+        self.fighting = {}
+        self.stats.change_health("full")
+        self.warp("village" for _ in range(1))
         return text
 
     def killed_enemy(self, enemy_name, enemy):
@@ -337,12 +343,11 @@ class Player():
             text += enemy.stats.print_stats()
         return text
 
-    def autofight(self, enemy_name, enemy):
-        """automatically fights an enemy"""
-        # TODO: make this work
-        pass
+    def autofight(self, enemy_name):
+        while True:
+            pass
 
-    def set_(self, commands):
+    def set(self, commands):
         option = next(commands)
         value = next(commands)
 
@@ -356,10 +361,10 @@ class Player():
 
         elif isinstance(self.options[option], bool):
             value = value[0]
-            if value == "t":
+            if value in ("t", "y"):
                 self.options[option] = True
 
-            elif value == "f":
+            elif value in ("f", "n"):
                 self.options[option] = False
             else:
                 # TODO make this error a template
@@ -389,7 +394,7 @@ class Player():
         "attack": attack,
         "fight": fight,
         "heal": heal,
-        "set": set_,
+        # "set": set,
     }
 
 
