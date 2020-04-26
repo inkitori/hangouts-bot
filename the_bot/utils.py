@@ -62,12 +62,12 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
     output_list = []
     if is_description:
         for item in items:
-            output_list.append(description(*(item if item else ""), mode=description_mode))
+            output_list.append(description(*(default(item, "")), mode=description_mode))
 
     else:
         output_list = convert_items(list(items), type_=str)
     output_text = seperator.join(output_list).strip()
-    output_text += end if not output_text.endswith(end) else ""
+    output_text += default("", end, output_text.endswith(end))
     return output_text
 
 
@@ -151,7 +151,7 @@ def command_parser(command_text):
         if isinstance(val, int):
             current_index += val
             current_index = clamp(current_index, 0, len(commands))
-            item = None
+            item = get_item(commands, indexes=(current_index, ))
         elif val == "remaining":
             item = join_items(*commands[current_index:], seperator=" ", end="")
         else:
@@ -210,6 +210,13 @@ def get_value(dictionary, key, default=""):
     except KeyError:
         value = default
     return value
+
+
+def default(item, default=None, condition="no condition"):
+    """returns default if not condition"""
+    if condition == "no condition":
+        condition = item
+    return item if condition else default
 
 
 # random

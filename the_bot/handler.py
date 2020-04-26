@@ -64,7 +64,7 @@ class Handler:
 
         else:
             # if this printed in hangouts, it would respond to every single message
-            output_text = "Invalid command" if self.console else ""
+            output_text = utils.default("Invalid command", "", self.console)
 
         return output_text
 

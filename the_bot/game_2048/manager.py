@@ -72,11 +72,10 @@ class Manager2048:
         if command == "create":
             new_game_name = next(commands)
             valid = self.verify_name(new_game_name)
-            if valid == "valid":
-                self.create_game(new_game_name)
-                play_game_name = new_game_name
-            else:
-                output_text = valid
+            if valid != "valid":
+                return valid
+            self.create_game(new_game_name)
+            play_game_name = new_game_name
 
         elif command == "rename":
             old_name = next(commands)
@@ -84,13 +83,13 @@ class Manager2048:
 
             valid = self.verify_name(new_name)
             if valid != "valid":
-                output_text = valid
+                return valid
             elif old_name not in games.keys():
-                output_text = "that game does not exist"
-            else:
-                games[new_name] = games.pop(old_name)
-                play_game_name = new_name
-                output_text = f"renamed {old_name} to {new_name}"
+                return "that game does not exist"
+
+            games[new_name] = games.pop(old_name)
+            play_game_name = new_name
+            output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
             self.delete_game(commands)
@@ -114,12 +113,12 @@ class Manager2048:
             # moves the generator back one command because the command was not used
             commands.send(-1)
 
-        play_game_name = "current game"if not play_game_name else play_game_name
+        play_game_name = utils.default(play_game_name, "current game")
         games["current game"] = games[play_game_name]
 
         if not output_text:
-            if games[play_game_name]:
-                output_text = games[play_game_name].play_game(commands)
+            if games["current game"]:
+                output_text = games["current game"].play_game(commands)
             else:
                 output_text = "no game selected"
         return output_text

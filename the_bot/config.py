@@ -2,6 +2,7 @@
 sets up parser for arguments
 """
 import optparse
+import utils
 
 configurations = {
     # configuration_name: configuration_arguments in a list
@@ -41,7 +42,7 @@ parser.add_options([bot_option, id_option, token_option, config_option])
 def parse_arguments(configuration=""):
     """parses the arguments"""
     options, args = parser.parse_args()
-    options.config = configuration if configuration else options.config
+    options.config = utils.default(configuration, options.config)
 
     if options.config:
         new_args = configurations[options.config]

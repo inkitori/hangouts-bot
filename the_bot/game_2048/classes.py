@@ -107,7 +107,7 @@ class Board():
         max_length = 0
         for cell in self.cells:
             cell.length = len(str(game.mode.values[cell.value]))
-            max_length = cell.length if cell.length > max_length else max_length
+            max_length = max(self.cells, key=lambda cell: cell.value).value
         max_length += 1
         for row in range(game.mode.size):
             for column in range(game.mode.size):
@@ -231,7 +231,7 @@ class Game():
 
     def restart(self, mode=None):
         """Resets the game"""
-        self.mode = mode if mode else self.mode
+        self.mode = utils.default(mode, self.mode)
         self.score = 0
         if self.mode == Game.modes["confusion"]:
             self.setup_confusion()
