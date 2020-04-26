@@ -21,11 +21,13 @@ class RPGManager:
 
     def run_game(self, user_id, commands):
         """runs the game"""
+        user_id = int(user_id)
         command = next(commands)
         if not command:
             return "you must enter a command"
 
         if command != "register" and user_id not in self.game.players:
+            print(user_id, repr(user_id))
             return "You are not registered! Use register"
         else:
             commands.send(-1)

@@ -131,6 +131,7 @@ class Manager2048:
         else:
             output_text = "no game selected"
 
+        self.update_high_scores()
         return output_text
 
     def load_game(self):

@@ -50,7 +50,7 @@ class RPG():
         output_text += utils.join_items(*[
             player.print_profile()
             for player in possible_players
-        ], seperator="\n" * 2)
+        ])
 
         return utils.newline(output_text)
 

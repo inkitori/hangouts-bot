@@ -12,6 +12,8 @@ from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
 from rpg.manager import RPGManager
 
+print("loading handler")
+
 
 class Handler:
     """handler for bot"""
@@ -124,3 +126,6 @@ class Handler:
         is_description=True, description_mode="long"
     )
     keywords["/help"] = help_text
+
+
+print("finished loading handler")

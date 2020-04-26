@@ -1,11 +1,13 @@
 """
 bot for hangouts
 """
+from handler import Handler
 import hangups
 import asyncio
-from handler import Handler
 import utils
 import sys
+
+print("loading bots")
 
 
 class Bot:
@@ -127,3 +129,4 @@ bots = {
     "console": ConsoleBot,
     "test": TestBot
 }
+print("finished loading bots")
