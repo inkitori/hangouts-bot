@@ -166,7 +166,8 @@ class Player():
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
             "health": 100, "max_health": 100
         },
-        room="village", fighting={}, inventory={}
+        room="village", fighting={}, inventory={},
+        options={"autofight": False}
     ):
         self.name = name
         self.stats = classes.Stats(alive=True, type_="player", **stats)
@@ -175,6 +176,7 @@ class Player():
             enemy_name: classes.Enemy(**enemy_data)
             for enemy_name, enemy_data in fighting.items()
         }
+        self.options = options
         self.inventory = Inventory(**inventory)
 
     def get_id(self):
@@ -219,6 +221,7 @@ class Player():
                 enemy_name: enemy.to_dict()
                 for enemy_name, enemy in self.fighting.items()
             },
+            "options": self.options,
             "inventory": self.inventory.to_dict(),
         }
         return player_dict
@@ -332,9 +335,13 @@ class Player():
     def print_profile(self):
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            is_description=True,
-        ) + self.stats.print_stats(self.inventory.modifers())
-        return profile_text
+            is_description=True, seperator="\n\t"
+        )
+        return utils.join_items(
+            profile_text, self.stats.print_stats(self.inventory.modifers()),
+            seperator="\t"
+        )
+
     commands = {
         "rest": rest,
         "warp": warp,

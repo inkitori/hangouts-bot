@@ -15,6 +15,9 @@
         },
         "room": "potatoland",
         "fighting": {},
+        "options": {
+            "autofight": false
+        },
         "inventory": {
             "items": {
                 "starter weapon": 7
@@ -31,32 +34,20 @@
         "name": "chendi",
         "stats": {
             "max_health": 100,
-            "health": 94,
+            "health": 100,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 11,
-            "balance": 11,
+            "lifetime_balance": 0,
+            "balance": 0,
             "xp": 0,
             "attack": 5,
             "defense": 5,
             "level": 1
         },
-        "room": "potatoland",
-        "fighting": {
-            "potato": {
-                "stats": {
-                    "max_health": 20,
-                    "health": 8,
-                    "mana": 0,
-                    "max_mana": 0,
-                    "lifetime_balance": 0,
-                    "balance": 0,
-                    "xp": 0,
-                    "attack": 5,
-                    "defense": 5,
-                    "level": 1
-                }
-            }
+        "room": "village",
+        "fighting": {},
+        "options": {
+            "autofight": false
         },
         "inventory": {
             "items": {},
@@ -99,6 +90,9 @@
                 }
             }
         },
+        "options": {
+            "autofight": false
+        },
         "inventory": {
             "items": {},
             "max_items": 8,
@@ -139,6 +133,9 @@
                     "level": 1
                 }
             }
+        },
+        "options": {
+            "autofight": false
         },
         "inventory": {
             "items": {

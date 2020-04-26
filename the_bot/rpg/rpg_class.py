@@ -47,10 +47,13 @@ class RPG():
         elif len(possible_players) > 1:
             output_text += utils.newline(f"{len(possible_players)} player(s) go by that name:")
 
-        # TODO: use utils.join_items here
+        output_text += utils.join_items(*[
+            player.print_profile()
+            for player in possible_players
+        ], seperator="\n" * 2)
 
-        for user in possible_players:
-            output_text += utils.newline(user.print_profile(), 2)
+        # for user in possible_players:
+            # output_text += utils.newline(user.print_profile(), 2)
         return utils.newline(output_text)
 
     def play_game(self, user_id, commands):

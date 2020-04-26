@@ -59,10 +59,10 @@ class Stats():
                 )
                 for stat_name, stat_value in self.__dict__.items()
                 if stat_name not in ("level", "xp") and stat_value is not None
-            ], is_description=True
+            ], is_description=True, seperator="\n\t"
         )
         if self.level is not None:
-            stats_text += self.print_level_xp()
+            stats_text += "\t" + self.print_level_xp()
         return stats_text
 
     def next_level_xp(self):
