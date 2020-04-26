@@ -2,21 +2,33 @@
     "102": {
         "name": "testbot",
         "stats": {
+            "health": 32,
             "max_health": 100,
-            "health": 97,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 147,
             "balance": 147,
+            "lifetime_balance": 147,
             "xp": 0,
             "attack": 5,
             "defense": 5,
             "level": 1
         },
         "room": "potatoland",
-        "fighting": {},
+        "fighting": {
+            "potato": {
+                "stats": {
+                    "health": 886,
+                    "max_health": 900,
+                    "xp": null,
+                    "attack": 36,
+                    "defense": 26,
+                    "level": 3
+                }
+            }
+        },
         "options": {
-            "autofight": false
+            "autofight": false,
+            "heal_percent": 50
         },
         "inventory": {
             "items": {
@@ -33,12 +45,12 @@
     "106637925595968853122": {
         "name": "chendi",
         "stats": {
-            "max_health": 100,
             "health": 100,
+            "max_health": 100,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 0,
             "balance": 0,
+            "lifetime_balance": 0,
             "xp": 0,
             "attack": 5,
             "defense": 5,
@@ -47,7 +59,8 @@
         "room": "village",
         "fighting": {},
         "options": {
-            "autofight": false
+            "autofight": false,
+            "heal_percent": 50
         },
         "inventory": {
             "items": {},
@@ -62,12 +75,12 @@
     "104456743203495898583": {
         "name": "tabi",
         "stats": {
-            "max_health": 100,
             "health": 97,
+            "max_health": 100,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 0,
             "balance": 0,
+            "lifetime_balance": 0,
             "xp": 0,
             "attack": 5,
             "defense": 5,
@@ -77,12 +90,12 @@
         "fighting": {
             "potato": {
                 "stats": {
-                    "max_health": 20,
-                    "health": 2,
+                    "health": 100,
+                    "max_health": 100,
                     "mana": 0,
                     "max_mana": 0,
-                    "lifetime_balance": 0,
                     "balance": 0,
+                    "lifetime_balance": 0,
                     "xp": 0,
                     "attack": 5,
                     "defense": 5,
@@ -91,7 +104,8 @@
             }
         },
         "options": {
-            "autofight": false
+            "autofight": false,
+            "heal_percent": 50
         },
         "inventory": {
             "items": {},
@@ -106,12 +120,12 @@
     "101": {
         "name": "ether",
         "stats": {
-            "max_health": 100,
             "health": 90,
+            "max_health": 100,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 6,
             "balance": 6,
+            "lifetime_balance": 6,
             "xp": 1,
             "attack": 5,
             "defense": 5,
@@ -121,12 +135,12 @@
         "fighting": {
             "super potato": {
                 "stats": {
+                    "health": 100,
                     "max_health": 100,
-                    "health": 70,
                     "mana": 0,
                     "max_mana": 0,
-                    "lifetime_balance": 0,
                     "balance": 0,
+                    "lifetime_balance": 0,
                     "xp": 0,
                     "attack": 5,
                     "defense": 5,
@@ -135,7 +149,8 @@
             }
         },
         "options": {
-            "autofight": false
+            "autofight": false,
+            "heal_percent": 50
         },
         "inventory": {
             "items": {

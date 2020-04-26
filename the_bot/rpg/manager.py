@@ -24,6 +24,7 @@ class RPGManager:
         command = next(commands)
         if not command:
             return "you must enter a command"
+        print(user_id, repr(user_id))
 
         if command != "register" and user_id not in self.game.players:
             return "You are not registered! Use register"

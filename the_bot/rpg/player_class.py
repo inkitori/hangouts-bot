@@ -139,11 +139,11 @@ class Inventory():
         weapon = self.get_equipped(classes.ItemType.WEAPON)[1]
         armor = self.get_equipped(classes.ItemType.ARMOR)[1]
         if weapon:
-            modifier_attack += weapon.stats.attack
-            modifier_defense += weapon.stats.defense
+            modifier_attack += utils.default(weapon.stats.attack, 0)
+            modifier_defense += utils.default(weapon.stats.defense, 0)
         if armor:
-            modifier_attack += armor.stats.attack
-            modifier_defense += armor.stats.defense
+            modifier_attack += utils.default(armor.stats.attack, 0)
+            modifier_defense += utils.default(armor.stats.defense, 0)
         return classes.Stats(attack=modifier_attack, defense=modifier_defense)
 
     commands = {
@@ -164,13 +164,14 @@ class Player():
         self, name,
         stats={
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100
+            "health": 100, "max_health": 100, "level": 1, "lifetime_balance": 0,
+            "balance": 0, "xp": 0
         },
         room="village", fighting={}, inventory={},
-        options={"autofight": False}
+        options={"autofight": False, "heal_percent": 50}
     ):
         self.name = name
-        self.stats = classes.Stats(alive=True, type_="player", **stats)
+        self.stats = classes.Stats(alive=True, **stats)
         self.room = room
         self.fighting = {
             enemy_name: classes.Enemy(**enemy_data)
@@ -325,12 +326,52 @@ class Player():
         elif self.fighting:
             text = f"You are already fighting {', '.join(self.fighting.keys())}!"
 
+        enemy_name, enemy = room.generate_enemy()
+        self.fighting[enemy_name] = enemy
+
+        if self.options["autofight"]:
+            text = self.autofight(enemy_name, enemy)
+
         else:
-            enemy_name, enemy = room.generate_enemy()
             text += f"{enemy_name} has approached to fight!\n"
             text += enemy.stats.print_stats()
-            self.fighting[enemy_name] = enemy
         return text
+
+    def autofight(self, enemy_name, enemy):
+        """automatically fights an enemy"""
+        # TODO: make this work
+        pass
+
+    def set(self, commands):
+        option = next(commands)
+        value = next(commands)
+
+        # input validation
+        if option not in self.options:
+            return "That is not a valid option!"
+        elif not option:
+            return "you must provide an option"
+        elif not value:
+            return "you must provide a value"
+
+        elif isinstance(self.options[option], bool):
+            value = value[0]
+            if value == "t":
+                self.options[option] = True
+
+            elif value == "f":
+                self.options[option] = False
+            else:
+                # TODO make this error a template
+                return f"invalid value {value} for boolean option {option}, use true/false"
+
+        elif isinstance(self.options[option], int):
+            if value.isdigit():
+                self.options[option] = int(value)
+            else:
+                return f"invalid value {value} for integer option {option}, use an integer"
+
+        return f"Successfully set {option} to {self.options[option]}"
 
     def print_profile(self):
         profile_text = utils.join_items(
@@ -348,6 +389,7 @@ class Player():
         "attack": attack,
         "fight": fight,
         "heal": heal,
+        # "set": set,
     }
 
 

@@ -52,8 +52,6 @@ class RPG():
             for player in possible_players
         ], seperator="\n" * 2)
 
-        # for user in possible_players:
-            # output_text += utils.newline(user.print_profile(), 2)
         return utils.newline(output_text)
 
     def play_game(self, user_id, commands):

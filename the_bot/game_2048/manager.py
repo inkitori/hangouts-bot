@@ -25,7 +25,7 @@ class Manager2048:
             is_description=True
         ),
         "move": utils.join_items(
-            *[(direction.name.lower(), direction.value.commands) for direction in Directions],
+            *[(direction.name.lower(), *direction.value.commands) for direction in Directions],
             is_description=True
         ),
         "scores": utils.join_items(
@@ -40,7 +40,7 @@ class Manager2048:
         ("informational", *list(help_texts)),
         is_description=True, description_mode="long"
     )
-    # needs to be here because resereved_words is declared first
+    # needs to be here because resereved_words is declared first (avoid circular references)
     reserved_words += list(help_texts)
 
     def __init__(self):

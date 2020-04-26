@@ -11,26 +11,23 @@ class Stats():
     """class for stats"""
     # TODO: fix this nonsense
     def __init__(
-        self, *, alive=False, generate_stats=False, type_=None,
-        max_health=0, health=0, mana=0, attack=0, defense=0,
-        max_mana=0, level=1, xp=0, balance=0, lifetime_balance=0
+        self, *, alive=False, generate_stats=False,
+        max_health=None, health=None, mana=None, attack=None, defense=None,
+        max_mana=None, level=None, xp=None, balance=None, lifetime_balance=None
     ):
-        # TODO: get rid of ifs and change default value to none
-        # TODO: then change print stats to skip values of None
-        # if alive:
-        self.max_health = max(max_health, health)  # prevents bugs
-        self.health = health
-    # if type_ == "player":
-        self.mana = mana
-        self.max_mana = max(max_mana, mana)
-        self.lifetime_balance = max(lifetime_balance, balance)
-        self.balance = balance
-        self.xp = xp
-    #elif type_ == "item":
-        self.mana = mana
-        self.health = health
+        # TODO: get rid of init arguments and take **kwargs
         if generate_stats:
             attack, defense, health = self.generate_from_level(level)
+        if health is not None:
+            self.health = health
+            self.max_health = max(utils.default(max_health, 1), health)
+        if mana is not None:
+            self.mana = mana
+            self.max_mana = max(utils.default(max_mana, 0), mana)
+        if balance is not None:
+            self.balance = balance
+            self.lifetime_balance = max(utils.default(lifetime_balance, 0), balance)
+        self.xp = xp
         self.attack = attack
         self.defense = defense
         self.level = level
@@ -48,13 +45,14 @@ class Stats():
     def print_stats(self, modifiers=None):
         """returns text representation of stats"""
         # this mess adds a + modifed value if there is a modified stat
+        modifiers =  utils.default(modifiers, Stats())
         stats_text = utils.join_items(
             *[
                 (
                     stat_name, str(stat_value) +
                     utils.default(
-                        f" +{modifiers.__dict__[stat_name]}",
-                        "", modifiers.__dict__[stat_name]
+                        f" +{modifiers.__dict__.get(stat_name, 0)}",
+                        "", modifiers.__dict__.get(stat_name, 0)
                     )
                 )
                 for stat_name, stat_value in self.__dict__.items()
@@ -104,11 +102,11 @@ class Stats():
         self.health = utils.clamp(self.health, 0, self.max_health)
 
 
-class Enemy():
+class Enemy:
     """represents an enemy"""
 
-    def __init__(self, stats={}):
-        self.stats = Stats(alive=True, generate_stats=True, type_="enemy", **stats)
+    def __init__(self, stats={"health": 1, "attack": 0, "defense": 0, "level": 1}):
+        self.stats = Stats(alive=True, generate_stats=True, **stats)
 
     def name(self):
         return utils.get_key(enemies, self)
@@ -117,7 +115,7 @@ class Enemy():
         return {"stats": self.stats.to_dict()}
 
 
-class Room():
+class Room:
     """represents a room in the world"""
 
     def __init__(self, enemies_list=[], min_level=1, xp_range=(1, 1), can_rest=False):
@@ -151,17 +149,17 @@ class ItemType(enum.Enum):
     TOME = "tome"
 
 
-class Item():
+class Item:
     """represents an item"""
 
     def __init__(
         self, type_, rarity=1, modifier="boring",
-        stats={"health": 0, "attack": 0, "defense": 0, "mana": 0}
+        stats={"health": 0, "attack": 0, "defense": 0, "mana": 0, "level": 1, }
     ):
         self.type_ = ItemType(type_)
         self.rarity = Rarity(rarity)
         self.modifier = modifier
-        self.stats = Stats(alive=False, generate_stats=False, type_="item", **stats)
+        self.stats = Stats(alive=False, generate_stats=False, **stats)
 
     def short_description(self):
         """returns text description of item"""
@@ -190,6 +188,6 @@ rooms = {
     "potatoland": Room(enemies_list=["potato", "super potato"])
 }
 enemies = {
-    "potato": Enemy(stats={"health": 20, "attack": 1}),
-    "super potato": Enemy(stats={"health": 100, "attack": 10, "defense": 1, }),
+    "potato": Enemy(stats={"level": 3}),
+    "super potato": Enemy(stats={"level": 10}),
 }
