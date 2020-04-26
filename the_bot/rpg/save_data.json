@@ -6,8 +6,8 @@
             "health": 97,
             "mana": 100,
             "max_mana": 100,
-            "lifetime_balance": 108,
-            "balance": 108,
+            "lifetime_balance": 112,
+            "balance": 112,
             "xp": 0,
             "attack": 5,
             "defense": 5,
@@ -23,6 +23,78 @@
             "equipped": {
                 "armor": null,
                 "weapon": "starter weapon",
+                "tome": null
+            }
+        }
+    },
+    "106637925595968853122": {
+        "name": "chendi",
+        "stats": {
+            "max_health": 100,
+            "health": 94,
+            "mana": 100,
+            "max_mana": 100,
+            "lifetime_balance": 11,
+            "balance": 11,
+            "xp": 0,
+            "attack": 5,
+            "defense": 5,
+            "level": 1
+        },
+        "room": "potatoland",
+        "fighting": {
+            "potato": {
+                "stats": {
+                    "max_health": 20,
+                    "health": 8,
+                    "attack": 5,
+                    "defense": 5,
+                    "level": 1
+                }
+            }
+        },
+        "inventory": {
+            "items": {},
+            "max_items": 8,
+            "equipped": {
+                "armor": null,
+                "weapon": null,
+                "tome": null
+            }
+        }
+    },
+    "104456743203495898583": {
+        "name": "tabi",
+        "stats": {
+            "max_health": 100,
+            "health": 97,
+            "mana": 100,
+            "max_mana": 100,
+            "lifetime_balance": 0,
+            "balance": 0,
+            "xp": 0,
+            "attack": 5,
+            "defense": 5,
+            "level": 1
+        },
+        "room": "potatoland",
+        "fighting": {
+            "potato": {
+                "stats": {
+                    "max_health": 20,
+                    "health": 2,
+                    "attack": 5,
+                    "defense": 5,
+                    "level": 1
+                }
+            }
+        },
+        "inventory": {
+            "items": {},
+            "max_items": 8,
+            "equipped": {
+                "armor": null,
+                "weapon": null,
                 "tome": null
             }
         }

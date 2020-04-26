@@ -1,8 +1,8 @@
 {
     "101": {
         "name": "ether",
-        "balance": 4478053794,
-        "lifetime_balance": 48611111111141498,
+        "balance": 4478053795,
+        "lifetime_balance": 48611111111141499,
         "prestige": 7999,
         "items": {
             "pick": 6
@@ -13,11 +13,35 @@
     },
     "102": {
         "name": "qwerty",
-        "balance": 165,
-        "lifetime_balance": 279,
+        "balance": 189,
+        "lifetime_balance": 304,
         "prestige": 0,
         "items": {
             "pick": 1
+        },
+        "confirmed_prestige": false,
+        "confirmed_upgrade": false,
+        "prestige_upgrade": 0
+    },
+    "106637925595968853122": {
+        "name": "chendi",
+        "balance": 12,
+        "lifetime_balance": 12,
+        "prestige": 0,
+        "items": {
+            "pick": 0
+        },
+        "confirmed_prestige": false,
+        "confirmed_upgrade": false,
+        "prestige_upgrade": 0
+    },
+    "104456743203495898583": {
+        "name": "tabi",
+        "balance": 0,
+        "lifetime_balance": 0,
+        "prestige": 0,
+        "items": {
+            "pick": 0
         },
         "confirmed_prestige": false,
         "confirmed_upgrade": false,

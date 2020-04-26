@@ -25,9 +25,9 @@
         },
         "2": {
             "board": [
-                0,
-                0,
-                0,
+                2,
+                1,
+                1,
                 0,
                 0,
                 0,
@@ -39,12 +39,12 @@
                 0,
                 0,
                 1,
-                1,
+                0,
                 0
             ],
             "has_won": false,
             "mode": "normal",
-            "score": 0
+            "score": 4
         },
         "q": {
             "board": [
@@ -131,8 +131,8 @@
                 0,
                 0,
                 0,
-                0,
-                1
+                1,
+                0
             ],
             "has_won": false,
             "mode": "eleven",
@@ -160,6 +160,29 @@
             "has_won": false,
             "mode": "normal",
             "score": 0
+        },
+        "adsfasfs": {
+            "board": [
+                3,
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "has_won": false,
+            "mode": "confusion",
+            "score": 12
         }
     },
     "scores": {

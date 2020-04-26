@@ -192,7 +192,6 @@ class Game():
     }
     game_commands = ["restart", "{direction}"]
 
-
     def __init__(self, board=None, has_won=False, mode="normal", score=0):
         self.score = score
         self.text = ""
