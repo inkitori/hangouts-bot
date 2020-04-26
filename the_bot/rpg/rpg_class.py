@@ -45,7 +45,7 @@ class RPG():
             output_text += "No users go by that name!"
 
         elif len(possible_players) > 1:
-            output_text += f"{len(possible_players)} player(s) go by that name:\n"
+            output_text += utils.newline(f"{len(possible_players)} player(s) go by that name:")
 
         for user in possible_players:
             output_text += utils.newline(user.print_profile(), 2)
