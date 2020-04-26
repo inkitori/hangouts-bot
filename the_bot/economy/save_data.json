@@ -1,8 +1,8 @@
 {
     "101": {
         "name": "ether",
-        "balance": 4478053805,
-        "lifetime_balance": 48611111111141509,
+        "balance": 4478053806,
+        "lifetime_balance": 48611111111141510,
         "prestige": 7999,
         "items": {
             "pick": 6
@@ -13,8 +13,8 @@
     },
     "102": {
         "name": "qwerty",
-        "balance": 428,
-        "lifetime_balance": 553,
+        "balance": 453,
+        "lifetime_balance": 579,
         "prestige": 0,
         "items": {
             "pick": 1

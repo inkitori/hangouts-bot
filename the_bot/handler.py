@@ -1,8 +1,6 @@
 """
 handler for bots
 """
-from hangups import hangouts_pb2 as hangouts_pb2
-
 import random
 from collections import defaultdict
 from datetime import datetime

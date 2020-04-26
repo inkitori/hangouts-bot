@@ -98,7 +98,7 @@ class Manager2048:
             output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
-            self.delete_game(commands)
+            output_text = self.delete_game(commands)
 
         elif command in games:
             games[Keywords.CURRENT_GAME] = games[command]
@@ -164,12 +164,11 @@ class Manager2048:
         """deletes a game"""
         delete_game_name = next(commands)
         if not delete_game_name:
-            output_text = "you must give the name of the game"
+            return "you must give the name of the game"
         elif delete_game_name not in games.keys():
-            output_text = "that game does not exist"
+            return "that game does not exist"
         else:
             if games[Keywords.CURRENT_GAME] == games[delete_game_name]:
                 games[Keywords.CURRENT_GAME] = None
             del games[delete_game_name]
-            output_text = f"{delete_game_name} deleted"
-        return output_text
+            return f"{delete_game_name} deleted"
