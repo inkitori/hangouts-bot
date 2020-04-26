@@ -154,6 +154,8 @@ def command_parser(command_text):
             item = get_item(commands, indexes=(current_index, ))
         elif val == "remaining":
             item = join_items(*commands[current_index:], seperator=" ", end="")
+        elif val == "all":
+            item = commands
         else:
             item = get_item(commands, indexes=(current_index, ))
             current_index += 1
