@@ -86,39 +86,6 @@ class Handler:
             output_text = "Could not get id"
         return output_text
 
-    async def kick(self, bot, user, conv, commands):
-        """
-        kicks a user
-        last i checked, this was broken
-        """
-        kick_user_name = next(commands)
-        users = conv.users
-
-        try:
-            for user in users:
-                if kick_user_name in user.full_name.lower():
-                    kick_user = kick_user_name
-                    break
-
-            if not kick_user:
-                return "Nobody in this conversation goes by that name"
-            # only reason i figured this out was because of hangupsbot, so thank you so much
-            # https://github.com/xmikos/hangupsbot/blob/master/hangupsbot/commands/conversations.py
-
-            kick_id = hangouts_pb2.ParticipantId(gaia_id=kick_user.id_.gaia_id, chat_id=conv.id_)
-
-            request = hangouts_pb2.RemoveUserRequest(
-                request_header=bot.client.get_request_header(),
-                participant_id=kick_id,
-                event_request_header=conv._get_event_request_header()
-            )
-            res = await bot.client.remove_user(request)
-            conv.add_event(res.created_event)
-        except Exception:
-            output_text = "Yeah don't use this command lol"
-
-        return output_text
-
     def play_game(self, user_id, game_name, commands):
         """plays a game"""
         manager = self.game_managers[game_name]
@@ -138,7 +105,6 @@ class Handler:
         "/rename": rename_conv,
         "/quit": quit_,
         "/id": id_,
-        "/kick": kick,
     }
     keywords = {
         "ping": "pong",
