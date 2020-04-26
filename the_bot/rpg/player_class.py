@@ -180,18 +180,6 @@ class Player():
     def get_id(self):
         return utils.get_key(players, self)
 
-    def print_stats(self):
-        """returns string representation of stats"""
-        stats_list = []
-        for stat_name, stat in self.stats.__dict__.items():
-            # TODO: print modifiers from equipped items too
-            stat_text = f"{stat_name}: {stat}"
-            if utils.get_value(self.modiifer_stats.__dict__, stat_name):
-                stat_text += f" {self.modiifer_stats.__dict__[stat_name]}"
-            stats_list.append(stat_text)
-
-        return utils.join_items(stats_list)
-
     def modified_stats(self):
         """returns Stats() of player modified by player.equipped"""
         modifiers = self.inventory.modifers()
@@ -296,7 +284,7 @@ class Player():
             text += utils.join_items(
                 f"{enemy_name} dealt {damage_taken} to you!",
                 f"You have {self.stats.health} hp left",
-                f"{enemy_name} has {enemy.stats.health} left!"
+                f"{enemy_name} has {enemy.stats.health} left!",
             )
 
             if self.stats.health <= 0:
@@ -345,7 +333,7 @@ class Player():
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
             is_description=True,
-        ) + self.stats.print_stats()
+        ) + self.stats.print_stats(self.inventory.modifers())
         return profile_text
     commands = {
         "rest": rest,

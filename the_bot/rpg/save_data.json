@@ -47,6 +47,11 @@
                 "stats": {
                     "max_health": 20,
                     "health": 8,
+                    "mana": 0,
+                    "max_mana": 0,
+                    "lifetime_balance": 0,
+                    "balance": 0,
+                    "xp": 0,
                     "attack": 5,
                     "defense": 5,
                     "level": 1
@@ -83,6 +88,11 @@
                 "stats": {
                     "max_health": 20,
                     "health": 2,
+                    "mana": 0,
+                    "max_mana": 0,
+                    "lifetime_balance": 0,
+                    "balance": 0,
+                    "xp": 0,
                     "attack": 5,
                     "defense": 5,
                     "level": 1
@@ -96,6 +106,51 @@
                 "armor": null,
                 "weapon": null,
                 "tome": null
+            }
+        }
+    },
+    "101": {
+        "name": "ether",
+        "stats": {
+            "max_health": 100,
+            "health": 90,
+            "mana": 100,
+            "max_mana": 100,
+            "lifetime_balance": 6,
+            "balance": 6,
+            "xp": 1,
+            "attack": 5,
+            "defense": 5,
+            "level": 1
+        },
+        "room": "potatoland",
+        "fighting": {
+            "super potato": {
+                "stats": {
+                    "max_health": 100,
+                    "health": 70,
+                    "mana": 0,
+                    "max_mana": 0,
+                    "lifetime_balance": 0,
+                    "balance": 0,
+                    "xp": 0,
+                    "attack": 5,
+                    "defense": 5,
+                    "level": 1
+                }
+            }
+        },
+        "inventory": {
+            "items": {
+                "starter armor": 2,
+                "starter weapon": 1,
+                "clarity tome": 1
+            },
+            "max_items": 8,
+            "equipped": {
+                "armor": "starter armor",
+                "weapon": "starter weapon",
+                "tome": "clarity tome"
             }
         }
     }

@@ -17,18 +17,18 @@ class Stats():
     ):
         # TODO: get rid of ifs and change default value to none
         # TODO: then change print stats to skip values of None
-        if alive:
-            self.max_health = max_health
-            self.health = health
-        if type_ == "player":
-            self.mana = mana
-            self.max_mana = max_mana
-            self.lifetime_balance = lifetime_balance
-            self.balance = balance
-            self.xp = xp
-        elif type_ == "item":
-            self.mana = mana
-            self.health = health
+        # if alive:
+        self.max_health = max(max_health, health)  # prevents bugs
+        self.health = health
+    # if type_ == "player":
+        self.mana = mana
+        self.max_mana = max(max_mana, mana)
+        self.lifetime_balance = max(lifetime_balance, balance)
+        self.balance = balance
+        self.xp = xp
+    #elif type_ == "item":
+        self.mana = mana
+        self.health = health
         if generate_stats:
             attack, defense, health = self.generate_from_level(level)
         self.attack = attack
@@ -47,17 +47,22 @@ class Stats():
 
     def print_stats(self, modifiers=None):
         """returns text representation of stats"""
+        # this mess adds a + modifed value if there is a modified stat
         stats_text = utils.join_items(
             *[
-                (stat_name, stat_value)
+                (
+                    stat_name, str(stat_value) +
+                    utils.default(
+                        f" +{modifiers.__dict__[stat_name]}",
+                        "", modifiers.__dict__[stat_name]
+                    )
+                )
                 for stat_name, stat_value in self.__dict__.items()
-                if stat_name not in ("level", "xp")
+                if stat_name not in ("level", "xp") and stat_value is not None
             ], is_description=True
         )
-        try:
+        if self.level is not None:
             stats_text += self.print_level_xp()
-        except AttributeError:
-            pass
         return stats_text
 
     def next_level_xp(self):
@@ -115,7 +120,7 @@ class Enemy():
 class Room():
     """represents a room in the world"""
 
-    def __init__(self, enemies_list=[], min_level=1, xp_range=(0, 0), can_rest=False):
+    def __init__(self, enemies_list=[], min_level=1, xp_range=(1, 1), can_rest=False):
         self.enemies_list = enemies_list
         self.min_level = min_level
         self.xp_range = xp_range
@@ -139,6 +144,7 @@ class Rarity(enum.IntEnum):
     LEGENDARY = enum.auto()
 
 
+@enum.unique
 class ItemType(enum.Enum):
     WEAPON = "weapon"
     ARMOR = "armor"
@@ -174,15 +180,16 @@ class Item():
 
 
 all_items = {
-    "starter armor": Item(type_="armor"),
-    "starter weapon": Item(type_="weapon", stats={}),
+    "starter armor": Item(type_="armor", stats={"defense": 5}),
+    "starter weapon": Item(type_="weapon", stats={"attack": 5}),
     "clarity tome": Item(type_="tome", stats={"health": 20})
 }
 
 rooms = {
     "village": Room(can_rest=True),
-    "potatoland": Room(enemies_list=["potato", ])
+    "potatoland": Room(enemies_list=["potato", "super potato"])
 }
 enemies = {
-    "potato": Enemy(stats={"health": 20, "max_health": 20, "attack": 1})
+    "potato": Enemy(stats={"health": 20, "attack": 1}),
+    "super potato": Enemy(stats={"health": 100, "attack": 10, "defense": 1, }),
 }

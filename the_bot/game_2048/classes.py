@@ -8,6 +8,12 @@ import enum
 import collections
 
 
+@enum.unique
+class Keywords(enum.Enum):
+    """this just exists because spelling errors"""
+    CURRENT_GAME = "current game"
+
+
 class Cell():
     """represents a cell in a board"""
 
@@ -117,6 +123,7 @@ class Board():
             game.text += "\n"
 
 
+@enum.unique
 class GameIncreaseModes(enum.Enum):
     TIMES_2 = enum.auto()
     PLUS_1 = enum.auto()
@@ -164,6 +171,7 @@ class GameMode():
 Direction = collections.namedtuple("Direction", "commands x positive")
 
 
+@enum.unique
 class Directions(enum.Enum):
     UP = Direction(("up", "u", "^"), False, False)
     LEFT = Direction(("left", "l", "<"), True, False)
@@ -205,7 +213,7 @@ class Game():
 
     def name(self):
         """name of the game"""
-        return utils.get_key(games, self, "current game")
+        return utils.get_key(games, self, Keywords.CURRENT_GAME)
 
     def update(self):
         """appends text based on current state"""
@@ -300,4 +308,4 @@ class Game():
         return utils.newline(self.text)
 
 
-games = {"current game": None}
+games = {Keywords.CURRENT_GAME: None}

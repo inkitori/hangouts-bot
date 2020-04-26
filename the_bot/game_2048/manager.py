@@ -2,7 +2,7 @@
 manager for 2048 games
 """
 import utils
-from game_2048.classes import Game, games, Directions
+from game_2048.classes import Game, games, Directions, Keywords
 
 
 class Manager2048:
@@ -16,7 +16,7 @@ class Manager2048:
         Game.game_commands + list(Game.modes.keys()) +
         [command for direction in Directions for command in direction.value.commands] +
         game_management_commands +
-        ["2048", "/2048", "current game"]
+        ["2048", "/2048"] + [keyword.value for keyword in Keywords]
     )
     help_texts = {
         "help": "",  # avoids probelems with referencing itself
@@ -95,14 +95,14 @@ class Manager2048:
             self.delete_game(commands)
 
         elif command in games:
-            games["current game"] = games[command]
+            games[Keywords.CURRENT_GAME] = games[command]
 
         elif command == "games":
             output_text += utils.join_items(
                 *[
                     utils.description(game_name, game.mode.name(), game.score)
                     for game_name, game in games.items()
-                    if game_name != "current game"
+                    if game_name != Keywords.CURRENT_GAME
                 ]
             )
 
@@ -113,14 +113,18 @@ class Manager2048:
             # moves the generator back one command because the command was not used
             commands.send(-1)
 
-        play_game_name = utils.default(play_game_name, "current game")
-        games["current game"] = games[play_game_name]
+        play_game_name = utils.default(play_game_name, Keywords.CURRENT_GAME)
+        games[Keywords.CURRENT_GAME] = games[play_game_name]
 
-        if not output_text:
-            if games["current game"]:
-                output_text = games["current game"].play_game(commands)
-            else:
-                output_text = "no game selected"
+        if output_text:
+            return output_text
+
+        # plays game
+        if games[Keywords.CURRENT_GAME]:
+            output_text = games[Keywords.CURRENT_GAME].play_game(commands)
+        else:
+            output_text = "no game selected"
+
         return output_text
 
     def load_game(self):
@@ -135,7 +139,7 @@ class Manager2048:
         """saves games to a json file"""
         games_dict = dict()
         for game_name, game in games.items():
-            if game_name == "current game" or (game is None):
+            if game_name == Keywords.CURRENT_GAME or (game is None):
                 continue
             games_dict[game_name] = {
                 "board": [cell.value for cell in game.board.cells],
@@ -157,8 +161,8 @@ class Manager2048:
         elif delete_game_name not in games.keys():
             output_text = "that game does not exist"
         else:
-            if games["current game"] == games[delete_game_name]:
-                games["current game"] = None
+            if games[Keywords.CURRENT_GAME] == games[delete_game_name]:
+                games[Keywords.CURRENT_GAME] = None
             del games[delete_game_name]
             output_text = f"{delete_game_name} deleted"
         return output_text

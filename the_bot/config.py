@@ -4,13 +4,14 @@ sets up parser for arguments
 import optparse
 import utils
 
+console_bot = "--bot=console"
 configurations = {
     # configuration_name: configuration_arguments in a list
     # feel free to add anything u want here, its fine
-    "": "",  # prevents errors when no config is selected
-    "con": ["--bot=console", ],
-    "alt": ["--bot=console", "--id=102"],
-    "adm": ["--bot=console", "--id=103"],
+    "": [],  # prevents errors when no config is selected
+    "con": [console_bot, ],
+    "alt": [console_bot, "--id=102"],
+    "adm": [console_bot, "--id=103"],
     "test": ["--bot=test", "--id=102"],
 }
 
