@@ -11,7 +11,7 @@
             "xp": 0,
             "attack": 5,
             "defense": 5,
-            "level": 1
+            "level": 3
         },
         "room": "village",
         "fighting": {},
@@ -123,7 +123,7 @@
         "fighting": {
             "potato": {
                 "stats": {
-                    "health": 77,
+                    "health": 100,
                     "max_health": 100,
                     "xp": null,
                     "attack": 5,
