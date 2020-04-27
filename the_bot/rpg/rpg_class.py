@@ -23,8 +23,13 @@ class RPG():
         name = next(commands)
         if user_id in self.players:
             return "You are already registered!"
+
+        # input validation
         if not name:
             return "you must provide a name"
+        elif name in [player.name for player in self.players]:
+            return "that name is taken by a player"
+
         self.players[user_id] = player_class.Player(name=name)
         return "Successfully registered!"
 

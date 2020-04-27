@@ -112,24 +112,20 @@
             "max_health": 100,
             "mana": 100,
             "max_mana": 100,
-            "balance": 6,
-            "lifetime_balance": 6,
-            "xp": 1,
+            "balance": 17,
+            "lifetime_balance": 17,
+            "xp": 2,
             "attack": 5,
             "defense": 5,
             "level": 1
         },
         "room": "potatoland",
         "fighting": {
-            "super potato": {
+            "potato": {
                 "stats": {
-                    "health": 100,
+                    "health": 77,
                     "max_health": 100,
-                    "mana": 0,
-                    "max_mana": 0,
-                    "balance": 0,
-                    "lifetime_balance": 0,
-                    "xp": 0,
+                    "xp": null,
                     "attack": 5,
                     "defense": 5,
                     "level": 1

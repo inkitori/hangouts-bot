@@ -323,31 +323,30 @@ class Player():
 
     def fight(self, commands):
         """starts a with an enemy"""
-        text = ""
         room = classes.rooms[self.room]
 
         if not room.enemies_list:
-            text = "There are no enemies here"
-
+            return "There are no enemies here"
         elif self.fighting:
-            text = f"You are already fighting {', '.join(self.fighting.keys())}!"
+            return f"You are already fighting {', '.join(self.fighting.keys())}!"
 
         enemy_name, enemy = room.generate_enemy()
         self.fighting[enemy_name] = enemy
 
         if self.options["autofight"]:
-            text = self.autofight(enemy_name, enemy)
-
+            return self.autofight(enemy_name, enemy)
         else:
-            text += f"{enemy_name} has approached to fight!\n"
-            text += enemy.stats.print_stats()
-        return text
+            return utils.join_items(
+                f"{enemy_name} has approached to fight!",
+                enemy.stats.print_stats(),
+                seperator="\n\t"
+            )
 
     def autofight(self, enemy_name):
         while True:
             pass
 
-    def set(self, commands):
+    def set_(self, commands):
         option = next(commands)
         value = next(commands)
 
@@ -394,8 +393,9 @@ class Player():
         "attack": attack,
         "fight": fight,
         "heal": heal,
-        # "set": set,
+        "set": set_,
     }
 
 
 players = {}
+parties = {}

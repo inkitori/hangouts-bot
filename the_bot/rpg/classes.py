@@ -132,6 +132,9 @@ class Room:
         enemy = copy.deepcopy(enemies[enemy_name])
         return enemy_name, enemy
 
+    def generate_encounter(self, party):
+        pass
+
 
 @enum.unique
 class Rarity(enum.IntEnum):
@@ -188,6 +191,6 @@ rooms = {
     "potatoland": Room(enemies_list=["potato", "super potato"])
 }
 enemies = {
-    "potato": Enemy(stats={"level": 3}),
-    "super potato": Enemy(stats={"level": 10}),
+    "potato": Enemy(stats={"level": 1}),
+    "super potato": Enemy(stats={"level": 3}),
 }
