@@ -3,7 +3,6 @@ assorted useful functions
 """
 import hangups
 import shelve
-import json
 import inspect
 import pickle
 import os.path
@@ -108,19 +107,15 @@ def save(file_name="save_data", **contents):
             save_file[name] = data
 
 
-def load(file_name):  # *names, file_name="save_data"):
+def load(*names, file_name="save_data"):
     """loads data from a file"""
-    """
     data = []
     with shelve.open(file_name) as save_file:
         for name in names:
             data.append(save_file[name])
-    """
-    with open(file_name, "r") as file:
-        try:
-            return json.load(file)
-        except json.decoder.JSONDecodeError:
-            print("could not load data")
+    if len(data) == 1:
+        data = data[0]
+    return data
 
 
 # processing strings
@@ -193,10 +188,9 @@ def get_item(sequence, indexes=(0, ), default=""):
     return items
 
 
-def get_key(dictionary, item, *ignore):
+def get_key(dictionary, item, *ignore, is_same=True):
     """
     gets a key using a value
-    assumes unique values
     ignores keys in ignore
     """
     dictionary = dictionary.copy()
@@ -205,7 +199,13 @@ def get_key(dictionary, item, *ignore):
             del dictionary[key]
         except KeyError:
             pass
-    key_index = list(dictionary.values()).index(item)
+    if is_same:
+        key_index = list(dictionary.values()).index(item)
+    else:
+        for key, value in dictionary.items():
+            if value == item:
+                return key
+        raise KeyError(item)
     return list(dictionary.keys())[key_index]
 
 

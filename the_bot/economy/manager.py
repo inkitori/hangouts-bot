@@ -23,6 +23,7 @@ class EconomyManager():
             ("commands", *classes.EconomyUser.commands),
             is_description=True, description_mode="long"
         )
+        self.save_game()
 
     def run_game(self, user_id, commands):
         """runs the game"""
@@ -99,13 +100,11 @@ class EconomyManager():
     def save_game(self):
         """saves the game"""
         utils.save(economy_users=self.users)
+        classes.users = self.users
 
     def load_game(self):
         """loads the game"""
-        # self.users = utils.load("economy_users")
-        data = utils.load(self.save_file)
-        for user_id, user_data in data.items():
-            self.users[int(user_id)] = classes.EconomyUser(**user_data)
+        self.users = utils.load("economy_users")
 
     def register(self, user_id, commands):
         """registers a user"""

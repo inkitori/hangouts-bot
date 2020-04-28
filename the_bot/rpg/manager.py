@@ -18,6 +18,7 @@ class RPGManager:
     def __init__(self, load_sheets=True):
         self.load_game(load_sheets=load_sheets)
         random.seed(datetime.now())
+        self.save_game()
 
     def run_game(self, user_id, commands):
         """runs the game"""
@@ -35,15 +36,10 @@ class RPGManager:
 
     def load_game(self, load_sheets):
         """loads the game"""
-        """
         self.game.players = utils.load("rpg_players")
         if load_sheets:
             print("loading rpg data from sheets")
             self.load_sheets_data()
-        """
-        save_data = utils.load(self.save_file)
-        for user_id, player_data in save_data.items():
-            self.game.players[int(user_id)] = player_class.Player(**player_data)
 
     def load_sheets_data(self):
         sheets = utils.create_sheets_service().spreadsheets()
@@ -61,3 +57,4 @@ class RPGManager:
     def save_game(self):
         """saves the game"""
         utils.save(rpg_players=self.game.players)
+        player_class.players = self.game.players

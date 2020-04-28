@@ -2,8 +2,7 @@
 manager for 2048 games
 """
 import utils
-from game_2048.classes import Game, games, Directions, Keywords
-# TODO: switch to import game_2048.classes as classes
+import game_2048.classes as classes
 
 
 class Manager2048:
@@ -14,49 +13,55 @@ class Manager2048:
         "delete {game_name}", "games",
     ]
     reserved_words = (
-        Game.game_commands + list(Game.modes.keys()) +
-        [command for direction in Directions for command in direction.value.commands] +
+        classes.Game.game_commands + list(classes.Game.modes.keys()) +
+        [command for direction in classes.Directions for command in direction.value.commands] +
         game_management_commands +
-        ["2048", "/2048"] + [keyword.value for keyword in Keywords]
+        ["2048", "/2048"] + [keyword.value for keyword in classes.Keywords]
     )
     help_texts = {
         "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
-            *[(mode_name, mode.description) for mode_name, mode in Game.modes.items()],
+            *[(mode_name, mode.description)
+              for mode_name, mode in classes.Game.modes.items()],
             is_description=True
         ),
         "move": utils.join_items(
-            *[(direction.name.lower(), *direction.value.commands) for direction in Directions],
+            *[(direction.name.lower(), *direction.value.commands)
+              for direction in classes.Directions],
             is_description=True
         ),
         "scores": utils.join_items(
-            *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+            *[(mode_name, mode.high_score)
+              for mode_name, mode in classes.Game.modes.items()],
             is_description=True
         ),
         "reserved": utils.description("reserved", *reserved_words)
     }
     help_texts["help"] = utils.join_items(
-        ("in-game commands", *list(Game.game_commands)),
+        ("in-game commands", *list(classes.Game.game_commands)),
         ("game management", *game_management_commands),
         ("informational", *list(help_texts)),
         is_description=True, description_mode="long"
     )
     # needs to be here because resereved_words is declared first (avoid circular references)
     reserved_words += list(help_texts)
+    games = classes.games
 
     def __init__(self):
         self.load_game()
+        self.save_game()
 
     def update_high_scores(self):
         self.help_texts["scores"] = utils.join_items(
-            *[(mode_name, mode.high_score) for mode_name, mode in Game.modes.items()],
+            *[(mode_name, mode.high_score)
+              for mode_name, mode in classes.Game.modes.items()],
             is_description=True
         )
 
     def create_game(self, game_name):
         """creates a new game in games dict"""
-        games[game_name] = Game()
-        return games[game_name]
+        self.games[game_name] = classes.Game()
+        return self.games[game_name]
 
     def verify_name(self, *names):
         """verifies a name for a game"""
@@ -65,7 +70,7 @@ class Manager2048:
                 return "game names cannot be reserved words"
             elif not name:
                 return "games must have names"
-            elif name in games.keys():
+            elif name in self.games.keys():
                 return "names must be unique, note that names are NOT case-sensitive"
         return "valid"
 
@@ -92,25 +97,26 @@ class Manager2048:
             valid = self.verify_name(new_name)
             if valid != "valid":
                 return valid
-            elif old_name not in games.keys():
+            elif old_name not in self.games.keys():
                 return "that game does not exist"
 
-            games[new_name] = games.pop(old_name)
+            self.games[new_name] = self.games.pop(old_name)
             play_game_name = new_name
             output_text = f"renamed {old_name} to {new_name}"
 
         elif command == "delete":
             output_text = self.delete_game(commands)
 
-        elif command in games:
-            games[Keywords.CURRENT_GAME] = games[command]
+        elif command in self.games:
+            self.games[classes.Keywords.CURRENT_GAME] = self.games[command]
 
         elif command == "games":
             output_text += utils.join_items(
                 *[
-                    utils.description(game_name, game.mode.name(), game.score)
-                    for game_name, game in games.items()
-                    if game_name != Keywords.CURRENT_GAME
+                    utils.description(
+                        game_name, game.mode_name, game.score)
+                    for game_name, game in self.games.items()
+                    if game_name != classes.Keywords.CURRENT_GAME
                 ]
             )
 
@@ -121,15 +127,17 @@ class Manager2048:
             # moves the generator back one command because the command was not used
             commands.send(-1)
 
-        play_game_name = utils.default(play_game_name, Keywords.CURRENT_GAME)
-        games[Keywords.CURRENT_GAME] = games[play_game_name]
+        play_game_name = utils.default(
+            play_game_name, classes.Keywords.CURRENT_GAME)
+        self.games[classes.Keywords.CURRENT_GAME] = self.games[play_game_name]
 
         if output_text:
             return output_text
 
         # plays game
-        if games[Keywords.CURRENT_GAME]:
-            output_text = games[Keywords.CURRENT_GAME].play_game(commands)
+        if self.games[classes.Keywords.CURRENT_GAME]:
+            output_text = self.games[classes.Keywords.CURRENT_GAME].play_game(
+                commands)
         else:
             output_text = "no game selected"
 
@@ -138,32 +146,28 @@ class Manager2048:
 
     def load_game(self):
         """loads games from file"""
-        """
-        global games  # TODO: change games to be a property of manager
-        games, scores = utils.load("games_2048", "scores_2048")
-        for mode_name, mode in Game.modes.items():
+        self.games, scores = utils.load("games_2048", "scores_2048")
+        for mode_name, mode in classes.Game.modes.items():
             mode.high_score = scores[mode_name]
-        """
-        data = utils.load(self.save_file)
-        for game_name, game_data in data["games"].items():
-            games[game_name] = Game(**game_data)
-        for mode_name, mode in Game.modes.items():
-            mode.high_score = data["scores"][mode_name]
 
     def save_game(self):
         """saves games to a json file"""
-        scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
-        utils.save(games_2048=games, scores_2048=scores)
+        scores = {
+            mode_name: mode.high_score
+            for mode_name, mode in classes.Game.modes.items()
+        }
+        utils.save(games_2048=self.games, scores_2048=scores)
+        classes.games = self.games
 
     def delete_game(self, commands):
         """deletes a game"""
         delete_game_name = next(commands)
         if not delete_game_name:
             return "you must give the name of the game"
-        elif delete_game_name not in games.keys():
+        elif delete_game_name not in self.games.keys():
             return "that game does not exist"
         else:
-            if games[Keywords.CURRENT_GAME] == games[delete_game_name]:
-                games[Keywords.CURRENT_GAME] = None
-            del games[delete_game_name]
+            if self.games[classes.Keywords.CURRENT_GAME] == self.games[delete_game_name]:
+                self.games[classes.Keywords.CURRENT_GAME] = None
+            del self.games[delete_game_name]
             return f"{delete_game_name} deleted"

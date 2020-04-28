@@ -25,6 +25,7 @@ class Cell():
 
 class Board():
     """represents a board for 2048"""
+
     def __init__(self, mode, values=None):
         self.size = mode.size
         self.number_of_cells = self.size ** 2
@@ -66,7 +67,7 @@ class Board():
                         current_cell.has_merged and not neighbor.has_merged
                     ):
                         current_cell.value += 1
-                        game.score += game.mode.increase_score(current_cell.value)
+                        game.score += game.mode().increase_score(current_cell.value)
                         neighbor.value = 0
                         current_cell.has_merged = True
                     else:
@@ -112,14 +113,14 @@ class Board():
         """appends the board to self.text"""
         max_length = 0
         for cell in self.cells:
-            cell.length = len(str(game.mode.values[cell.value]))
+            cell.length = len(str(game.mode().values[cell.value]))
             max_length = max(self.cells, key=lambda cell: cell.value).value
         max_length += 1
-        for row in range(game.mode.size):
-            for column in range(game.mode.size):
-                cell = game.board.cells[row * game.mode.size + column]
+        for row in range(game.mode().size):
+            for column in range(game.mode().size):
+                cell = game.board.cells[row * game.mode().size + column]
                 spaces = (max_length - cell.length + 1) * " "
-                game.text += spaces * 2 + str(game.mode.values[cell.value])
+                game.text += spaces * 2 + str(game.mode().values[cell.value])
             game.text += "\n"
 
 
@@ -153,7 +154,7 @@ class GameMode():
         self.description = description
 
     def name(self):
-        return utils.get_key(Game.modes, self)
+        return utils.get_key(Game.modes, self, is_same=False)
 
     def increase(self, value):
         """Increases cell value based on game mode"""
@@ -200,20 +201,23 @@ class Game():
     }
     game_commands = ["restart", "{direction}"]
 
-    def __init__(self, board=None, has_won=False, mode="normal", score=0):
+    def __init__(self, board=None, has_won=False, mode_name="normal", score=0):
         self.score = score
         self.text = ""
-        self.mode = self.modes[mode]
+        self.mode_name = mode_name
         self.state = None
         self.has_won = has_won
-        self.board = Board(self.mode, board)
-        if self.board.number_of_empty_cells() == self.mode.number_of_cells and not score:
+        self.board = Board(self.mode(), board)
+        if self.board.number_of_empty_cells() == self.mode().number_of_cells and not score:
             for _ in range(2):
-                self.board.make_new_block(self.mode)
+                self.board.make_new_block(self.mode())
 
     def name(self):
         """name of the game"""
         return utils.get_key(games, self, Keywords.CURRENT_GAME)
+
+    def mode(self):
+        return self.modes[self.mode_name]
 
     def update(self):
         """appends text based on current state"""
@@ -233,19 +237,21 @@ class Game():
     def draw_game(self):
         """appends board and scores to self.text"""
         self.text += utils.join_items(
-            utils.description(self.name(), self.mode.name()), f"score: {self.score}\n"
+            utils.description(self.name(), self.mode().name()),
+            f"score: {self.score}",
+            end="\n" * 2
         )
         self.board.draw_board(self)
 
     def restart(self, mode=None):
         """Resets the game"""
-        self.mode = utils.default(mode, self.mode)
+        self.mode_name = utils.default(mode, self.mode_name)
         self.score = 0
-        if self.mode == Game.modes["confusion"]:
+        if self.mode_name == "confusion":
             self.setup_confusion()
-        self.board = Board(self.mode)
+        self.board = Board(self.mode())
         for _ in range(2):
-            self.board.make_new_block(self.mode)
+            self.board.make_new_block(self.mode())
         self.state = None
         self.has_won = False
 
@@ -259,10 +265,10 @@ class Game():
 
             # does not create new block if board is full or the board did not change
             if old_board_values != [cell.value for cell in self.board.cells]:
-                self.board.make_new_block(self.mode)
+                self.board.make_new_block(self.mode())
 
-        if self.score > self.mode.high_score:
-            self.mode.high_score = self.score
+        if self.score > self.mode().high_score:
+            self.mode().high_score = self.score
         if not self.board.check_can_move():
             self.state = "lost"
         if self.state != "won":
@@ -271,7 +277,7 @@ class Game():
     def check_win(self):
         """checks if the player has won"""
         for block in self.board.cells:
-            if block.value == self.mode.win_value and not self.has_won:
+            if block.value == self.mode().win_value and not self.has_won:
                 self.state = "won"
 
     def setup_confusion(self):
@@ -297,7 +303,7 @@ class Game():
         else:
             if (x, positive) == (None, None):
                 if command in self.modes:
-                    self.restart(Game.modes[command])
+                    self.restart(command)
                 elif command in self.game_commands and not command.startswith("{"):
                     self.state = command
                 elif command != "":
