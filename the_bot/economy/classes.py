@@ -42,8 +42,10 @@ def generate_items(type_):
     max_possible_items = min(
         len(Item.modifiers[type_]), len(Item.prices[type_]))
     return [
-        Item(type_, Item.prices[type_][level],
-             Item.modifiers[type_][level], level)
+        Item(
+            type_, Item.prices[type_][level],
+             Item.modifiers[type_][level], level
+        )
         for level in range(max_possible_items)
     ]
 
