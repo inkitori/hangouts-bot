@@ -57,10 +57,11 @@ class Handler:
             user_id = user_id if self.console else user.id_[0]
             output_text = self.play_game(user_id, command, commands)
             if self.console:
-                # 2048 is designed to print for hangouts
-                # where each numeral is the same width as 2 spaces
-                # consoles are monospaced, so this fixes that
+                # fixes difference in character width in hangouts vs monospaced consoles
                 output_text = output_text.replace("  ", " ")
+
+                # use this for testing formatting
+                # output_text = output_text.replace(" ", "\\s").replace("  ", "\\t")
 
         else:
             # if this printed in hangouts, it would respond to every single message

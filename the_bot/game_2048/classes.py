@@ -112,8 +112,7 @@ class Board:
         max_length = 0
         for cell in self.cells:
             cell.length = len(str(game.mode().values[cell.value]))
-            max_length = max(self.cells, key=lambda cell: cell.value).value
-        max_length += 1
+        max_length = max(self.cells, key=lambda cell: cell.value).length
         for row in range(game.mode().size):
             for column in range(game.mode().size):
                 cell = game.board.cells[row * game.mode().size + column]

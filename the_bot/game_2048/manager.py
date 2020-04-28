@@ -20,8 +20,10 @@ class Manager2048:
     help_texts = {
         "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
-            *[(mode_name, mode.description)
-              for mode_name, mode in classes.Game.modes.items()],
+            *[
+                (mode_name, mode.description)
+                for mode_name, mode in classes.Game.modes.items()
+            ],
             is_description=True
         ),
         "move": utils.join_items(
@@ -56,8 +58,10 @@ class Manager2048:
 
     def update_high_scores(self):
         self.help_texts["scores"] = utils.join_items(
-            *[(mode_name, mode.high_score)
-              for mode_name, mode in classes.Game.modes.items()],
+            *[
+                (mode_name, mode.high_score)
+                for mode_name, mode in classes.Game.modes.items()
+            ],
             is_description=True
         )
 
@@ -114,14 +118,14 @@ class Manager2048:
             self.games[classes.Keywords.CURRENT_GAME] = self.games[command]
 
         elif command == "games":
-            output_text += utils.join_items(
+            output_text += utils.newline(utils.default(utils.join_items(
                 *[
                     utils.description(
                         game_name, game.mode_name, game.score)
                     for game_name, game in self.games.items()
                     if game_name != classes.Keywords.CURRENT_GAME
-                ]
-            )
+                ], end=""
+            ), "there are no games"), 2)
 
         elif command in self.help_texts:
             output_text += self.help_texts[command]
