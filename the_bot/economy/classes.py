@@ -6,7 +6,7 @@ import math
 import random
 
 
-class Item():
+class Item:
     """items"""
     prices = {
         "pick": (
@@ -51,24 +51,21 @@ shop_items = {
 }
 
 
-class EconomyUser():
+class EconomyUser:
     """class for users in economy"""
 
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
 
-    def __init__(
-        self, name, balance=0, lifetime_balance=0, items={"pick": 0},
-        prestige=0, prestige_upgrade=0, confirmed_prestige=False, confirmed_upgrade=False
-    ):
+    def __init__(self, name):
         self.name = name
-        self.balance = balance
-        self.lifetime_balance = lifetime_balance
-        self.prestige = prestige
-        self.items = items
+        self.balance = 0
+        self.lifetime_balance = 0
+        self.prestige = 0
+        self.items = {"pick": 0}
         self.confirmed_prestige = False
         self.confirmed_upgrade = False
-        self.prestige_upgrade = prestige_upgrade
+        self.prestige_upgrade = 0
 
     def change_balance(self, money):
         """increases money"""

@@ -4,18 +4,12 @@ import math
 import rpg.classes as classes
 
 
-class Inventory():
+class Inventory:
     """player's inventory"""
-    def __init__(
-        self, items={}, max_items=8,
-        equipped={"armor": None, "weapon": None, "tome": None}
-    ):
-        self.items = items
-        self.max_items = max_items
-        self.equipped = {
-            classes.ItemType(type_): item_name
-            for type_, item_name in equipped.items()
-        }
+    def __init__(self):
+        self.items = {}
+        self.max_items = 8
+        self.equipped = {"armor": None, "weapon": None, "tome": None}
 
     def add(self, commands):
         """
@@ -123,8 +117,7 @@ class Inventory():
                 if item_name
             ], is_description=True
         )
-        return equipped_text  # .title() not sure about title
-
+        return equipped_text
 
     def modifers(self):
         modifier_attack = 0
@@ -151,27 +144,20 @@ class Inventory():
     }
 
 
-class Player():
+class Player:
     """represents a player in the rpg"""
 
-    def __init__(
-        self, name,
-        stats={
+    def __init__(self, name):
+        stats = {
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
             "health": 100, "max_health": 100
         },
-        room="village", fighting={}, inventory={},
-        options={"autofight": False, "heal_percent": 50}
-    ):
         self.name = name
         self.stats = classes.Stats(alive=True, **stats)
-        self.room = room
-        self.fighting = {
-            enemy_name: classes.Enemy(**enemy_data)
-            for enemy_name, enemy_data in fighting.items()
-        }
-        self.options = options
-        self.inventory = Inventory(**inventory)
+        self.room = "village"
+        self.fighting = {}
+        self.options = {"autofight": False, "heal_percent": 50}
+        self.inventory = Inventory()
 
     def get_id(self):
         return utils.get_key(players, self)

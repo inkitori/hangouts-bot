@@ -57,7 +57,7 @@ class Bot:
             await conv.send_message(utils.to_seg(output_text))
 
 
-class ConsoleBot():
+class ConsoleBot:
     """console based bot (for testing)"""
     def __init__(self, options):
         self.handler = Handler(console=True)
@@ -79,7 +79,7 @@ class ConsoleBot():
             print(utils.newline(output_text))
 
 
-class TestBot():
+class TestBot:
     """bot for testing commands"""
     def __init__(self, options):
         self.handler = Handler(console=True)

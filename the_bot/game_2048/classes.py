@@ -14,7 +14,7 @@ class Keywords(enum.Enum):
     CURRENT_GAME = "current game"
 
 
-class Cell():
+class Cell:
     """represents a cell in a board"""
 
     def __init__(self, value=0):
@@ -23,15 +23,13 @@ class Cell():
         self.has_merged = False
 
 
-class Board():
+class Board:
     """represents a board for 2048"""
 
-    def __init__(self, mode, values=None):
+    def __init__(self, mode):
         self.size = mode.size
         self.number_of_cells = self.size ** 2
-        if not values:
-            values = [0] * self.number_of_cells
-        self.cells = [Cell(value) for value in values]
+        self.cells = [Cell() for _ in range(self.number_of_cells)]
 
     def move_blocks(self, x, positive, game):
         """Moves all blocks in the board"""
@@ -131,7 +129,7 @@ class GameIncreaseModes(enum.Enum):
     RANDOM = enum.auto()
 
 
-class GameMode():
+class GameMode:
     """class to represent different gamemodes"""
     shuffled = [i for i in range(100)]
     random.shuffle(shuffled)
@@ -180,7 +178,7 @@ class Directions(enum.Enum):
     RIGHT = Direction(("right", "r", ">"), True, True)
 
 
-class Game():
+class Game:
     """class to represent each game of 2048"""
     modes = {
         "normal": GameMode(description="normal 2048"),
@@ -201,16 +199,15 @@ class Game():
     }
     game_commands = ["restart", "{direction}"]
 
-    def __init__(self, board=None, has_won=False, mode_name="normal", score=0):
-        self.score = score
+    def __init__(self):
+        self.score = 0
         self.text = ""
-        self.mode_name = mode_name
+        self.mode_name = "normal"
         self.state = None
-        self.has_won = has_won
-        self.board = Board(self.mode(), board)
-        if self.board.number_of_empty_cells() == self.mode().number_of_cells and not score:
-            for _ in range(2):
-                self.board.make_new_block(self.mode())
+        self.has_won = False
+        self.board = Board(self.mode())
+        for _ in range(2):
+            self.board.make_new_block(self.mode())
 
     def name(self):
         """name of the game"""

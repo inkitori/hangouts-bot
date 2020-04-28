@@ -4,9 +4,8 @@ import rpg.classes as classes
 import utils
 
 
-class RPG():
+class RPG:
     """the RPG"""
-
     all_items = classes.all_items
     players = player_class.players
     rooms = classes.rooms

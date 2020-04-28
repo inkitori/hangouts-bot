@@ -21,17 +21,21 @@ class Manager2048:
         "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
             *[(mode_name, mode.description)
-            for mode_name, mode in classes.Game.modes.items()],
+              for mode_name, mode in classes.Game.modes.items()],
             is_description=True
         ),
         "move": utils.join_items(
-            *[(direction.name.lower(), *direction.value.commands)
-              for direction in classes.Directions],
+            *[
+                (direction.name.lower(), *direction.value.commands)
+                for direction in classes.Directions
+            ],
             is_description=True
         ),
         "scores": utils.join_items(
-            *[(mode_name, mode.high_score)
-              for mode_name, mode in classes.Game.modes.items()],
+            *[
+                (mode_name, mode.high_score)
+                for mode_name, mode in classes.Game.modes.items()
+            ],
             is_description=True
         ),
         "reserved": utils.description("reserved", *reserved_words)

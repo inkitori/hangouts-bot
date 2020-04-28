@@ -5,7 +5,7 @@ import economy.classes as classes
 import utils
 
 
-class EconomyManager():
+class EconomyManager:
     """manager for economy"""
     def __init__(self):
         self.users = classes.users

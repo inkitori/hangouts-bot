@@ -7,7 +7,7 @@ import copy
 import enum
 
 
-class Stats():
+class Stats:
     """class for stats"""
     # TODO: fix this nonsense
     def __init__(
@@ -102,8 +102,8 @@ class Stats():
 class Enemy:
     """represents an enemy"""
 
-    def __init__(self, stats={"health": 1, "attack": 0, "defense": 0, "level": 1}):
-        self.stats = Stats(alive=True, generate_stats=True, **stats)
+    def __init__(self, level=1):
+        self.stats = Stats(alive=True, generate_stats=True, level=level)
 
     def name(self):
         return utils.get_key(enemies, self)
@@ -127,6 +127,7 @@ class Room:
         return enemy_name, enemy
 
     def generate_encounter(self, party):
+        # trying to figure out how to get parites to work, just leave this alone
         pass
 
 
@@ -177,6 +178,6 @@ rooms = {
     "potatoland": Room(enemies_list=["potato", "super potato"])
 }
 enemies = {
-    "potato": Enemy(stats={"level": 1}),
-    "super potato": Enemy(stats={"level": 3}),
+    "potato": Enemy(),
+    "super potato": Enemy(3),
 }
