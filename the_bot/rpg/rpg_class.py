@@ -26,7 +26,7 @@ class RPG:
         # input validation
         if not name:
             return "you must provide a name"
-        elif name in [player.name for player in self.players]:
+        elif name in [player.name for player in self.players.values()]:
             return "that name is taken by a player"
 
         self.players[user_id] = player_class.Player(name=name)

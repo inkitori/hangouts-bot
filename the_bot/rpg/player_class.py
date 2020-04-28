@@ -9,7 +9,7 @@ class Inventory:
     def __init__(self):
         self.items = {}
         self.max_items = 8
-        self.equipped = {"armor": None, "weapon": None, "tome": None}
+        self.equipped = {type_: None for type_ in classes.ItemType}
 
     def add(self, commands):
         """
@@ -150,8 +150,8 @@ class Player:
     def __init__(self, name):
         stats = {
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100
-        },
+            "health": 100, "max_health": 100, "level": 1
+        }
         self.name = name
         self.stats = classes.Stats(alive=True, **stats)
         self.room = "village"
