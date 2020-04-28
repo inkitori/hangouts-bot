@@ -150,7 +150,7 @@ class Player:
     def __init__(self, name):
         stats = {
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100, "level": 1
+            "health": 100, "max_health": 100, "level": 1, "xp": 0,
         }
         self.name = name
         self.stats = classes.Stats(alive=True, **stats)
