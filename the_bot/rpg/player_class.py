@@ -98,11 +98,12 @@ class Inventory:
 
     def print_inventory(self, commands):
         """returns string representation of inventory"""
-        inventory_text = ""
-        # TODO: change to use utils.join_items and print amount of item
-        for item_name, item_count in self.items.items():
-            item = classes.all_items[item_name]
-            inventory_text += item.short_description()
+        inventory_text = utils.join_items(
+            ("inventory", *[
+                f"{classes.all_items[item_name].short_description()} x{item_count}"
+                for item_name, item_count in self.items.items()
+            ]), end="\n" * 2, is_description=True, description_mode="long"
+        )
 
         inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()

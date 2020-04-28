@@ -93,9 +93,11 @@ def description(name, *description, mode="short", end="\n"):
     if mode == "short":
         description = join_items(*description, seperator=", ")
         full_description = f"{name} - {description}"
-    if mode == "long":
+    elif mode == "long":
         description.insert(0, f"{name.title()}:")
         full_description = join_items(*description, seperator="\n\t", end=end)
+    else:
+        raise ValueError(f"mode {mode} does not exist for descriptions")
     return full_description.strip()
 
 

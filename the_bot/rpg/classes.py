@@ -160,7 +160,7 @@ class Item:
 
     def short_description(self):
         """returns text description of item"""
-        return f"{self.rarity.name.lower()} {self.modifier} {self.name()}\n"
+        return f"{self.rarity.name.lower()} {self.modifier} {self.name()}"
 
     def name(self):
         return utils.get_key(all_items, self)
