@@ -9,7 +9,6 @@ import enum
 
 class Stats:
     """class for stats"""
-    # TODO: fix this nonsense
     def __init__(
         self, *, alive=False, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,

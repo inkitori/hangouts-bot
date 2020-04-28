@@ -132,6 +132,8 @@ class EconomyManager:
         elif len(possible_users) > 1:
             output_text += f"{len(possible_users)} user(s) go by that name:\n"
 
-        for user in possible_users:
-            output_text += user.profile()
+        output_text += utils.join_items(
+            *[user.profile() for user in possible_users],
+            seperator="\n"
+        )
         return utils.newline(output_text)

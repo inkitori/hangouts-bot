@@ -99,25 +99,24 @@ class Inventory:
     def print_inventory(self, commands):
         """returns string representation of inventory"""
         inventory_text = ""
-        # change to use utils.join_items
+        # TODO: change to use utils.join_items and print amount of item
         for item_name, item_count in self.items.items():
             item = classes.all_items[item_name]
-            # TODO: print amount of item
             inventory_text += item.short_description()
+
         inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
         return inventory_text
 
     def print_equipped(self):
         """returns string representation of equipped items"""
-        equipped_text = utils.join_items(
-            *[
-                (type_.name.lower(), classes.all_items[item_name].short_description())
+        return utils.join_items(
+            ("equipped", *[
+                utils.description(type_.name.lower(), item_name)
                 for type_, item_name in self.equipped.items()
                 if item_name
-            ], is_description=True
+            ]), is_description=True, description_mode="long"
         )
-        return equipped_text
 
     def modifers(self):
         modifier_attack = 0
@@ -310,6 +309,7 @@ class Player:
 
     def autofight(self, enemy_name):
         while True:
+            # this might get deleted so leave it alone for now
             pass
 
     def set_(self, commands):

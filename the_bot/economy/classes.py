@@ -182,7 +182,8 @@ class EconomyUser:
             f"pick: {self.get_item('pick').name()}",
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
-            f"id: {self.get_id()}"
+            f"id: {self.get_id()}",
+            seperator="\n\t"
         )
         return utils.newline(profile_text).title()
 
