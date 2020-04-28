@@ -7,6 +7,7 @@ import utils
 
 class EconomyManager:
     """manager for economy"""
+
     def __init__(self):
         self.users = classes.users
         self.load_game()
@@ -33,16 +34,16 @@ class EconomyManager:
         elif user_id not in self.users.keys():
             return "You are not registered! Use register"
 
-        user = self.users[user_id]
+        player = self.users[user_id]
         if command not in ("prestige", "prestige_upgrade"):
-            user.confirmed_prestige = False
-            user.confirmed_upgrade = False
+            player.confirmed_prestige = False
+            player.confirmed_upgrade = False
         if command in self.commands:
             function_ = self.commands[command]
-            output_text = function_(user, commands)
+            output_text = function_(player, commands)
         elif command in classes.EconomyUser.commands:
             function_ = classes.EconomyUser.commands[command]
-            output_text = function_(user, commands)
+            output_text = function_(player, commands)
         else:
             output_text = "Invalid command"
 
@@ -50,11 +51,12 @@ class EconomyManager:
 
     def leaderboard(self, playing_user, commands):
         """returns leaderboard"""
-        user_balances = {user: user.lifetime_balance for user in self.users.values()}
+        user_balances = {
+            player: player.lifetime_balance for player in self.users.values()}
         leaderboard_text = "Ranking by balance earned in this lifetime:\n"
 
         sorted_users = [
-            user for user in sorted(
+            player for player in sorted(
                 list(user_balances.items()),
                 key=lambda x: x[1], reverse=True
             )
@@ -63,10 +65,11 @@ class EconomyManager:
         for rank in range(5):
             user_balance = utils.get_item(sorted_users, (rank, ))
             if user_balance:
-                user, balance = user_balance
-                leaderboard_text += f"{rank + 1}. {user.name}: {balance}\n"
+                player, balance = user_balance
+                leaderboard_text += f"{rank + 1}. {player.name}: {balance}\n"
 
-        playing_user_rank = sorted_users.index((playing_user, playing_user.lifetime_balance))
+        playing_user_rank = sorted_users.index(
+            (playing_user, playing_user.lifetime_balance))
         if playing_user_rank > 5:
             leaderboard_text += (
                 f"\n{playing_user_rank + 1}."
@@ -75,12 +78,12 @@ class EconomyManager:
 
         return leaderboard_text
 
-    def shop(self, user, commands):
+    def shop(self, player, commands):
         """returns shop"""
         shop_list = []
         for type_name, items in classes.shop_items.items():
             items_text = [type_name]
-            player_item = user.items[type_name]
+            player_item = player.items[type_name]
             if player_item == len(items):
                 items_text = f"You already have the highest level {type_name}"
             else:
@@ -96,15 +99,15 @@ class EconomyManager:
 
     def save_game(self):
         """saves the game"""
-        utils.save(economy_users=self.users)
+        utils.save(economy_players=self.users)
         classes.users = self.users
 
     def load_game(self):
         """loads the game"""
-        self.users = utils.load("economy_users")
+        self.users = utils.load("economy_players")
 
     def register(self, user_id, commands):
-        """registers a user"""
+        """registers a player"""
         name = next(commands)
         if user_id in self.users:
             return "You are already registered!"
@@ -113,8 +116,8 @@ class EconomyManager:
         self.users[user_id] = classes.EconomyUser(name=name)
         return "Successfully registered!"
 
-    def profile(self, user, commands):
-        """returns user profiles"""
+    def profile(self, player, commands):
+        """returns player profiles"""
         output_text = ""
         user_name = next(commands)
         possible_users = []
@@ -125,15 +128,17 @@ class EconomyManager:
         if user_name.isdigit() and int(user_name) in self.users:
             possible_users.append(self.users[int(user_name)])
         elif user_name == "self":
-            possible_users.append(user)
+            possible_users.append(player)
         if not possible_users:
             output_text += "No users go by that name!"
 
         elif len(possible_users) > 1:
-            output_text += f"{len(possible_users)} user(s) go by that name:\n"
+            output_text += f"{len(possible_users)} player(s) go by that name:\n"
 
         output_text += utils.join_items(
-            *[user.profile() for user in possible_users],
-            seperator="\n"
+            *[
+                player.profile()
+                for player in possible_users
+            ], end="\n"
         )
-        return utils.newline(output_text)
+        return output_text

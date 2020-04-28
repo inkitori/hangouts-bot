@@ -39,9 +39,11 @@ class Item:
 
 
 def generate_items(type_):
-    max_possible_items = min(len(Item.modifiers[type_]), len(Item.prices[type_]))
+    max_possible_items = min(
+        len(Item.modifiers[type_]), len(Item.prices[type_]))
     return [
-        Item(type_, Item.prices[type_][level], Item.modifiers[type_][level], level)
+        Item(type_, Item.prices[type_][level],
+             Item.modifiers[type_][level], level)
         for level in range(max_possible_items)
     ]
 
@@ -134,7 +136,8 @@ class EconomyUser:
     def prestige_action(self, commands):
         """gives prestige information"""
         output_text = ""
-        earned_prestige = math.trunc(self.lifetime_balance / self.prestige_conversion)
+        earned_prestige = math.trunc(
+            self.lifetime_balance / self.prestige_conversion)
         if self.confirmed_prestige:
             self.balance = 0
             self.lifetime_balance = 0
@@ -175,7 +178,7 @@ class EconomyUser:
         return output_text
 
     def profile(self):
-        """returns user profile"""
+        """returns player profile"""
         profile_text = utils.join_items(
             f"name: {self.name}",
             f"balance: {self.balance}",
@@ -188,31 +191,31 @@ class EconomyUser:
         return utils.newline(profile_text).title()
 
     def give(self, commands):
-        """gives money to another user"""
+        """gives money to another player"""
         # input validation
         reciveing_user = next(commands)
         money = next(commands)
         if not reciveing_user:
-            return "You must specfiy a user or ID"
+            return "You must specfiy a player or ID"
         elif not money:
             return "You must specify an amount"
         elif not money.isdigit():
             return "You must give an integer amount of Saber Dollars"
 
         money = int(money)
-        # get the user
-        for user in users.values():
-            if reciveing_user == user.name:
-                reciveing_user = user
+        # get the player
+        for player in users.values():
+            if reciveing_user == player.name:
+                reciveing_user = player
                 break
         if reciveing_user.isdigit() and int(reciveing_user) in users:
             reciveing_user = users[int(reciveing_user)]
 
-        # check user is valid
+        # check player is valid
         if reciveing_user.get_id() not in users:
-            return "That user has not registered!"
+            return "That player has not registered!"
         elif reciveing_user.get_id() == self.get_id():
-            return "That user is you!"
+            return "That player is you!"
 
         # check money is valid
         if money < 0:
