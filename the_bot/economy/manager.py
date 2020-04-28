@@ -7,9 +7,6 @@ import utils
 
 class EconomyManager():
     """manager for economy"""
-
-    save_file = "the_bot/economy/save_data.json"
-
     def __init__(self):
         self.users = classes.users
         self.load_game()

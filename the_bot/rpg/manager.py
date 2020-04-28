@@ -10,8 +10,6 @@ import rpg.player_class as player_class
 
 class RPGManager:
     """manager for rpg"""
-
-    save_file = "the_bot/rpg/save_data.json"
     game = rpg_class.RPG()
     spreadsheet_id = "1H9m57A7vcSvGnEIrAKAHjg-GmvKw1GqQqQdAMeuN5do"
 

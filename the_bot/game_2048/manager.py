@@ -7,7 +7,6 @@ import game_2048.classes as classes
 
 class Manager2048:
     """manager for 2048 game"""
-    save_file = "the_bot/game_2048/save_data.json"
     game_management_commands = [
         "create {game_name}", "{game_name}", "rename {old_name} {new_name}",
         "delete {game_name}", "games",
@@ -22,7 +21,7 @@ class Manager2048:
         "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
             *[(mode_name, mode.description)
-              for mode_name, mode in classes.Game.modes.items()],
+            for mode_name, mode in classes.Game.modes.items()],
             is_description=True
         ),
         "move": utils.join_items(
