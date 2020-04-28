@@ -17,10 +17,10 @@ class RPG:
                 if enemy_name not in self.enemies:
                     print(f"invalid enemy {enemy_name} in room {room_name}")
 
-    def register(self, user_id, commands):
-        """registers a user in the game"""
+    def register(self, player_id, commands):
+        """registers a player in the game"""
         name = next(commands)
-        if user_id in self.players:
+        if player_id in self.players:
             return "You are already registered!"
 
         # input validation
@@ -29,44 +29,48 @@ class RPG:
         elif name in [player.name for player in self.players.values()]:
             return "that name is taken by a player"
 
-        self.players[user_id] = player_class.Player(name=name)
+        self.players[player_id] = player_class.Player(name=name)
         return "Successfully registered!"
 
-    def profile(self, player, commands):
-        """returns user profiles"""
+    def profile(self, player, commands, players=None):
+        """returns player profiles"""
+        # TODO: get rid of self and just use players
+        players = utils.default(players, self.players)
         output_text = ""
-        user_name = next(commands)
-        possible_players = []
+        player_name = next(commands)
 
-        for possible_player in self.players.values():
-            if user_name in possible_player.name:
+        # create list of players
+        possible_players = []
+        for possible_player in players.values():
+            if player_name in possible_player.name:
                 possible_players.append(possible_player)
-        if user_name.isdigit() and int(user_name) in self.players:
-            possible_players.append(self.players[int(user_name)])
-        elif user_name == "self":
+        if player_name.isdigit() and int(player_name) in players:
+            possible_players.append(players[int(player_name)])
+        elif player_name == "self":
             possible_players.append(player)
+
         if not possible_players:
-            output_text += "No users go by that name!"
+            output_text += "No players go by that name/id!"
 
         elif len(possible_players) > 1:
-            output_text += utils.newline(f"{len(possible_players)} player(s) go by that name:")
+            output_text += utils.newline(
+                f"{len(possible_players)} player(s) go by that name:")
 
         output_text += utils.join_items(
             *[
-                player.print_profile()
+                player.profile()
                 for player in possible_players
             ], end="\n"
         )
-
         return output_text
 
-    def play_game(self, user_id, commands):
-        """runs functions based on user command"""
+    def play_game(self, player_id, commands):
+        """runs functions based on player command"""
         command = next(commands)
         output_text = ""
-        player = utils.get_value(self.players, user_id)
+        player = utils.get_value(self.players, player_id)
         if command == "register":
-            output_text = self.register(user_id, commands)
+            output_text = self.register(player_id, commands)
         elif command == "help":
             output_text = utils.join_items(
                 ("player_class.Inventory", *player_class.Inventory.commands),
@@ -78,9 +82,11 @@ class RPG:
             output_text = self.profile(player, commands)
 
         elif command in player_class.Inventory.commands:
-            output_text = player_class.Inventory.commands[command](player.inventory, commands)
+            output_text = player_class.Inventory.commands[command](
+                player.inventory, commands)
         elif command in player_class.Player.commands:
-            output_text = player_class.Player.commands[command](player, commands)
+            output_text = player_class.Player.commands[command](
+                player, commands)
         else:
             output_text = "invalid command for rpg"
 

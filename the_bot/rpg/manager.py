@@ -18,18 +18,18 @@ class RPGManager:
         random.seed(datetime.now())
         self.save_game()
 
-    def run_game(self, user_id, commands):
+    def run_game(self, player_id, commands):
         """runs the game"""
-        user_id = int(user_id)
+        player_id = int(player_id)
         command = next(commands)
         if not command:
             return "you must enter a command"
 
-        if command != "register" and user_id not in self.game.players:
+        if command != "register" and player_id not in self.game.players:
             return "You are not registered! Use register"
         else:
             commands.send(-1)
-        return self.game.play_game(user_id, commands)
+        return self.game.play_game(player_id, commands)
 
     def load_game(self, load_sheets):
         """loads the game"""
@@ -43,7 +43,7 @@ class RPGManager:
         named_ranges = utils.get_named_ranges(
             sheets, spreadsheet_id=self.spreadsheet_id,
             sheet_name="RPG",
-            )
+        )
 
         item_data = sheets.values().get(
             spreadsheetId=self.spreadsheet_id,

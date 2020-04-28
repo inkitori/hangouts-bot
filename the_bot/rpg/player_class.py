@@ -6,6 +6,7 @@ import rpg.classes as classes
 
 class Inventory:
     """player's inventory"""
+
     def __init__(self):
         self.items = {}
         self.max_items = 8
@@ -26,7 +27,8 @@ class Inventory:
             output_text = "that item does not exist"
         else:
             # increments the value
-            self.items[item_name] = utils.get_value(self.items, item_name, default=0) + 1
+            self.items[item_name] = utils.get_value(
+                self.items, item_name, default=0) + 1
             output_text = f"added {item_name} to inventory"
         return output_text
 
@@ -148,9 +150,11 @@ class Player:
     """represents a player in the rpg"""
 
     def __init__(self, name):
+        # TODO: move pass as arguments in stats and get rid of the dict
         stats = {
             "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
             "health": 100, "max_health": 100, "level": 1, "xp": 0,
+            "balance": 0, "lifetime_balance": 0,
         }
         self.name = name
         self.stats = classes.Stats(alive=True, **stats)
@@ -229,8 +233,9 @@ class Player:
 
         enemy = random.choice(list(self.fighting.values()))
         enemy_name = utils.get_key(self.fighting, enemy)
-        user_damage = self.modified_stats().attack
-        damage_dealt = int(user_damage * (user_damage / enemy.stats.defense))
+        player_damage = self.modified_stats().attack
+        damage_dealt = int(
+            player_damage * (player_damage / enemy.stats.defense))
 
         multiplier = random.choice((1, -1))
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
@@ -243,7 +248,10 @@ class Player:
 
         else:
             # take damage
-            damage_taken = int(enemy.stats.attack / self.modified_stats().defense)
+            damage_taken = int(
+                enemy.stats.attack /
+                self.modified_stats().defense
+            )
 
             multiplier = random.choice((1, -1))
             damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
@@ -344,7 +352,7 @@ class Player:
 
         return f"Successfully set {option} to {self.options[option]}"
 
-    def print_profile(self):
+    def profile(self):
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
             is_description=True, seperator="\n\t"

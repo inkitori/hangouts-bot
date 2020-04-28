@@ -17,6 +17,12 @@ class Manager2048:
         game_management_commands +
         ["2048", "/2048"] + [keyword.value for keyword in classes.Keywords]
     )
+    reserved_words = [
+        word
+        for words in reserved_words
+        for word in words.split()
+        if not word.startswith("{")
+    ]
     help_texts = {
         "help": "",  # avoids probelems with referencing itself
         "gamemodes": utils.join_items(
