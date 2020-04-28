@@ -54,7 +54,7 @@ shop_items = {
 
 
 class EconomyUser:
-    """class for users in economy"""
+    """class for players in economy"""
 
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
@@ -193,9 +193,9 @@ class EconomyUser:
     def give(self, commands):
         """gives money to another player"""
         # input validation
-        reciveing_user = next(commands)
+        reciveing_player = next(commands)
         money = next(commands)
-        if not reciveing_user:
+        if not reciveing_player:
             return "You must specfiy a player or ID"
         elif not money:
             return "You must specify an amount"
@@ -204,17 +204,17 @@ class EconomyUser:
 
         money = int(money)
         # get the player
-        for player in users.values():
-            if reciveing_user == player.name:
-                reciveing_user = player
+        for player in players.values():
+            if reciveing_player == player.name:
+                reciveing_player = player
                 break
-        if reciveing_user.isdigit() and int(reciveing_user) in users:
-            reciveing_user = users[int(reciveing_user)]
+        if reciveing_player.isdigit() and int(reciveing_player) in players:
+            reciveing_player = players[int(reciveing_player)]
 
         # check player is valid
-        if reciveing_user.get_id() not in users:
+        if reciveing_player.get_id() not in players:
             return "That player has not registered!"
-        elif reciveing_user.get_id() == self.get_id():
+        elif reciveing_player.get_id() == self.get_id():
             return "That player is you!"
 
         # check money is valid
@@ -224,15 +224,15 @@ class EconomyUser:
             return "You don't have enough money to do that!"
 
         self.change_balance(-money)
-        reciveing_user.change_balance(money)
+        reciveing_player.change_balance(money)
 
         return utils.join_items(
-            f"Successfully given {money} Saber Dollars to {reciveing_user.name}.",
-            f"{reciveing_user.name} now has {reciveing_user.balance} Saber Dollars."
+            f"Successfully given {money} Saber Dollars to {reciveing_player.name}.",
+            f"{reciveing_player.name} now has {reciveing_player.balance} Saber Dollars."
         )
 
     def get_id(self):
-        return utils.get_key(users, self)
+        return utils.get_key(players, self)
 
     def get_item(self, type_):
         return shop_items[type_][self.items[type_]]
@@ -246,4 +246,4 @@ class EconomyUser:
     }
 
 
-users = {}
+players = {}
