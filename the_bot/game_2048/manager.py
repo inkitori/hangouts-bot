@@ -3,6 +3,7 @@ manager for 2048 games
 """
 import utils
 from game_2048.classes import Game, games, Directions, Keywords
+# TODO: switch to import game_2048.classes as classes
 
 
 class Manager2048:
@@ -70,6 +71,7 @@ class Manager2048:
 
     def run_game(self, user, commands):
         """runs the game based on commands"""
+        # TODO: clean this mess up
         output_text = ""
         command = next(commands)
         play_game_name = ""
@@ -135,7 +137,13 @@ class Manager2048:
         return output_text
 
     def load_game(self):
-        """loads games from a json file"""
+        """loads games from file"""
+        """
+        global games  # TODO: change games to be a property of manager
+        games, scores = utils.load("games_2048", "scores_2048")
+        for mode_name, mode in Game.modes.items():
+            mode.high_score = scores[mode_name]
+        """
         data = utils.load(self.save_file)
         for game_name, game_data in data["games"].items():
             games[game_name] = Game(**game_data)
@@ -144,21 +152,8 @@ class Manager2048:
 
     def save_game(self):
         """saves games to a json file"""
-        games_dict = dict()
-        for game_name, game in games.items():
-            if game_name == Keywords.CURRENT_GAME or (game is None):
-                continue
-            games_dict[game_name] = {
-                "board": [cell.value for cell in game.board.cells],
-                "has_won": game.has_won,
-                "mode": game.mode.name(),
-                "score": game.score
-            }
-        data = {
-            "games": games_dict,
-            "scores": {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
-        }
-        utils.save(self.save_file, data)
+        scores = {mode_name: mode.high_score for mode_name, mode in Game.modes.items()}
+        utils.save(games_2048=games, scores_2048=scores)
 
     def delete_game(self, commands):
         """deletes a game"""

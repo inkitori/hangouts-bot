@@ -98,11 +98,11 @@ class EconomyManager():
 
     def save_game(self):
         """saves the game"""
-        data = {user_id: player.__dict__ for user_id, player in self.users.items()}
-        utils.save(self.save_file, data)
+        utils.save(economy_users=self.users)
 
     def load_game(self):
         """loads the game"""
+        # self.users = utils.load("economy_users")
         data = utils.load(self.save_file)
         for user_id, user_data in data.items():
             self.users[int(user_id)] = classes.EconomyUser(**user_data)

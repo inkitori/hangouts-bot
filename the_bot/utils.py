@@ -2,6 +2,7 @@
 assorted useful functions
 """
 import hangups
+import shelve
 import json
 import inspect
 import pickle
@@ -62,7 +63,8 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
     output_list = []
     if is_description:
         for item in items:
-            output_list.append(description(*(default(item, "")), mode=description_mode))
+            output_list.append(description(
+                *(default(item, "")), mode=description_mode))
 
     else:
         output_list = convert_items(list(items), type_=str)
@@ -98,15 +100,22 @@ def description(name, *description, mode="short", end="\n"):
     return full_description.strip()
 
 
-# json
-def save(file_name, contents):
-    """saves data into a json"""
-    with open(file_name, "w") as file:
-        json.dump(contents, file, indent=4)
+# save and load data
+def save(file_name="save_data", **contents):
+    """saves data into a file"""
+    with shelve.open(file_name, writeback=True) as save_file:
+        for name, data in contents.items():
+            save_file[name] = data
 
 
-def load(file_name):
-    """loads a dict from a json"""
+def load(file_name):  # *names, file_name="save_data"):
+    """loads data from a file"""
+    """
+    data = []
+    with shelve.open(file_name) as save_file:
+        for name in names:
+            data.append(save_file[name])
+    """
     with open(file_name, "r") as file:
         try:
             return json.load(file)
