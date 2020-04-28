@@ -125,12 +125,6 @@ class Inventory():
         )
         return equipped_text  # .title() not sure about title
 
-    def to_dict(self):
-        return {
-            "items": self.items,
-            "max_items": self.max_items,
-            "equipped": {type_.value: item_name for type_, item_name in self.equipped.items()},
-        }
 
     def modifers(self):
         modifier_attack = 0
@@ -211,20 +205,6 @@ class Player():
             self.room = room
             output_text = "Successfully warped!"
         return output_text
-
-    def to_dict(self):
-        player_dict = {
-            "name": self.name,
-            "stats": self.stats.to_dict(),
-            "room": self.room,
-            "fighting": {
-                enemy_name: enemy.to_dict()
-                for enemy_name, enemy in self.fighting.items()
-            },
-            "options": self.options,
-            "inventory": self.inventory.to_dict(),
-        }
-        return player_dict
 
     def rest(self, commands):
         """rests player"""

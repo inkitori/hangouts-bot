@@ -32,9 +32,6 @@ class Stats():
         self.defense = defense
         self.level = level
 
-    def to_dict(self):
-        return self.__dict__
-
     def generate_from_level(self, level):
         """generates stats from level"""
         attack = round(5 * level ** 1.8)
@@ -111,9 +108,6 @@ class Enemy:
     def name(self):
         return utils.get_key(enemies, self)
 
-    def to_dict(self):
-        return {"stats": self.stats.to_dict()}
-
 
 class Room:
     """represents a room in the world"""
@@ -170,14 +164,6 @@ class Item:
 
     def name(self):
         return utils.get_key(all_items, self)
-
-    def to_dict(self):
-        return {
-            "type_": self.type_.value,
-            "rarity": self.rarity.value,
-            "modifier": self.modifier,
-            "stats": self.stats.to_dict()
-        }
 
 
 all_items = {
