@@ -30,12 +30,15 @@ class Handler:
     image_folder = "the_bot/images/"
     images = {
         "llama": "llama.JPG",
+        "ether": "ether.PNG"
     }
 
-    def __init__(self, console=False):
+    def __init__(self, console=False, load_sheets=True):
         self.cooldowns = defaultdict(dict)
         self.console = console
-        self.game_managers["/rpg"] = RPGManager(load_sheets=not console)
+        self.game_managers["/rpg"] = RPGManager(
+            load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
+        )
         random.seed(datetime.now())
 
     async def handle_message(self, event, user_id=101, bot=None):
