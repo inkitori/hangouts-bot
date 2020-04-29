@@ -249,7 +249,7 @@ class Player:
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
         enemy.stats.change_health(-damage_dealt)
 
-        text += f"You dealt {damage_dealt} damage to {enemy_name}!\n"
+        text += utils.newline(f"You dealt {damage_dealt} damage to {enemy_name}!")
 
         if enemy.stats.health <= 0:
             text += self.killed_enemy(enemy_name, enemy)
