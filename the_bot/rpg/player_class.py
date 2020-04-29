@@ -264,22 +264,22 @@ class Player:
         return text
 
     def take_damage(self, enemy, enemy_name):
-            damage_taken = int(
-                enemy.stats.attack /
-                (self.modified_stats().defense + self.stats.defense)
-            )
+        damage_taken = int(
+            enemy.stats.attack /
+            (self.modified_stats().defense + self.stats.defense)
+        )
 
-            multiplier = random.choice((1, -1))
-            damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
+        multiplier = random.choice((1, -1))
+        damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
 
-            self.stats.change_health(-damage_taken)
+        self.stats.change_health(-damage_taken)
 
-            text = utils.join_items(
-                f"{enemy_name} dealt {damage_taken} to you!",
-                f"You have {self.stats.health} hp left",
-                f"{enemy_name} has {enemy.stats.health} left!",
-            )
-            return text
+        text = utils.join_items(
+            f"{enemy_name} dealt {damage_taken} to you!",
+            f"You have {self.stats.health} hp left",
+            f"{enemy_name} has {enemy.stats.health} left!",
+        )
+        return text
 
 
 
