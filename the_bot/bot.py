@@ -45,17 +45,19 @@ class Bot:
         user, conv = utils.get_user_and_conv(self, event)
         output_text = ""
 
+        if user.is_self or utils.user_in(self.ignore, user):
+            return
+
         # handles messages
-        if (
-            isinstance(event, hangups.ChatMessageEvent)
-            and not user.is_self and not utils.user_in(self.ignore, user)
-        ):
+        if (isinstance(event, hangups.ChatMessageEvent)):
             output_text = await self.handler.handle_message(event, bot=self)
 
         # sends message to hangouts
         if output_text:
             await conv.send_message(utils.to_seg(output_text))
 
+    async def send_image(self, image, conv):
+        await conv.send_message(utils.to_seg(""), image)
 
 class ConsoleBot:
     """console based bot (for testing)"""

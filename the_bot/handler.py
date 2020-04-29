@@ -62,8 +62,7 @@ class Handler:
                 output_text = f"images are not available outside of hangouts, including {command}"
             else:
                 with open(self.image_folder + self.images[command], "rb") as image:
-                    # FIXME: this ruins the division between handler and bot for dealing with hangouts
-                    await conv.send_message(utils.to_seg(""), image)
+                    await bot.send_image(image, conv)
 
         elif command in self.commands:
             if self.console:
