@@ -5,6 +5,7 @@ import utils
 import random
 import copy
 import enum
+import math
 
 
 class Stats:
@@ -108,6 +109,25 @@ class Enemy:
 
     def name(self):
         return utils.get_key(enemies, self)
+
+    def attack(self, player):
+        """"""
+        damage_dealt = round(
+            self.stats.attack /
+            (player.modified_stats().defense + player.stats.defense), 1
+        )
+
+        multiplier = random.choice((1, -1))
+        damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
+
+        player.stats.change_health(-damage_dealt)
+
+        text = utils.join_items(
+            f"{self.name} dealt {damage_dealt} to you!",
+            f"You have {player.stats.health} hp left",
+            f"{self.name} has {self.stats.health} left!",
+        )
+        return text
 
 
 class Room:

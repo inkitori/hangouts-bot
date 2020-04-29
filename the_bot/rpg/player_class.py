@@ -150,15 +150,17 @@ class Player:
     """represents a player in the rpg"""
 
     def __init__(self, name):
+        # TODO: move pass as arguments in stats and get rid of the dict
+        stats = {
+            "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
+            "health": 100, "max_health": 100, "level": 1, "xp": 0,
+            "balance": 0, "lifetime_balance": 0,
+        }
         self.name = name
-        self.stats = classes.Stats(
-            attack=5, defense=5, max_mana=100, mana=100,
-            health=100, max_health=100, level=1, xp=0,
-            balance=0, lifetime_balance=0,
-        )
+        self.stats = classes.Stats(alive=True, **stats)
         self.room = "village"
         self.fighting = {}
-        self.options = {"autofight": False, "heal_percent": 50}
+        self.args = {"autofight": False, "heal_percent": 50}
         self.inventory = Inventory()
 
     def get_id(self):
@@ -224,9 +226,7 @@ class Player:
 
             if self.fighting:
                 enemy = random.choice(list(self.fighting.values()))
-                enemy_name = utils.get_key(self.fighting, enemy)
-
-                text += self.take_damage(enemy, enemy_name)
+                text += enemy.attack(self)
 
             return text
 
@@ -241,11 +241,11 @@ class Player:
         enemy = random.choice(list(self.fighting.values()))
         enemy_name = utils.get_key(self.fighting, enemy)
         player_damage = self.modified_stats().attack + self.stats.attack
-        damage_dealt = int(
-            player_damage * (player_damage / enemy.stats.defense))
+        damage_dealt = round(
+            player_damage * (player_damage / enemy.stats.defense), 1)
 
         multiplier = random.choice((1, -1))
-        damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
+        damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
         enemy.stats.change_health(-damage_dealt)
 
         text += utils.newline(
@@ -256,29 +256,11 @@ class Player:
 
         else:
             # take damage
-            text += self.take_damage(enemy, enemy_name)
+            text += enemy.attack(self)
 
             if self.stats.health <= 0:
                 text += self.died(enemy_name)
 
-        return text
-
-    def take_damage(self, enemy, enemy_name):
-        damage_taken = int(
-            enemy.stats.attack /
-            (self.modified_stats().defense + self.stats.defense)
-        )
-
-        multiplier = random.choice((1, -1))
-        damage_taken += int(multiplier * math.sqrt(damage_taken / 2))
-
-        self.stats.change_health(-damage_taken)
-
-        text = utils.join_items(
-            f"{enemy_name} dealt {damage_taken} to you!",
-            f"You have {self.stats.health} hp left",
-            f"{enemy_name} has {enemy.stats.health} left!",
-        )
         return text
 
     def died(self, cause):
@@ -319,7 +301,7 @@ class Player:
         enemy_name, enemy = room.generate_enemy()
         self.fighting[enemy_name] = enemy
 
-        if self.options["autofight"]:
+        if self.args["autofight"]:
             return self.autofight(enemy_name, enemy)
         else:
             return utils.join_items(
@@ -334,38 +316,38 @@ class Player:
             pass
 
     def set_(self, commands):
-        option = next(commands)
+        arg = next(commands)
         value = next(commands)
 
         # input validation
-        if option not in self.options:
-            return "That is not a valid option!"
-        elif not option:
-            return "you must provide an option"
+        if arg not in self.args:
+            return "That is not a valid arg!"
+        elif not arg:
+            return "you must provide an arg"
         elif not value:
             return "you must provide a value"
 
-        elif isinstance(self.options[option], bool):
+        elif isinstance(self.args[arg], bool):
             value = value[0]
             if value in ("t", "y"):
-                self.options[option] = True
+                self.args[arg] = True
 
             elif value in ("f", "n"):
-                self.options[option] = False
+                self.args[arg] = False
             else:
                 # TODO make this error a template
-                return f"invalid value {value} for boolean option {option}, use true/false"
+                return f"invalid value {value} for boolean arg {arg}, use true/false"
 
-        elif isinstance(self.options[option], int):
+        elif isinstance(self.args[arg], int):
             if value.isdigit():
-                self.options[option] = int(value)
+                self.args[arg] = int(value)
             else:
-                return f"invalid value {value} for integer option {option}, use an integer"
+                return f"invalid value {value} for integer arg {arg}, use an integer"
 
-        return f"Successfully set {option} to {self.options[option]}"
+        return f"Successfully set {arg} to {self.args[arg]}"
 
     def profile(self):
-        # TODO: change to use description_mode="long" by changing print_stats to have a lsit option
+        # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
             is_description=True, separator="\n\t"

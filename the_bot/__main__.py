@@ -13,7 +13,7 @@ def stuff(handler):
     pass
 
 
-options = config.parse_arguments()
-current_bot = bot.bots[options.bot](options)
+args = config.parse_arguments()
+current_bot = bot.bots[args.bot](args)
 stuff(handler=current_bot.handler)
 current_bot.run()

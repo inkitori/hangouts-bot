@@ -19,10 +19,10 @@ class Bot:
         104687919952293193271,  # Ether(chendibot)
     )
 
-    def __init__(self, options):
-        self.cookies = hangups.get_auth_stdin(options.token, True)
+    def __init__(self, args):
+        self.cookies = hangups.get_auth_stdin(args.token, True)
         self.client = hangups.Client(self.cookies)
-        self.handler = Handler(load_sheets=options.load_sheets)
+        self.handler = Handler(load_sheets=args.load_sheets)
 
     def run(self):
         """main loop for running bot"""
@@ -66,11 +66,13 @@ class Bot:
     async def quit(self):
         await self.client.disconnect()
 
+
 class ConsoleBot:
     """console based bot (for testing)"""
-    def __init__(self, options):
-        self.handler = Handler(console=True, load_sheets=options.load_sheets)
-        self.user_id = options.user_id
+
+    def __init__(self, args):
+        self.handler = Handler(console=True, load_sheets=args.load_sheets)
+        self.user_id = args.user_id
 
     def run(self):
         """main bot loop"""
@@ -90,9 +92,10 @@ class ConsoleBot:
 
 class TestBot:
     """bot for testing commands"""
-    def __init__(self, options):
-        self.handler = Handler(console=True, load_sheets=options.load_sheets)
-        self.user_id = options.user_id
+
+    def __init__(self, args):
+        self.handler = Handler(console=True, load_sheets=args.load_sheets)
+        self.user_id = args.user_id
         self.commands = {
             "/rpg": (
                 "register testbot", "profile",
