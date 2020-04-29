@@ -221,8 +221,16 @@ class Player:
             self.stats.mana -= tome.stats.mana
             self.stats.change_health(tome.stats.health)
 
-            return f"You have been healed back up to {self.stats.health}"
+            text = f"You have been healed back up to {self.stats.health}"
 
+            if self.fighting:
+                enemy = random.choice(list(self.fighting.values()))
+                enemy_name = utils.get_key(self.fighting, enemy)
+                
+                text += self.take_damage(enemy, enemy_name)
+            
+            return text
+                
     # TODO: merge with fight
     def attack(self, commands):
         """attacks an enemy"""
@@ -233,7 +241,7 @@ class Player:
 
         enemy = random.choice(list(self.fighting.values()))
         enemy_name = utils.get_key(self.fighting, enemy)
-        player_damage = self.modified_stats().attack
+        player_damage = self.modified_stats().attack + self.stats.attack
         damage_dealt = int(
             player_damage * (player_damage / enemy.stats.defense))
 
@@ -248,9 +256,17 @@ class Player:
 
         else:
             # take damage
+            text += self.take_damage(enemy, enemy_name)
+
+            if self.stats.health <= 0:
+                text += self.died(enemy_name)
+
+        return text
+
+    def take_damage(self, enemy, enemy_name):
             damage_taken = int(
                 enemy.stats.attack /
-                self.modified_stats().defense
+                (self.modified_stats().defense + self.stats.defense)
             )
 
             multiplier = random.choice((1, -1))
@@ -258,16 +274,14 @@ class Player:
 
             self.stats.change_health(-damage_taken)
 
-            text += utils.join_items(
+            text = utils.join_items(
                 f"{enemy_name} dealt {damage_taken} to you!",
                 f"You have {self.stats.health} hp left",
                 f"{enemy_name} has {enemy.stats.health} left!",
             )
+            return text
 
-            if self.stats.health <= 0:
-                text += self.died(enemy_name)
 
-        return text
 
     def died(self, cause):
         text = utils.join_items(
