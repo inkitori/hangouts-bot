@@ -30,7 +30,10 @@ class Handler:
     image_folder = "the_bot/images/"
     images = {
         "llama": "llama.JPG",
-        "ether": "ether.PNG"
+        "ether": "ether.PNG",
+        "penguin": "penguins1.GIF",
+        "penguins": "penguins2.GIF",
+        "more_penguins": "penguins3.GIF"
     }
 
     def __init__(self, *, console=False, load_sheets=True):
@@ -43,6 +46,7 @@ class Handler:
 
     async def handle_message(self, event, user_id=101, bot=None):
         """handles messages"""
+        output_text = ""
         text = event if self.console else event.text
         if not self.console:
             user, conv = utils.get_user_and_conv(bot, event)
@@ -59,7 +63,7 @@ class Handler:
             else:
                 with open(self.image_folder + self.images[command], "rb") as image:
                     # FIXME: this ruins the division between handler and bot for dealing with hangouts
-                    await conv.send_message(utils.toSeg(""), image)
+                    await conv.send_message(utils.to_seg(""), image)
 
         elif command in self.commands:
             if self.console:
