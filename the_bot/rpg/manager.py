@@ -27,8 +27,8 @@ class RPGManager:
 
         if command != "register" and player_id not in self.game.players:
             return "You are not registered! Use register"
-        else:
-            commands.send(-1)
+
+        commands.send(-1)
         return self.game.play_game(player_id, commands)
 
     def load_game(self, load_sheets):
