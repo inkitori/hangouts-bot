@@ -188,7 +188,7 @@ class EconomyUser:
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
             f"id: {self.get_id()}",
-            seperator="\n\t"
+            separator="\n\t"
         )
         return profile_text.title()
 

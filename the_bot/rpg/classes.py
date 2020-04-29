@@ -9,6 +9,7 @@ import enum
 
 class Stats:
     """class for stats"""
+
     def __init__(
         self, *, alive=False, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,
@@ -25,7 +26,8 @@ class Stats:
             self.max_mana = max(utils.default(max_mana, 0), mana)
         if balance is not None:
             self.balance = balance
-            self.lifetime_balance = max(utils.default(lifetime_balance, 0), balance)
+            self.lifetime_balance = max(
+                utils.default(lifetime_balance, 0), balance)
         self.xp = xp
         self.attack = attack
         self.defense = defense
@@ -53,7 +55,7 @@ class Stats:
                 )
                 for stat_name, stat_value in self.__dict__.items()
                 if stat_name not in ("level", "xp") and stat_value is not None
-            ], is_description=True, seperator="\n\t"
+            ], is_description=True, separator="\n\t"
         )
         if self.level is not None:
             stats_text += "\t" + self.print_level_xp()
@@ -164,6 +166,9 @@ class Item:
 
     def name(self):
         return utils.get_key(all_items, self)
+
+    def full_name(self):
+        return utils.join_items(self.modifier, self.name(), separator=' ', newlines=0)
 
 
 all_items = {

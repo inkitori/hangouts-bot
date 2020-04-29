@@ -93,8 +93,8 @@ class Handler:
         if not new_name:
             return "Format: /rename {name}"
         else:
-            await conv.rename(new_name)
-            return "Sucessfully renamed"
+            return await bot.rename_conv(new_name)
+
 
     async def id_(self, bot, user, conv):
         """get the id of a user"""
@@ -116,7 +116,7 @@ class Handler:
         """makes the bot quit"""
         if utils.user_in(self.admins, user):
             print("Saber out!")
-            await bot.client.disconnect()
+            await bot.quit()
         else:
             return "bro wtf u can't use that"
 

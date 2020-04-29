@@ -32,6 +32,6 @@ def profile(self, player, commands):
         *[
             player.profile()
             for player in possible_players
-        ], seperator="\n" * 2
+        ], separator="\n" * 2
     )
     return output_text

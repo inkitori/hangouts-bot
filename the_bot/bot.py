@@ -59,6 +59,13 @@ class Bot:
     async def send_image(self, image, conv):
         await conv.send_message(utils.to_seg(""), image)
 
+    async def rename_conv(self, new_name, conv):
+        await conv.rename(new_name)
+        return "Sucessfully renamed"
+
+    async def quit(self):
+        await self.client.disconnect()
+
 class ConsoleBot:
     """console based bot (for testing)"""
     def __init__(self, options):

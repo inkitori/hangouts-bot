@@ -221,16 +221,17 @@ class Player:
             self.stats.mana -= tome.stats.mana
             self.stats.change_health(tome.stats.health)
 
-            text = utils.newline(f"You have been healed back up to {self.stats.health}")
+            text = utils.newline(
+                f"You have been healed back up to {self.stats.health}")
 
             if self.fighting:
                 enemy = random.choice(list(self.fighting.values()))
                 enemy_name = utils.get_key(self.fighting, enemy)
-                
+
                 text += self.take_damage(enemy, enemy_name)
-            
+
             return text
-                
+
     # TODO: merge with fight
     def attack(self, commands):
         """attacks an enemy"""
@@ -249,7 +250,8 @@ class Player:
         damage_dealt += int(multiplier * math.sqrt(damage_dealt / 2))
         enemy.stats.change_health(-damage_dealt)
 
-        text += utils.newline(f"You dealt {damage_dealt} damage to {enemy_name}!")
+        text += utils.newline(
+            f"You dealt {damage_dealt} damage to {enemy_name}!")
 
         if enemy.stats.health <= 0:
             text += self.killed_enemy(enemy_name, enemy)
@@ -280,7 +282,6 @@ class Player:
             f"{enemy_name} has {enemy.stats.health} left!",
         )
         return text
-
 
 
     def died(self, cause):
@@ -327,7 +328,7 @@ class Player:
             return utils.join_items(
                 f"{enemy_name} has approached to fight!",
                 enemy.stats.print_stats(),
-                seperator="\n\t"
+                separator="\n\t"
             )
 
     def autofight(self, enemy_name):
@@ -370,11 +371,11 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit option
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            is_description=True, seperator="\n\t"
+            is_description=True, separator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),
-            seperator="\n\t"
+            separator="\n\t"
         )
 
     commands = {
