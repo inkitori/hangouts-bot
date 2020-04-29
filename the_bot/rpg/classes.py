@@ -169,7 +169,7 @@ class Item:
 all_items = {
     "starter armor": Item(type_="armor", stats={"defense": 5}),
     "starter weapon": Item(type_="weapon", stats={"attack": 5}),
-    "clarity tome": Item(type_="tome", stats={"health": 20})
+    "clarity tome": Item(type_="tome", stats={"health": 20, "mana": 5})
 }
 
 rooms = {
