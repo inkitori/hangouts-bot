@@ -32,7 +32,6 @@ class RPG:
 
         self.players[player_id] = player_class.Player(name=name)
         return "Successfully registered!"
-    
 
     def play_game(self, player_id, commands):
         """runs functions based on player command"""

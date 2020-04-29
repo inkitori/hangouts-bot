@@ -11,7 +11,7 @@ class Stats:
     """class for stats"""
 
     def __init__(
-        self, *, alive=False, generate_stats=False,
+        self, *, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,
         max_mana=None, level=None, xp=None, balance=None, lifetime_balance=None
     ):
@@ -104,7 +104,7 @@ class Enemy:
     """represents an enemy"""
 
     def __init__(self, level=1):
-        self.stats = Stats(alive=True, generate_stats=True, level=level)
+        self.stats = Stats(generate_stats=True, level=level)
 
     def name(self):
         return utils.get_key(enemies, self)
@@ -148,6 +148,13 @@ class ItemType(enum.Enum):
     TOME = "tome"
 
 
+@enum.unique
+class Modifier(enum.Enum):
+    CRAPPY = Stats(health=-5, mana=-5, attack=-5, defense=-5)
+    BORING = Stats(health=0, mana=0, attack=0, defense=0)
+    STRONG = Stats(health=5, mana=5, attack=5, defense=5)
+
+
 class Item:
     """represents an item"""
 
@@ -158,7 +165,7 @@ class Item:
         self.type_ = ItemType(type_)
         self.rarity = Rarity(rarity)
         self.modifier = modifier
-        self.stats = Stats(alive=False, generate_stats=False, **stats)
+        self.stats = Stats(generate_stats=False, **stats)
 
     def short_description(self):
         """returns text description of item"""

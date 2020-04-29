@@ -150,14 +150,12 @@ class Player:
     """represents a player in the rpg"""
 
     def __init__(self, name):
-        # TODO: move pass as arguments in stats and get rid of the dict
-        stats = {
-            "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100, "level": 1, "xp": 0,
-            "balance": 0, "lifetime_balance": 0,
-        }
         self.name = name
-        self.stats = classes.Stats(alive=True, **stats)
+        self.stats = classes.Stats(
+            attack=5, defense=5, max_mana=100, mana=100,
+            health=100, max_health=100, level=1, xp=0,
+            balance=0, lifetime_balance=0,
+        )
         self.room = "village"
         self.fighting = {}
         self.options = {"autofight": False, "heal_percent": 50}
@@ -282,7 +280,6 @@ class Player:
             f"{enemy_name} has {enemy.stats.health} left!",
         )
         return text
-
 
     def died(self, cause):
         text = utils.join_items(
