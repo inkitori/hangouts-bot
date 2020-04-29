@@ -3,6 +3,7 @@ manager for economy
 """
 import economy.classes as classes
 import utils
+import game_functions
 
 
 class EconomyManager:
@@ -11,16 +12,6 @@ class EconomyManager:
     def __init__(self):
         self.players = classes.players
         self.load_game()
-        self.commands = {
-            "leaderboard": self.leaderboard,
-            "shop": self.shop,
-            "profile": self.profile
-        }
-        self.help_text = utils.join_items(
-            ("informational", *self.commands, "help"),
-            ("commands", *classes.EconomyUser.commands),
-            is_description=True, description_mode="long"
-        )
         self.save_game()
 
     def run_game(self, player_id, commands):
@@ -40,7 +31,7 @@ class EconomyManager:
             player.confirmed_upgrade = False
         if command in self.commands:
             function_ = self.commands[command]
-            output_text = function_(player, commands)
+            output_text = function_(self, player, commands)
         elif command in classes.EconomyUser.commands:
             function_ = classes.EconomyUser.commands[command]
             output_text = function_(player, commands)
@@ -116,29 +107,13 @@ class EconomyManager:
         self.players[player_id] = classes.EconomyUser(name=name)
         return "Successfully registered!"
 
-    def profile(self, player, commands):
-        """returns player profiles"""
-        output_text = ""
-        player_name = next(commands)
-        possible_players = []
-
-        for possible_player in self.players.values():
-            if player_name in possible_player.name:
-                possible_players.append(possible_player)
-        if player_name.isdigit() and int(player_name) in self.players:
-            possible_players.append(self.players[int(player_name)])
-        elif player_name == "self":
-            possible_players.append(player)
-        if not possible_players:
-            output_text += "No players go by that name!"
-
-        elif len(possible_players) > 1:
-            output_text += f"{len(possible_players)} player(s) go by that name:\n"
-
-        output_text += utils.join_items(
-            *[
-                player.profile()
-                for player in possible_players
-            ], end="\n"
-        )
-        return output_text
+    commands = {
+        "leaderboard": leaderboard,
+        "shop": shop,
+        "profile": game_functions.profile
+    }
+    help_text = utils.join_items(
+        ("informational", *commands, "help"),
+        ("commands", *classes.EconomyUser.commands),
+        is_description=True, description_mode="long"
+    )

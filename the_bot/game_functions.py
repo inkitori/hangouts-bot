@@ -4,8 +4,9 @@ functions shared between games that don't fit in utils
 import utils
 
 
-def profile(players, player, commands):
+def profile(self, player, commands):
     """returns player profiles"""
+    players = self.players
     output_text = ""
     player_name = commands.send("remaining")
 

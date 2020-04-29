@@ -2,6 +2,7 @@
 import rpg.player_class as player_class
 import rpg.classes as classes
 import utils
+import game_functions
 
 
 class RPG:
@@ -32,38 +33,6 @@ class RPG:
         self.players[player_id] = player_class.Player(name=name)
         return "Successfully registered!"
 
-    def profile(self, player, commands, players=None):
-        """returns player profiles"""
-        # TODO: get rid of self and just use players
-        players = utils.default(players, self.players)
-        output_text = ""
-        player_name = next(commands)
-
-        # create list of players
-        possible_players = []
-        for possible_player in players.values():
-            if player_name in possible_player.name:
-                possible_players.append(possible_player)
-        if player_name.isdigit() and int(player_name) in players:
-            possible_players.append(players[int(player_name)])
-        elif player_name == "self":
-            possible_players.append(player)
-
-        if not possible_players:
-            output_text += "No players go by that name/id!"
-
-        elif len(possible_players) > 1:
-            output_text += utils.newline(
-                f"{len(possible_players)} player(s) go by that name:")
-
-        output_text += utils.join_items(
-            *[
-                player.profile()
-                for player in possible_players
-            ], end="\n"
-        )
-        return output_text
-
     def play_game(self, player_id, commands):
         """runs functions based on player command"""
         command = next(commands)
@@ -79,7 +48,7 @@ class RPG:
                 is_description=True, description_mode="long"
             )
         elif command == "profile":
-            output_text = self.profile(player, commands)
+            output_text = game_functions.profile(self, player, commands)
 
         elif command in player_class.Inventory.commands:
             output_text = player_class.Inventory.commands[command](
