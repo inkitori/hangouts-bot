@@ -13,6 +13,7 @@ configurations = {
     "alt": [console_bot, "--id=102"],
     "adm": [console_bot, "--id=103"],
     "test": ["--bot=test", "--id=102"],
+    "nwf": ["--bot=console", "--skip-sheets"]
 }
 
 # creating options
@@ -29,12 +30,10 @@ token_option = optparse.make_option(
     "-t", "--token", dest="token", default="token.txt",
     help="the token to use to login to hangouts",
 )
-"""
 load_sheets_option = optparse.make_option(
-    "-s", "--sheets", dest="load_sheets", default="true",
-    help="whether or not to load sheets",
+    "-s", "--skip-sheets", dest="load_sheets", action="store_false", default=True,
+    help="skips loading sheets",
 )
-"""
 config_option = optparse.make_option(
     "-c", "--configuration", dest="config", default="", type="choice",
     choices=list(configurations),
@@ -43,7 +42,8 @@ config_option = optparse.make_option(
 
 # creating and setting up parser
 parser = optparse.OptionParser(description=__doc__)
-parser.add_options([bot_option, id_option, token_option, config_option])
+parser.add_options([bot_option, id_option, token_option,
+                    config_option, load_sheets_option])
 
 
 def parse_arguments(configuration=""):
@@ -54,7 +54,5 @@ def parse_arguments(configuration=""):
     if options.config:
         new_args = configurations[options.config]
         options, args = parser.parse_args(args=new_args)
-    # TODO: replace with an actual load sheets option
-    options.load_sheets = None
 
     return options

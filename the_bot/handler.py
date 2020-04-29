@@ -36,6 +36,7 @@ class Handler:
     def __init__(self, *, console=False, load_sheets=True):
         self.cooldowns = defaultdict(dict)
         self.console = console
+        print("loglog", load_sheets, not console, load_sheets is not None)
         self.game_managers["/rpg"] = RPGManager(
             load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
         )
