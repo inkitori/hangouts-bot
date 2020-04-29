@@ -190,7 +190,7 @@ class EconomyUser:
             f"id: {self.get_id()}",
             seperator="\n\t"
         )
-        return utils.newline(profile_text).title()
+        return profile_text.title()
 
     def give(self, commands):
         """gives money to another player"""

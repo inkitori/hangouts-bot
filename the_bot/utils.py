@@ -53,7 +53,10 @@ def scientific(number):
 
 
 # TODO: get rid of is_description (fix the code before deleting here)
-def join_items(*items, seperator="\n", is_description=False, description_mode="short", end="\n"):
+def join_items(
+        *items, seperator="\n",
+        is_description=False, description_mode="short", end="", newlines=1
+    ):
     """
     joins a list using seperator
     if is_description, passes each item to description before joining
@@ -63,12 +66,16 @@ def join_items(*items, seperator="\n", is_description=False, description_mode="s
     if is_description:
         for item in items:
             output_list.append(description(
-                *(default(item, "")), mode=description_mode))
+                *(default(item, "")), mode=description_mode,
+                newlines=0
+            ))
 
     else:
         output_list = convert_items(list(items), type_=str)
+    output_list = [item.strip() for item in output_list]
     output_text = seperator.join(output_list).strip()
     output_text += default("", end, output_text.endswith(end))
+    output_text = newline(output_text, newlines)
     return output_text
 
 
@@ -77,7 +84,7 @@ def newline(text, number=1):
     return text.strip() + ("\n" * number)
 
 
-def description(name, *description, mode="short", end="\n"):
+def description(name, *description, mode="short", end="\n", newlines=1):
     """
     chendis stupid string formatting function
 
@@ -91,14 +98,14 @@ def description(name, *description, mode="short", end="\n"):
     description = convert_items(list(description), str)
 
     if mode == "short":
-        description = join_items(*description, seperator=", ")
+        description = join_items(*description, seperator=", ", end=end, newlines=0)
         full_description = f"{name} - {description}"
     elif mode == "long":
         description.insert(0, f"{name.title()}:")
-        full_description = join_items(*description, seperator="\n\t", end=end)
+        full_description = join_items(*description, seperator="\n\t", end=end, newlines=0)
     else:
         raise ValueError(f"mode {mode} does not exist for descriptions")
-    return full_description.strip()
+    return newline(full_description, newlines)
 
 
 # save and load data
@@ -159,7 +166,7 @@ def command_parser(command_text):
             current_index = clamp(current_index, 0, len(commands))
             item = get_item(commands, indexes=(current_index, ))
         elif val == "remaining":
-            item = join_items(*commands[current_index:], seperator=" ", end="")
+            item = join_items(*commands[current_index:], seperator=" ", newlines=0)
         elif val == "all":
             item = commands
         else:

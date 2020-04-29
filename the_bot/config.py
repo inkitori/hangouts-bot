@@ -13,7 +13,8 @@ configurations = {
     "alt": [console_bot, "--id=102"],
     "adm": [console_bot, "--id=103"],
     "test": ["--bot=test", "--id=102"],
-    "nwf": ["--bot=console", "--skip-sheets"]
+    "nwf": ["--bot=console", "--skip-sheets"],
+
 }
 
 # creating options

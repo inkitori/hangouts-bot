@@ -6,12 +6,11 @@ import config
 
 
 def stuff(handler):
-    """for running random stuff"""
-    for player_id in (101, 102, 103):
-        try:
-            del handler.game_managers["/rpg"].game.players[player_id]
-        except KeyError:
-            continue
+    """
+    for running random stuff
+    mainly used for changing data
+    """
+    pass
 
 
 options = config.parse_arguments()

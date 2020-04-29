@@ -233,9 +233,9 @@ class Game:
     def draw_game(self):
         """appends board and scores to self.text"""
         self.text += utils.join_items(
-            utils.description(self.name(), self.mode().name()),
+            utils.description(self.name(), self.mode().name(), newlines=0),
             f"score: {self.score}",
-            end="\n" * 2
+            newlines=2
         )
         self.board.draw_board(self)
 
