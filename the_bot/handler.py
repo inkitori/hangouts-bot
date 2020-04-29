@@ -27,6 +27,10 @@ class Handler:
         "/rpg": RPGManager(load_sheets=False),
         "/economy": EconomyManager(),
     }
+    image_folder = "the_bot/images/"
+    images = {
+        "llama": "llama.JPG",
+    }
 
     def __init__(self, console=False):
         self.cooldowns = defaultdict(dict)
@@ -45,6 +49,14 @@ class Handler:
         # deals with commands
         if command in self.keywords:
             output_text = self.keywords[command]
+
+        elif command in self.images:
+            if self.console:
+                output_text = f"images are not available outside of hangouts, including {command}"
+            else:
+                with open(self.image_folder + self.images[command], "rb") as image:
+                    # FIXME: this ruins the division between handler and bot for dealing with hangouts
+                    await conv.send_message(utils.toSeg(""), image)
 
         elif command in self.commands:
             if self.console:
@@ -122,6 +134,7 @@ class Handler:
         ("keywords", *list(keywords)),
         ("games", *list(game_managers)),
         ("commands", *list(commands)),
+        ("images", *list(images)),
         is_description=True, description_mode="long"
     )
     keywords["/help"] = help_text
