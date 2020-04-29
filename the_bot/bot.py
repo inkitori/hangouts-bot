@@ -22,7 +22,7 @@ class Bot:
     def __init__(self, options):
         self.cookies = hangups.get_auth_stdin(options.token, True)
         self.client = hangups.Client(self.cookies)
-        self.handler = Handler()
+        self.handler = Handler(load_sheets=options.load_sheets)
 
     def run(self):
         """main loop for running bot"""
@@ -60,7 +60,7 @@ class Bot:
 class ConsoleBot:
     """console based bot (for testing)"""
     def __init__(self, options):
-        self.handler = Handler(console=True)
+        self.handler = Handler(console=True, load_sheets=options.load_sheets)
         self.user_id = options.user_id
 
     def run(self):
@@ -82,9 +82,8 @@ class ConsoleBot:
 class TestBot:
     """bot for testing commands"""
     def __init__(self, options):
-        self.handler = Handler(console=True)
+        self.handler = Handler(console=True, load_sheets=options.load_sheets)
         self.user_id = options.user_id
-        # TODO: add a way to only run some tests
         self.commands = {
             "/rpg": (
                 "register testbot", "profile",

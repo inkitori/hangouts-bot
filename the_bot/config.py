@@ -29,6 +29,12 @@ token_option = optparse.make_option(
     "-t", "--token", dest="token", default="token.txt",
     help="the token to use to login to hangouts",
 )
+"""
+load_sheets_option = optparse.make_option(
+    "-s", "--sheets", dest="load_sheets", default="true",
+    help="whether or not to load sheets",
+)
+"""
 config_option = optparse.make_option(
     "-c", "--configuration", dest="config", default="", type="choice",
     choices=list(configurations),
@@ -48,5 +54,7 @@ def parse_arguments(configuration=""):
     if options.config:
         new_args = configurations[options.config]
         options, args = parser.parse_args(args=new_args)
+    # TODO: replace with an actual load sheets option
+    options.load_sheets = None
 
     return options

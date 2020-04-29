@@ -33,7 +33,7 @@ class Handler:
         "ether": "ether.PNG"
     }
 
-    def __init__(self, console=False, load_sheets=True):
+    def __init__(self, *, console=False, load_sheets=True):
         self.cooldowns = defaultdict(dict)
         self.console = console
         self.game_managers["/rpg"] = RPGManager(
