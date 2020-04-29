@@ -221,7 +221,7 @@ class Player:
             self.stats.mana -= tome.stats.mana
             self.stats.change_health(tome.stats.health)
 
-            text = f"You have been healed back up to {self.stats.health}"
+            text = utils.newline(f"You have been healed back up to {self.stats.health}")
 
             if self.fighting:
                 enemy = random.choice(list(self.fighting.values()))
