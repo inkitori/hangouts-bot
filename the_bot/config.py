@@ -18,33 +18,34 @@ configurations = {
 }
 
 # creating options
-bot_option = optparse.make_option(
+options = [
+    optparse.make_option(
     "-b", "--bot", dest="bot", default="hangouts", type="choice",
-    choices=["hangouts", "console", "test"],
-    help="chooses a bot to run",
-)
-id_option = optparse.make_option(
-    "-i", "--id", dest="user_id", default=101, type="int",
-    help="the id to use when using the console(default 101)",
-)
-token_option = optparse.make_option(
-    "-t", "--token", dest="token", default="token.txt",
-    help="the token to use to login to hangouts",
-)
-load_sheets_option = optparse.make_option(
-    "-s", "--skip-sheets", dest="load_sheets", action="store_false", default=True,
-    help="skips loading sheets",
-)
-config_option = optparse.make_option(
-    "-c", "--configuration", dest="config", default="", type="choice",
-    choices=list(configurations),
-    help="the configuration to use(overrides all other options)",
-)
+        choices=["hangouts", "console", "test"],
+        help="chooses a bot to run",
+    ),
+    optparse.make_option(
+        "-i", "--id", dest="user_id", default=101, type="int",
+        help="the id to use when using the console(default 101)",
+    ),
+    optparse.make_option(
+        "-t", "--token", dest="token", default="token.txt",
+        help="the token to use to login to hangouts",
+    ),
+    optparse.make_option(
+        "-s", "--skip-sheets", dest="load_sheets", action="store_false", default=True,
+        help="skips loading sheets",
+    ),
+    optparse.make_option(
+        "-c", "--configuration", dest="config", default="", type="choice",
+        choices=list(configurations),
+        help="the configuration to use(overrides all other options)",
+    ),
+]
 
 # creating and setting up parser
 parser = optparse.OptionParser(description=__doc__)
-parser.add_options([bot_option, id_option, token_option,
-                    config_option, load_sheets_option])
+parser.add_options(options)
 
 
 def parse_arguments(configuration=""):
