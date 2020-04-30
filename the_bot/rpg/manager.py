@@ -50,6 +50,7 @@ class RPGManager:
             spreadsheetId=self.spreadsheet_id,
             range=named_ranges["items"]
         ).execute()
+        print(item_data)
         field_names, *item_data = item_data.get("values", [])
         rpg_class.RPG.all_items += {
             item_data[0]: classes.Item(**zip(field_names, item))

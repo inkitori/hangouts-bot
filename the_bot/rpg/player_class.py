@@ -122,8 +122,9 @@ class Inventory:
         inventory_text = utils.join_items(
             ("inventory", *[
                 f"{classes.all_items[item_name].short_description()} x{item_count}"
-                ''.join(utils.trim(item_name.split())): item_count for item_name, item_count in self.items.items()
-            ]), newlines=2, is_description=True, description_mode="long"
+                utils.join_items(utils.trim(item_name.split()), separator=' '): 
+                    item_count for item_name, item_count in self.items.items()
+            ]), newlines=2, description_mode="long"
         )
 
         inventory_text += self.print_equipped()
