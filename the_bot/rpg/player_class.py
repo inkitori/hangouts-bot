@@ -119,14 +119,19 @@ class Inventory:
 
     def print_inventory(self, commands):
         """returns string representation of inventory"""
+        if not self.items:
+            return "you dont have anything in your inventory"
+
         inventory_text = utils.join_items(
             ("inventory", *[
                 f"{classes.all_items[item_name].description()} x{item_count}"
                 for item_name, item_count in self.items.items()
             ]), newlines=2, description_mode="long"
         )
-
-        inventory_text += self.print_equipped()
+        if not [item for item in self.equipped.values() if item is not None]:
+            inventory_text += "you don't have anything equipped, use equip to equip something"
+        else:
+            inventory_text += self.print_equipped()
         return inventory_text
 
     def print_equipped(self):
