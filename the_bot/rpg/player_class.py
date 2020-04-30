@@ -119,7 +119,7 @@ class Inventory:
             ("inventory", *[
                 f"{classes.all_items[item_name].short_description()} x{item_count}"
                 for item_name, item_count in self.items.items()
-            ]), newlines=2, is_description=True, description_mode="long"
+            ]), newlines=2, description_mode="long"
         )
 
         inventory_text = utils.newline(inventory_text, 2)
@@ -133,7 +133,7 @@ class Inventory:
                 utils.description(type_.name.lower(), item_name)
                 for type_, item_name in self.equipped.items()
                 if item_name
-            ]), is_description=True, description_mode="long"
+            ]), description_mode="long"
         )
 
     def modifers(self):
@@ -365,7 +365,7 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            is_description=True, seperator="\n\t"
+            description_mode="short"seperator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),

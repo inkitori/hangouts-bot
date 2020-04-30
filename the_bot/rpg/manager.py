@@ -50,6 +50,7 @@ class RPGManager:
             range=named_ranges["items"]
         ).execute()
         item_data = item_data.get("values", [])
+        return
 
     def save_game(self):
         """saves the game"""

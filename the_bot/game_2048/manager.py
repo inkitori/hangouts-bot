@@ -30,21 +30,21 @@ class Manager2048:
                 (mode_name, mode.description)
                 for mode_name, mode in classes.Game.modes.items()
             ],
-            is_description=True
+            description_mode="short"
         ),
         "move": utils.join_items(
             *[
                 (direction.name.lower(), *direction.value.commands)
                 for direction in classes.Directions
             ],
-            is_description=True
+            description_mode="short"
         ),
         "scores": utils.join_items(
             *[
                 (mode_name, mode.high_score)
                 for mode_name, mode in classes.Game.modes.items()
             ],
-            is_description=True
+            description_mode="short"
         ),
         "reserved": utils.description("reserved", *reserved_words)
     }
@@ -52,7 +52,7 @@ class Manager2048:
         ("in-game commands", *list(classes.Game.game_commands)),
         ("game management", *game_management_commands),
         ("informational", *list(help_texts)),
-        is_description=True, description_mode="long"
+        description_mode="long"
     )
     # needs to be here because resereved_words is declared first (avoid circular references)
     reserved_words += list(help_texts)
@@ -68,7 +68,7 @@ class Manager2048:
                 (mode_name, mode.high_score)
                 for mode_name, mode in classes.Game.modes.items()
             ],
-            is_description=True
+            description_mode="short"
         )
 
     def create_game(self, game_name):

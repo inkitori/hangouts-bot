@@ -132,6 +132,8 @@ class TestBot:
     async def main(self, text):
         """sends inpput to handler and prints output"""
         output_text = await self.handler.handle_message(text, user_id=self.user_id)
+        # indicative of printing objects instead of strings
+        assert not ("<" in output_text and ">" in output_text)
         print(utils.newline(output_text))
 
 

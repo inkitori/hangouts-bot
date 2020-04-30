@@ -52,18 +52,17 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-# TODO: get rid of is_description (fix the code before deleting here)
 def join_items(
         *items, seperator="\n",
-        is_description=False, description_mode="short", end="", newlines=1
+        description_mode=None, end="", newlines=1
     ):
     """
     joins a list using seperator
-    if is_description, passes each item to description before joining
+    if desription_mode is specified, passes each item to description before joining
     """
 
     output_list = []
-    if is_description:
+    if description_mode:
         for item in items:
             output_list.append(description(
                 *(default(item, "")), mode=description_mode,

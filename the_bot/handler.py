@@ -141,7 +141,7 @@ class Handler:
         ("games", *list(game_managers)),
         ("commands", *list(commands)),
         ("images", *list(images)),
-        is_description=True, description_mode="long"
+        description_mode="long"
     )
     keywords["/help"] = help_text
 
