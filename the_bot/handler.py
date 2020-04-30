@@ -49,7 +49,7 @@ class Handler:
         output_text = ""
         text = event if self.console else event.text
         if not self.console:
-            user, conv = utils.get_user_and_conv(bot, event)
+            user, conv = utils.get_user_and_conv(bot._convo_list, event)
         commands = utils.command_parser(text)
         command = next(commands)
 

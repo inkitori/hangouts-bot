@@ -45,7 +45,7 @@ class Inventory:
             return "you must pick an item"
         elif not item_name:
             return "that is not a valid item name"
-        
+
         full_item = utils.join_items(modifier, item_name, seperator=' ')
 
         if full_item not in self.items:
@@ -117,12 +117,11 @@ class Inventory:
         """returns string representation of inventory"""
         inventory_text = utils.join_items(
             ("inventory", *[
-                f"{classes.all_items[item_name].short_description()} x{item_count}"
+                f"{classes.all_items[item_name].description()} x{item_count}"
                 for item_name, item_count in self.items.items()
             ]), newlines=2, description_mode="long"
         )
 
-        inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
         return inventory_text
 
@@ -365,7 +364,7 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            description_mode="short"seperator="\n\t"
+            description_mode="short", seperator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),

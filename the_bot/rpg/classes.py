@@ -179,17 +179,30 @@ class Item:
     """represents an item"""
 
     def __init__(
-        self, type_, rarity=1, modifier="boring",
-        stats={"health": 0, "attack": 0, "defense": 0, "mana": 0, "level": 1, }
+        self, type_, *, rarity=1, modifier="boring", price=1,
+        health=0, attack=0, defense=0, mana=0, level=1,
+        description="what, you thought we would write flavor text for everything? pft"
     ):
         self.type_ = ItemType(type_)
         self.rarity = Rarity(rarity)
-        self.modifier = modifier
-        self.stats = Stats(generate_stats=False, **stats)
+        self.modifier = [
+            item_modifier for item_modifier in ItemModifer
+            if item_modifier.name.lower == modifier
+        ][0]
+        self.stats = Stats(
+            generate_stats=False, health=health, attack=attack,
+            defense=defense, mana=mana, level=level,
+        )
 
-    def short_description(self):
+    def description(self):
         """returns text description of item"""
-        return f"{self.rarity.name.lower()} {self.modifier} {self.full_name()}"
+        return utils.description(
+            utils.join_items(
+                self.rarity.name.lower(),
+                self.modifier, self.full_name()
+            ),
+            self.description
+        )
 
     def name(self):
         return utils.get_key(all_items, self)
@@ -199,14 +212,14 @@ class Item:
 
 
 all_items = {
-    "starter armor": Item(type_="armor", stats={"defense": 5}),
-    "starter weapon": Item(type_="weapon", stats={"attack": 5}),
-    "clarity tome": Item(type_="tome", stats={"health": 20, "mana": 5})
+    "starter armor": Item(type_="armor", defense=5),
+    "starter weapon": Item(type_="weapon", attack=5),
+    "clarity tome": Item(type_="tome", health=20, mana=5),
 }
 
 rooms = {
     "village": Room(can_rest=True),
-    "potatoland": Room(enemies_list=["potato", "super potato"])
+    "potatoland": Room(enemies_list=["potato", "super potato"]),
 }
 enemies = {
     "potato": Enemy(),

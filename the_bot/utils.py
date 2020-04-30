@@ -17,15 +17,16 @@ def to_seg(text):
     return hangups.ChatMessageSegment.from_str(text)
 
 
-def get_user_and_conv(bot, event):
-    """gets user and conversation from a hangouts event"""
-    conv = bot._convo_list.get(event.conversation_id)
+def get_user_and_conv(conversations, event):
+    """gets user and conversation from a hangups event"""
+    conv = conversations.get(event.conversation_id)
     user = conv.get_user(event.user_id)
     return user, conv
 
 
 def cooldown(cooldowns, user, event, cooldown):
     """checks cooldown for a command and user"""
+    # TODO: either delete (this is unused) or clean up
     text = clean(event.text)
     command = get_item(text)
     stripped_time = event.timestamp.replace(tzinfo=None)
@@ -42,7 +43,15 @@ def cooldown(cooldowns, user, event, cooldown):
 
 
 def user_in(user_list, user):
-    """checks if the user is in user_list"""
+    """
+    checks if the user is in user_list, intended for hanugps useres
+
+    Args:
+        user_list - list of users to check against
+        user - the user to check
+
+    Returns bool
+    """
     return int(user.id_[0]) in user_list
 
 
@@ -52,13 +61,18 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-def join_items(
-        *items, seperator="\n",
-        description_mode=None, end="", newlines=1
-    ):
+def join_items(*items, seperator="\n", description_mode=None, end="", newlines=1):
     """
-    joins a list using seperator
-    if desription_mode is specified, passes each item to description before joining
+    joins items using seperator, ending with end and newlines
+
+    Args:
+        *items - the things to join
+        seperator - what seperates items
+        description_mode - what mode to use for description (defaults to no description)
+        end - what to end the string with
+        newlines - how many newlines to add after end (will remove all whitespace at end first)
+
+    Returns a string
     """
 
     output_list = []
@@ -297,7 +311,7 @@ def get_named_ranges(sheets, spreadsheet_id, sheet_name="Sheet1", included="all"
     named_ranges = sheet_data["namedRanges"]
     named_ranges_dict = {}
     for named_range in named_ranges:
-        range_name = named_range["name"]
+        range_name = named_range["name"].lower()
         if range_name in included or included == "all":
             range_notation = a1_notation(*[
                 named_range["range"][i]
