@@ -45,7 +45,7 @@ class RPG:
                 ("player_class.Inventory", *player_class.Inventory.commands),
                 ("player", "register", "profile", *player_class.Player.commands),
                 ("other", "help"),
-                is_description=True, description_mode="long"
+                description_mode="long"
             )
         elif command == "profile":
             output_text = game_functions.profile(self, player, commands)

@@ -6,6 +6,7 @@ import random
 import utils
 import rpg.rpg_class as rpg_class
 import rpg.player_class as player_class
+import rpg.classes as classes
 
 
 class RPGManager:
@@ -42,14 +43,18 @@ class RPGManager:
         sheets = utils.create_sheets_service().spreadsheets()
         named_ranges = utils.get_named_ranges(
             sheets, spreadsheet_id=self.spreadsheet_id,
-            sheet_name="RPG",
+            sheet_name="RPG", included=("items", "enemies", "rooms")
         )
 
         item_data = sheets.values().get(
             spreadsheetId=self.spreadsheet_id,
             range=named_ranges["items"]
         ).execute()
-        item_data = item_data.get("values", [])
+        field_names, *item_data = item_data.get("values", [])
+        rpg_class.RPG.all_items += {
+            item_data[0]: classes.Item(**zip(field_names, item))
+            for item in item_data
+        }
 
     def save_game(self):
         """saves the game"""

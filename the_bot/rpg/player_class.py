@@ -46,8 +46,8 @@ class Inventory:
             return "you must pick an item"
         elif not item_name:
             return "that is not a valid item name"
-        
-        full_item = utils.join_items(modifier, item_name, separator=' ')
+
+        full_item = utils.join_items(modifier, item_name, seperator=' ')
 
         if full_item not in self.items:
             return "you do not have that item"
@@ -126,7 +126,6 @@ class Inventory:
             ]), newlines=2, is_description=True, description_mode="long"
         )
 
-        inventory_text = utils.newline(inventory_text, 2)
         inventory_text += self.print_equipped()
         return inventory_text
 
@@ -137,7 +136,7 @@ class Inventory:
                 utils.description(type_.name.lower(), item_name)
                 for type_, item_name in self.equipped.items()
                 if item_name
-            ]), is_description=True, description_mode="long"
+            ]), description_mode="long"
         )
 
     def modifers(self):

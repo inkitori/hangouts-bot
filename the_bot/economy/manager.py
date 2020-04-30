@@ -86,7 +86,7 @@ class EconomyManager:
                     ))
             shop_list.append(items_text)
 
-        return utils.join_items(*shop_list, is_description=True, description_mode="long")
+        return utils.join_items(*shop_list, description_mode="long")
 
     def save_game(self):
         """saves the game"""
@@ -115,5 +115,5 @@ class EconomyManager:
     help_text = utils.join_items(
         ("informational", *commands, "help"),
         ("commands", *classes.EconomyPlayer.commands),
-        is_description=True, description_mode="long"
+        description_mode="long"
     )

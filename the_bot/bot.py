@@ -42,7 +42,7 @@ class Bot:
 
     async def _on_event(self, event):
         """called when there is an event in hangouts"""
-        user, conv = utils.get_user_and_conv(self, event)
+        user, conv = utils.get_user_and_conv(self._convo_list, event)
         output_text = ""
 
         if user.is_self or utils.user_in(self.ignore, user):
@@ -132,6 +132,8 @@ class TestBot:
     async def main(self, text):
         """sends inpput to handler and prints output"""
         output_text = await self.handler.handle_message(text, user_id=self.user_id)
+        # indicative of printing objects instead of strings
+        assert not ("<" in output_text and ">" in output_text)
         print(utils.newline(output_text))
 
 
