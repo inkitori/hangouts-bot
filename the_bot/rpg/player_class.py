@@ -121,9 +121,8 @@ class Inventory:
         """returns string representation of inventory"""
         inventory_text = utils.join_items(
             ("inventory", *[
-                f"{classes.all_items[item_name].short_description()} x{item_count}"
-                utils.join_items(utils.trim(item_name.split()), separator=' '): 
-                    item_count for item_name, item_count in self.items.items()
+                f"{classes.all_items[item_name].description()} x{item_count}"
+                for item_name, item_count in self.items.items()
             ]), newlines=2, description_mode="long"
         )
 
