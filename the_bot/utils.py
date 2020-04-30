@@ -61,8 +61,7 @@ def scientific(number):
     return "{:.2e}".format(number)
 
 
-# TODO: get rid of is_description (fix the code before deleting here)
-def join_items(*items, separator="\n", description_mode=None, end="", newlines=1):
+def join_items(*items, separator="\n", description_mode=None, start="", end="", newlines=1):
     """
     joins items using separator, ending with end and newlines
 
@@ -70,6 +69,7 @@ def join_items(*items, separator="\n", description_mode=None, end="", newlines=1
         *items - the things to join
         separator - what seperates items
         description_mode - what mode to use for description (defaults to no description)
+        start - what to start the string with
         end - what to end the string with
         newlines - how many newlines to add after end (will remove all whitespace at end first)
 
@@ -89,7 +89,7 @@ def join_items(*items, separator="\n", description_mode=None, end="", newlines=1
     output_list = [item.strip() for item in output_list]
     output_text = separator.join(output_list).strip()
     output_text += default("", end, output_text.endswith(end))
-    output_text = newline(output_text, newlines)
+    output_text = start + newline(output_text, newlines)
     return output_text
 
 

@@ -53,7 +53,13 @@ class RPGManager:
         print(item_data)
         field_names, *item_data = item_data.get("values", [])
         rpg_class.RPG.all_items += {
-            item_data[0]: classes.Item(**zip(field_names, item))
+            item_data[0]: classes.Item(
+                **{
+                    name: data
+                    for name, data in zip(field_names, item)
+                    if data
+                }
+            )
             for item in item_data
         }
 

@@ -121,8 +121,8 @@ class Inventory:
         """returns string representation of inventory"""
         if not self.items:
             return "you dont have anything in your inventory"
-
-        inventory_text = utils.join_items(
+        inventory_text = ""  # TODO: print # of full slots
+        inventory_text += utils.join_items(
             ("inventory", *[
                 f"{classes.all_items[item_name].description()} x{item_count}"
                 for item_name, item_count in self.items.items()
@@ -165,7 +165,7 @@ class Inventory:
         "equip": equip,
         "unequip": unequip,
         "inventory": print_inventory,
-        # TODO: command to view stats of an item
+        # TODO: details {item_name} command to view stats of an item
     }
 
 
@@ -208,9 +208,6 @@ class Player:
 
         elif room not in rooms:
             output_text = "That room doesn't exist!"
-
-        elif rooms[room].min_level > self.stats.level:
-            output_text = "Your level is not high enough to warp there!"
 
         elif room == self.room:
             output_text = "You are already in that room!"
@@ -302,8 +299,7 @@ class Player:
         text = ""
         text += f"{enemy_name} is now dead!\n"
 
-        xp_range = classes.rooms[self.room].xp_range
-        xp_earned = random.randint(*xp_range)
+        xp_earned = enemy.level ** 2
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
@@ -388,6 +384,7 @@ class Player:
         "fight": fight,
         "heal": heal,
         "set": set_,
+        # TODO: flee command to leave a fight (penalty for fleeing?)
     }
 
 
