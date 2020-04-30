@@ -56,7 +56,7 @@ class Stats:
                 )
                 for stat_name, stat_value in self.__dict__.items()
                 if stat_name not in ("level", "xp") and stat_value is not None
-            ], is_description=True, separator="\n\t"
+            ], is_description=True, seperator="\n\t"
         )
         if self.level is not None:
             stats_text += "\t" + self.print_level_xp()
@@ -108,7 +108,7 @@ class Enemy:
         self.stats = Stats(generate_stats=True, level=level)
 
     def name(self):
-        return utils.get_key(enemies, self)
+        return utils.get_key(enemies, self, is_same=False)
 
     def attack(self, player):
         """"""
@@ -123,9 +123,9 @@ class Enemy:
         player.stats.change_health(-damage_dealt)
 
         text = utils.join_items(
-            f"{self.name} dealt {damage_dealt} to you!",
+            f"{self.name()} dealt {damage_dealt} to you!",
             f"You have {player.stats.health} hp left",
-            f"{self.name} has {self.stats.health} left!",
+            f"{self.name()} has {self.stats.health} left!",
         )
         return text
 
@@ -169,7 +169,7 @@ class ItemType(enum.Enum):
 
 
 @enum.unique
-class Modifier(enum.Enum):
+class ItemModifer(enum.Enum):
     CRAPPY = Stats(health=-5, mana=-5, attack=-5, defense=-5)
     BORING = Stats(health=0, mana=0, attack=0, defense=0)
     STRONG = Stats(health=5, mana=5, attack=5, defense=5)
@@ -189,13 +189,13 @@ class Item:
 
     def short_description(self):
         """returns text description of item"""
-        return f"{self.rarity.name.lower()} {self.modifier} {self.name()}"
+        return f"{self.rarity.name.lower()} {self.modifier} {self.full_name()}"
 
     def name(self):
         return utils.get_key(all_items, self)
 
     def full_name(self):
-        return utils.join_items(self.modifier, self.name(), separator=' ', newlines=0)
+        return utils.join_items(self.modifier, self.name(), seperator=' ', newlines=0)
 
 
 all_items = {

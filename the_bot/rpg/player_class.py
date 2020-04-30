@@ -16,35 +16,50 @@ class Inventory:
         """
         puts an item into the inventory
         """
+        # input validation
+        modifier = next(commands)
         item_name = commands.send("remaining")
-        output_text = ""
-        if not item_name:
-            output_text = "you must pick an item"
-        elif sum(self.items.values()) >= self.max_items:
-            output_text = "your inventory is full, remove something first"
-        # this still lets the player add anything if they know the name
+        if not modifier:
+            return "you must pick an item"
+        elif not item_name:
+            return "that is not a valid item name"
         elif item_name not in classes.all_items:
-            output_text = "that item does not exist"
-        else:
-            # increments the value
-            self.items[item_name] = utils.get_value(
-                self.items, item_name, default=0) + 1
-            output_text = f"added {item_name} to inventory"
-        return output_text
+            return "that item does not exist"
+        elif modifier not in [item_modifier.name.lower() for item_modifier in classes.ItemModifer]:
+            return "that modifier does not exist"
+
+        if sum(self.items.values()) >= self.max_items:
+            return "your inventory is full, remove something first"
+        # this still lets the player add anything if they know the name
+
+        # increments the value
+        full_item = utils.join(modifier, item_name, separator=' ')
+        self.items[full_item] = utils.get_value(
+            self.items, full_item, default=0) + 1
+        return f"added {full_item} to inventory"
 
     def remove(self, commands):
+        modifier = next(commands)
         item_name = commands.send("remaining")
-        if not item_name:
-            return "you must specify an item"
-        elif item_name not in self.items:
+        if not modifier:
+            return "you must pick an item"
+        elif not item_name:
+            return "that is not a valid item name"
+        
+        full_item = utils.join_items(modifier, item_name, seperator=' ')
+
+        if full_item not in self.items:
             return "you do not have that item"
-        elif item_name in self.equipped.values() and self.items[item_name] == 1:
+        elif (
+            full_item in self.equipped.values()
+            and self.items[full_item] == 1
+        ):
             return "you must unequip that item first"
         else:
-            self.items[item_name] -= 1
-            if self.items[item_name] == 0:
-                del self.items[item_name]
-            return f"{item_name} removed from inventory"
+            self.items[full_item] -= 1
+            if self.items[full_item] == 0:
+                del self.items[full_item]
+            return f"{full_item.title()} removed from inventory"
 
     def equip(self, commands):
         """equips an item"""
@@ -307,7 +322,7 @@ class Player:
             return utils.join_items(
                 f"{enemy_name} has approached to fight!",
                 enemy.stats.print_stats(),
-                separator="\n\t"
+                seperator="\n\t"
             )
 
     def autofight(self, enemy_name):
@@ -350,11 +365,11 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            is_description=True, separator="\n\t"
+            is_description=True, seperator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),
-            separator="\n\t"
+            seperator="\n\t"
         )
 
     commands = {

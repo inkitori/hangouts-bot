@@ -32,8 +32,8 @@ class EconomyManager:
         if command in self.commands:
             function_ = self.commands[command]
             output_text = function_(self, player, commands)
-        elif command in classes.EconomyUser.commands:
-            function_ = classes.EconomyUser.commands[command]
+        elif command in classes.EconomyPlayer.commands:
+            function_ = classes.EconomyPlayer.commands[command]
             output_text = function_(player, commands)
         else:
             output_text = "Invalid command"
@@ -104,7 +104,7 @@ class EconomyManager:
             return "You are already registered!"
         if not name:
             return "you must provide a name"
-        self.players[player_id] = classes.EconomyUser(name=name)
+        self.players[player_id] = classes.EconomyPlayer(name=name)
         return "Successfully registered!"
 
     commands = {
@@ -114,6 +114,6 @@ class EconomyManager:
     }
     help_text = utils.join_items(
         ("informational", *commands, "help"),
-        ("commands", *classes.EconomyUser.commands),
+        ("commands", *classes.EconomyPlayer.commands),
         is_description=True, description_mode="long"
     )

@@ -55,7 +55,7 @@ shop_items = {
 }
 
 
-class EconomyUser:
+class EconomyPlayer:
     """class for players in economy"""
 
     prestige_conversion = 100000
@@ -188,7 +188,7 @@ class EconomyUser:
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
             f"id: {self.get_id()}",
-            separator="\n\t"
+            seperator="\n\t"
         )
         return profile_text.title()
 

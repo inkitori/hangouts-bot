@@ -54,11 +54,11 @@ def scientific(number):
 
 # TODO: get rid of is_description (fix the code before deleting here)
 def join_items(
-    *items, separator="\n",
-    is_description=False, description_mode="short", end="", newlines=1
-):
+        *items, seperator="\n",
+        is_description=False, description_mode="short", end="", newlines=1
+    ):
     """
-    joins a list using separator
+    joins a list using seperator
     if is_description, passes each item to description before joining
     """
 
@@ -73,7 +73,7 @@ def join_items(
     else:
         output_list = convert_items(list(items), type_=str)
     output_list = [item.strip() for item in output_list]
-    output_text = separator.join(output_list).strip()
+    output_text = seperator.join(output_list).strip()
     output_text += default("", end, output_text.endswith(end))
     output_text = newline(output_text, newlines)
     return output_text
@@ -98,13 +98,11 @@ def description(name, *description, mode="short", end="\n", newlines=1):
     description = convert_items(list(description), str)
 
     if mode == "short":
-        description = join_items(
-            *description, separator=", ", end=end, newlines=0)
+        description = join_items(*description, seperator=", ", end=end, newlines=0)
         full_description = f"{name} - {description}"
     elif mode == "long":
         description.insert(0, f"{name.title()}:")
-        full_description = join_items(
-            *description, separator="\n\t", end=end, newlines=0)
+        full_description = join_items(*description, seperator="\n\t", end=end, newlines=0)
     else:
         raise ValueError(f"mode {mode} does not exist for descriptions")
     return newline(full_description, newlines)
@@ -168,8 +166,7 @@ def command_parser(command_text):
             current_index = clamp(current_index, 0, len(commands))
             item = get_item(commands, indexes=(current_index, ))
         elif val == "remaining":
-            item = join_items(
-                *commands[current_index:], separator=" ", newlines=0)
+            item = join_items(*commands[current_index:], seperator=" ", newlines=0)
         elif val == "all":
             item = commands
         else:
