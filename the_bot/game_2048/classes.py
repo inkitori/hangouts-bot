@@ -12,6 +12,9 @@ import collections
 class Keywords(enum.Enum):
     """this just exists because spelling errors"""
     CURRENT_GAME = "current game"
+    WON = "won"
+    LOST = "lost"
+    RESTART = "restart"
 
 
 class Cell:
