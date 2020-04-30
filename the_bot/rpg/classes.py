@@ -56,7 +56,7 @@ class Stats:
                 )
                 for stat_name, stat_value in self.__dict__.items()
                 if stat_name not in ("level", "xp") and stat_value is not None
-            ], is_description=True, seperator="\n\t"
+            ], is_description=True, separator="\n\t"
         )
         if self.level is not None:
             stats_text += "\t" + self.print_level_xp()
@@ -195,7 +195,7 @@ class Item:
         return utils.get_key(all_items, self)
 
     def full_name(self):
-        return utils.join_items(self.modifier, self.name(), seperator=' ', newlines=0)
+        return utils.join_items(self.modifier, self.name(), separator=' ', newlines=0)
 
 
 all_items = {

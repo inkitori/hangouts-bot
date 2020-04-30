@@ -24,6 +24,7 @@ class Inventory:
         elif not item_name:
             return "that is not a valid item name"
         elif item_name not in classes.all_items:
+            print(item_name)
             return "that item does not exist"
         elif modifier not in [item_modifier.name.lower() for item_modifier in classes.ItemModifer]:
             return "that modifier does not exist"
@@ -33,7 +34,7 @@ class Inventory:
         # this still lets the player add anything if they know the name
 
         # increments the value
-        full_item = utils.join(modifier, item_name, separator=' ')
+        full_item = utils.join_items(modifier, item_name, separator=' ')
         self.items[full_item] = utils.get_value(
             self.items, full_item, default=0) + 1
         return f"added {full_item} to inventory"
@@ -46,7 +47,7 @@ class Inventory:
         elif not item_name:
             return "that is not a valid item name"
         
-        full_item = utils.join_items(modifier, item_name, seperator=' ')
+        full_item = utils.join_items(modifier, item_name, separator=' ')
 
         if full_item not in self.items:
             return "you do not have that item"
@@ -64,10 +65,13 @@ class Inventory:
     def equip(self, commands):
         """equips an item"""
         output_text = ""
+        modifier = next(commands)
         item_name = commands.send("remaining")
+        full_item = utils.join_items(modifier, item_name, separator=' ')
+
         if not item_name:
             output_text += "you must specify an item"
-        elif item_name not in self.items:
+        elif full_item not in self.items:
             output_text += "you do not have that item"
         else:
             item_type = classes.all_items[item_name].type_
@@ -76,7 +80,7 @@ class Inventory:
                 output_text += "you already equipped that"
             else:
                 output_text += f"equipping {item_name} as {item_type.name.lower()}"
-                self.equipped[item_type] = item_name
+                self.equipped[item_type] = full_item
                 if current_equipped_item:
                     output_text += f" replacing {current_equipped_item}"
         return output_text
@@ -110,7 +114,7 @@ class Inventory:
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
-        item = classes.all_items[item_name] if item_name else None
+        item = classes.all_items[''.join(utils.trim(item_name.split()))] if item_name else None
         return item_name, item
 
     def print_inventory(self, commands):
@@ -118,7 +122,7 @@ class Inventory:
         inventory_text = utils.join_items(
             ("inventory", *[
                 f"{classes.all_items[item_name].short_description()} x{item_count}"
-                for item_name, item_count in self.items.items()
+                ''.join(utils.trim(item_name.split())): item_count for item_name, item_count in self.items.items()
             ]), newlines=2, is_description=True, description_mode="long"
         )
 
@@ -172,7 +176,7 @@ class Player:
             "balance": 0, "lifetime_balance": 0,
         }
         self.name = name
-        self.stats = classes.Stats(alive=True, **stats)
+        self.stats = classes.Stats(**stats)
         self.room = "village"
         self.fighting = {}
         self.args = {"autofight": False, "heal_percent": 50}
@@ -271,6 +275,7 @@ class Player:
 
         else:
             # take damage
+            print(enemy_name)
             text += enemy.attack(self)
 
             if self.stats.health <= 0:
@@ -322,7 +327,7 @@ class Player:
             return utils.join_items(
                 f"{enemy_name} has approached to fight!",
                 enemy.stats.print_stats(),
-                seperator="\n\t"
+                separator="\n\t"
             )
 
     def autofight(self, enemy_name):
@@ -365,11 +370,11 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            is_description=True, seperator="\n\t"
+            is_description=True, separator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),
-            seperator="\n\t"
+            separator="\n\t"
         )
 
     commands = {
