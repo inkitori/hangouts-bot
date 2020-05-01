@@ -75,14 +75,13 @@ class RPGManager:
         ).execute()
         field_names, *item_data = item_data.get("values", [])
         rpg_class.RPG.all_items += {
-            item_data[0]: classes.Item(
+            item[0]: classes.Item(
                 **{
                     name: data
-                    for item in item_data
-                    for name, data in zip(field_names, item)
+                    for name, data in dict(zip(field_names, item)).items()
                     if data
                 }
-            )
+            ) for item in item_data if item
         }
 
     def save_game(self):
