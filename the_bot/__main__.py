@@ -8,9 +8,21 @@ import config
 def stuff(handler):
     """
     for running random stuff
-    mainly used for changing data
+    mainly used for changing data since shelve loads the obejcts
+    without going though __init__ and getting the new changes
     """
-    pass
+    return
+    game_managers = handler.game_managers
+    manager = game_managers["/rpg"]
+    rpg = manager.game
+    for player in rpg.players.values():
+        player.inventory.items = {
+            rpg.all_items[item_name].full_name: rpg.all_items[item_name]
+            for item_name in player.inventory.items
+        }
+    manager.save_game()
+    import sys
+    sys.exit()
 
 
 args = config.parse_arguments()
