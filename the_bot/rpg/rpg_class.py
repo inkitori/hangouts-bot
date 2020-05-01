@@ -10,13 +10,10 @@ class RPG:
     all_items = classes.all_items
     players = player_class.players
     rooms = classes.rooms
-    enemies = classes.enemies
 
     def __init__(self):
-        for room_name in self.rooms:
-            for enemy_name in self.rooms[room_name].enemies_list:
-                if enemy_name not in self.enemies:
-                    print(f"invalid enemy {enemy_name} in room {room_name}")
+        # nothing to put here right now
+        pass
 
     def register(self, player_id, commands):
         """registers a player in the game"""

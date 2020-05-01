@@ -50,7 +50,7 @@ class RPGManager:
 
     def load_rooms(self, named_ranges, sheets):
         # TODO: make 1 function for this instead of copying load_items
-        room_data = sheets.values().get( 
+        room_data = sheets.values().get(
             spreadsheetId=self.spreadsheet_id,
             range=named_ranges["rooms"]
         ).execute()
@@ -58,8 +58,12 @@ class RPGManager:
         # TODO: don't hardcode column order
         rpg_class.RPG.rooms += {
             name: classes.Room(
-                name, can_rest=utils.default(can_rest, False), level=level,
-                enemies_list=[classes.Enemy(enemy_name, level=int(level)) for enemy_name in enemies],
+                can_rest=utils.default(can_rest, False), level=level,
+                enemies_list=[
+                    classes.Enemy(name=enemy_name, level=int(level))
+                    for enemy_name in enemies
+                    if enemy_name
+                ],
                 boss=classes.Enemy(
                     name=boss_name, attack=int(boss_attack), defense=int(boss_defense),
                 ), drops=drops
@@ -74,7 +78,7 @@ class RPGManager:
             range=named_ranges["items"]
         ).execute()
         field_names, *item_data = item_data.get("values", [])
-        rpg_class.RPG.all_items += {
+        rpg_class.RPG.all_items.update({
             item[0]: classes.Item(
                 **{
                     name: data
@@ -82,7 +86,7 @@ class RPGManager:
                     if data
                 }
             ) for item in item_data if item
-        }
+        })
 
     def save_game(self):
         """saves the game"""

@@ -3,7 +3,6 @@ classes for rpg
 """
 import utils
 import random
-import copy
 import enum
 import math
 
@@ -105,11 +104,11 @@ class Stats:
 class Enemy:
     """represents an enemy"""
 
-    def __init__(self, level=1):
-        self.stats = Stats(generate_stats=True, level=level)
-
-    def name(self):
-        return utils.get_key(enemies, self, is_same=False)
+    def __init__(self, name, level=1, attack=0, defense=0, health=1):
+        self.stats = Stats(
+            generate_stats=True, level=level,
+            attack=attack, defense=defense, health=health
+        )
 
     def attack(self, player):
         """"""
@@ -124,9 +123,9 @@ class Enemy:
         player.stats.change_health(-damage_dealt)
 
         text = utils.join_items(
-            f"{self.name()} dealt {damage_dealt} to you!",
+            f"{self.name} dealt {damage_dealt} to you!",
             f"You have {player.stats.health} hp left",
-            f"{self.name()} has {self.stats.health} left!",
+            f"{self.name} has {self.stats.health} left!",
         )
         return text
 
@@ -134,19 +133,23 @@ class Enemy:
 class Room:
     """represents a room in the world"""
 
-    def __init__(self, enemies_list=[], min_level=1, xp_range=(1, 1), can_rest=False):
+    def __init__(
+        self, level=1, enemies_list=[], boss=None, min_level=1,
+        can_rest=False, drops=None
+    ):
+        self.level = level
         self.enemies_list = enemies_list
+        self.boss = boss
+        self.drops = drops
         self.min_level = min_level
-        self.xp_range = xp_range
         self.can_rest = can_rest
 
     def name(self):
         return utils.get_key(rooms, self)
 
     def generate_enemy(self):
-        enemy_name = random.choice(self.enemies_list)
-        enemy = copy.deepcopy(enemies[enemy_name])
-        return enemy_name, enemy
+        enemy = random.choice(self.enemies_list)
+        return enemy.name, enemy
 
     def generate_encounter(self, party):
         # trying to figure out how to get parites to work, just leave this alone
@@ -218,9 +221,5 @@ all_items = {
 
 rooms = {
     "village": Room(can_rest=True),
-    "potatoland": Room(enemies_list=["potato", "super potato"]),
-}
-enemies = {
-    "potato": Enemy(),
-    "super potato": Enemy(3),
+    "potatoland": Room(enemies_list=[Enemy("potato"), Enemy("super potato", level=3)]),
 }
