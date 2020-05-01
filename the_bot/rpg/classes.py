@@ -214,7 +214,7 @@ class Item:
         )
 
     def full_name(self):
-        return utils.join_items(self.modifier, self.name, separator=' ', newlines=0)
+        return utils.join_items(self.modifier.name.lower(), self.name, separator=' ', newlines=0)
 
 
 all_items = {

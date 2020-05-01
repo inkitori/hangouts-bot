@@ -141,8 +141,8 @@ class Inventory:
         inventory_text = ""  # TODO: print # of full slots
         inventory_text += utils.join_items(
             ("inventory", *[
-                f"{classes.all_items[item_name].description()} x{item_count}"
-                for item_name, item_count in self.items.items()
+                f"{item.description()} x{item.count}"
+                for item in self.items.values()
             ]), newlines=2, description_mode="long"
         )
         if not [item for item in self.equipped.values() if item is not None]:

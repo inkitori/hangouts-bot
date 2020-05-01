@@ -10,7 +10,7 @@ def stuff(handler):
     for running random stuff
     mainly used for changing data
     """
-    # return
+    return
     game_managers = handler.game_managers
     manager = game_managers["/rpg"]
     rpg = manager.game
