@@ -5,19 +5,19 @@ import bot
 import config
 
 
-def stuff(handler):
+def stuff(handler=None):
     """
     for running random stuff
     mainly used for changing data
     """
     return
-    game_managers = handler.game_managers
-    manager = game_managers["/rpg"]
-    rpg = manager.game
-    rpg.players = {}
-    manager.save_game()
+    import utils
+    utils.save(rpg_players={})
     import sys
     sys.exit()
+
+
+stuff()
 
 
 args = config.parse_arguments()

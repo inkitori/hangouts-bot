@@ -193,11 +193,7 @@ class Item:
         self.name = name
         self.type_ = ItemType(type_.lower())
         self.rarity = Rarity(int(rarity))
-        self.modifier = [
-            item_modifier
-            for item_modifier in ItemModifer
-            if item_modifier.name.lower() == modifier
-        ][0]
+        self.modifier = modifier
         self.stats = Stats(
             generate_stats=False, health=health, attack=attack,
             defense=defense, mana=mana, level=level,
@@ -214,7 +210,7 @@ class Item:
         )
 
     def full_name(self):
-        return utils.join_items(self.modifier.name.lower(), self.name, separator=' ', newlines=0)
+        return utils.join_items(self.modifier, self.name, separator=' ', newlines=0)
 
 
 all_items = {
