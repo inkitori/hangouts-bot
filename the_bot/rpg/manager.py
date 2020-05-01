@@ -56,7 +56,7 @@ class RPGManager:
         ).execute()
         field_names, *room_data = room_data.get("values", [])
         # TODO: don't hardcode column order
-        rpg_class.RPG.rooms += {
+        rpg_class.RPG.rooms.update({
             name: classes.Room(
                 can_rest=utils.default(can_rest, False), level=level,
                 enemies_list=[
@@ -64,13 +64,13 @@ class RPGManager:
                     for enemy_name in enemies
                     if enemy_name
                 ],
-                boss=classes.Enemy(
+                boss=None if not boss_name else classes.Enemy(
                     name=boss_name, attack=int(boss_attack), defense=int(boss_defense),
                 ), drops=drops
             )
             for name, can_rest, level, *enemies,
             boss_name, boss_attack, boss_defense, drops in room_data
-        }
+        })
 
     def load_items(self, named_ranges, sheets):
         item_data = sheets.values().get(

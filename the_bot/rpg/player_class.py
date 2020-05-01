@@ -47,7 +47,7 @@ class Inventory:
         elif not item_name:
             return "that is not a valid item name"
 
-        full_item = utils.join_items(modifier, item_name, seperator=' ')
+        full_item = utils.join_items(modifier, item_name, separator=' ')
 
         if full_item not in self.items:
             return "you do not have that item"

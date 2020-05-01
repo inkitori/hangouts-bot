@@ -105,6 +105,7 @@ class Enemy:
     """represents an enemy"""
 
     def __init__(self, name, level=1, attack=0, defense=0, health=1):
+        self.name = name
         self.stats = Stats(
             generate_stats=True, level=level,
             attack=attack, defense=defense, health=health
