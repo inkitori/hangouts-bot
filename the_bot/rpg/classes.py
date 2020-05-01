@@ -120,8 +120,10 @@ class Enemy:
 
         multiplier = random.choice((1, -1))
         damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
+        damage_dealt = round(damage_dealt, 1)
 
         player.stats.change_health(-damage_dealt)
+        player.stats.health = round(player.stats.health)
 
         text = utils.join_items(
             f"{self.name} dealt {damage_dealt} to you!",

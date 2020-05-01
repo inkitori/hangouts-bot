@@ -1,5 +1,6 @@
 import utils
 import random
+import copy
 import math
 import rpg.classes as classes
 
@@ -12,77 +13,88 @@ class Inventory:
         self.max_items = 8
         self.equipped = {type_: None for type_ in classes.ItemType}
 
+    def validate_item_name(self, item_name, modifier=None):
+        if modifier is not None:
+            if not modifier:
+                return "you must pick an item"
+            elif modifier not in [item_modifier.name.lower() for item_modifier in classes.ItemModifer]:
+                return "that modifier does not exist"
+        if not item_name:
+            return "that is not a valid item name"
+        elif item_name not in classes.all_items:
+            return "that item does not exist"
+        return "valid"
+
     def add(self, commands):
         """
         puts an item into the inventory
         """
         # input validation
-        modifier = next(commands)
         item_name = commands.send("remaining")
-        if not modifier:
-            return "you must pick an item"
-        elif not item_name:
-            return "that is not a valid item name"
-        elif item_name not in classes.all_items:
-            print(item_name)
-            return "that item does not exist"
-        elif modifier not in [item_modifier.name.lower() for item_modifier in classes.ItemModifer]:
-            return "that modifier does not exist"
+        item_is_valid = self.validate_item_name(item_name)
+        if item_is_valid != "valid":
+            return item_is_valid
 
-        if sum(self.items.values()) >= self.max_items:
+        if sum([item.count for item in self.items.values()]) >= self.max_items:
             return "your inventory is full, remove something first"
-        # this still lets the player add anything if they know the name
 
-        # increments the value
-        full_item = utils.join_items(modifier, item_name, separator=' ')
-        self.items[full_item] = utils.get_value(
-            self.items, full_item, default=0) + 1
-        return f"added {full_item} to inventory"
+        # TODO: this still lets the player add anything if they know the name
+        item = classes.all_items[item_name]
+        if item.full_name() in self.items:
+            self.items[item.full_name()].count += 1
+        else:
+            item = copy.copy(item)
+            item.stats = copy.deepcopy(item.stats)
+            self.items[item.full_name()] = item
+            item.count = 1
+
+        return f"added {item_name} to inventory"
 
     def remove(self, commands):
+        # input validation
         modifier = next(commands)
         item_name = commands.send("remaining")
-        if not modifier:
-            return "you must pick an item"
-        elif not item_name:
-            return "that is not a valid item name"
+        item_is_valid = self.validate_item_name(item_name, modifier)
+        if item_is_valid != "valid":
+            return item_is_valid
 
         full_item = utils.join_items(modifier, item_name, separator=' ')
 
         if full_item not in self.items:
             return "you do not have that item"
-        elif (
-            full_item in self.equipped.values()
-            and self.items[full_item] == 1
-        ):
+
+        item = self.items[full_item]
+        if (full_item in self.equipped and item.count == 1):
             return "you must unequip that item first"
-        else:
-            self.items[full_item] -= 1
-            if self.items[full_item] == 0:
-                del self.items[full_item]
-            return f"{full_item.title()} removed from inventory"
+
+        item.count -= 1
+        if item.count == 0:
+            del self.items[full_item]
+        return f"1 {full_item.title()} removed from inventory"
 
     def equip(self, commands):
         """equips an item"""
         output_text = ""
         modifier = next(commands)
         item_name = commands.send("remaining")
-        full_item = utils.join_items(modifier, item_name, separator=' ')
+        full_name = utils.join_items(modifier, item_name, separator=' ')
 
-        if not item_name:
-            output_text += "you must specify an item"
-        elif full_item not in self.items:
-            output_text += "you do not have that item"
-        else:
-            item_type = classes.all_items[item_name].type_
-            current_equipped_item = self.get_equipped(item_type)[0]
-            if current_equipped_item == item_name:
-                output_text += "you already equipped that"
-            else:
-                output_text += f"equipping {item_name} as {item_type.name.lower()}"
-                self.equipped[item_type] = full_item
-                if current_equipped_item:
-                    output_text += f" replacing {current_equipped_item}"
+        item_is_valid = self.validate_item_name(item_name, modifier)
+        if item_is_valid != "valid":
+            return item_is_valid
+
+        if full_name not in self.items:
+            return "you do not have that item"
+
+        item_type = classes.all_items[item_name].type_
+        current_equipped_item = self.get_equipped(item_type)[0]
+        if current_equipped_item == item_name:
+            return "you already equipped that"
+        output_text += f"equipping {item_name} as {item_type.name.lower()}"
+        self.equipped[item_type] = full_name
+        if current_equipped_item:
+            output_text += f" replacing {current_equipped_item}"
+
         return output_text
 
     def unequip(self, commands):
@@ -92,16 +104,21 @@ class Inventory:
             type_ = classes.ItemType(name)
         except ValueError:
             type_ = None
-        if not name:
-            output_text = "you must specify an item name or type"
-        elif type_:
+            modifier, *item_name = name.split()
+            item_name = ''.join(item_name)
+            item_is_valid = self.validate_item_name(item_name, modifier)
+            if item_is_valid != "valid":
+                return item_is_valid
+
+        if type_:
             if not self.equipped[type_]:
                 output_text = "you do not have anything equipped of that type"
             else:
                 current_equipped_item = self.equipped[type_]
                 self.equipped[type_] = None
                 output_text = f"unequipped {current_equipped_item} as {type_.name.lower()}"
-        elif name in classes.all_items:
+
+        elif name in self.equipped.values():
             item_type = classes.all_items[name].type_
             if self.equipped[item_type] != name:
                 output_text = "that item is not equipped"
@@ -114,7 +131,7 @@ class Inventory:
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
-        item = classes.all_items[''.join(utils.trim(item_name.split()))] if item_name else None
+        item = self.items[item_name] if item_name else None
         return item_name, item
 
     def print_inventory(self, commands):
@@ -266,8 +283,9 @@ class Player:
 
         multiplier = random.choice((1, -1))
         damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
+        damage_dealt = round(damage_dealt, 1)
         enemy.stats.change_health(-damage_dealt)
-
+        enemy.stats.health = round(enemy.stats.health, 1)
         text += utils.newline(
             f"You dealt {damage_dealt} damage to {enemy_name}!")
 
