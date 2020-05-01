@@ -370,7 +370,7 @@ class Player:
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
             ("name", self.name), ("id", self.get_id()),
-            description_mode="short", separator="\n\t"
+            is_description=True, separator="\n\t"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),
