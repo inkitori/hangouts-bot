@@ -45,22 +45,44 @@ class RPGManager:
             sheets, spreadsheet_id=self.spreadsheet_id,
             sheet_name="RPG", included=("items", "enemies", "rooms")
         )
+        for function_ in (self.load_items, self.load_rooms):
+            function_(named_ranges, sheets)
 
+    def load_rooms(self, named_ranges, sheets):
+        # TODO: make 1 function for this instead of copying load_items
+        room_data = sheets.values().get( 
+            spreadsheetId=self.spreadsheet_id,
+            range=named_ranges["rooms"]
+        ).execute()
+        field_names, *room_data = room_data.get("values", [])
+        # TODO: don't hardcode column order
+        rpg_class.RPG.rooms += {
+            name: classes.Room(
+                name, can_rest=utils.default(can_rest, False), level=level,
+                enemies_list=[classes.Enemy(enemy_name, level=int(level)) for enemy_name in enemies],
+                boss=classes.Enemy(
+                    name=boss_name, attack=int(boss_attack), defense=int(boss_defense),
+                ), drops=drops
+            )
+            for name, can_rest, level, *enemies,
+            boss_name, boss_attack, boss_defense, drops in room_data
+        }
+
+    def load_items(self, named_ranges, sheets):
         item_data = sheets.values().get(
             spreadsheetId=self.spreadsheet_id,
             range=named_ranges["items"]
         ).execute()
-        print(item_data)
         field_names, *item_data = item_data.get("values", [])
         rpg_class.RPG.all_items += {
             item_data[0]: classes.Item(
                 **{
                     name: data
+                    for item in item_data
                     for name, data in zip(field_names, item)
                     if data
                 }
             )
-            for item in item_data
         }
 
     def save_game(self):

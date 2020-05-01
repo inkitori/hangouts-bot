@@ -20,19 +20,20 @@ class Stats:
         if generate_stats:
             attack, defense, health = self.generate_from_level(level)
         if health is not None:
-            self.health = health
-            self.max_health = max(utils.default(max_health, 1), health)
+            self.health = int(health)
+            self.max_health = max(utils.default(max_health, 1), self.health)
         if mana is not None:
-            self.mana = mana
-            self.max_mana = max(utils.default(max_mana, 0), mana)
+            self.mana = int(mana)
+            self.max_mana = max(utils.default(max_mana, 0), self.mana)
         if balance is not None:
-            self.balance = balance
+            self.balance = int(balance)
             self.lifetime_balance = max(
-                utils.default(lifetime_balance, 0), balance)
-        self.xp = xp
-        self.attack = attack
-        self.defense = defense
-        self.level = level
+                utils.default(lifetime_balance, 0), self.balance
+            )
+        self.xp = xp if not xp else int(xp)
+        self.attack = attack if not attack else int(attack)
+        self.defense = defense if not defense else int(defense)
+        self.level = level if not level else int(level)
 
     def generate_from_level(self, level):
         """generates stats from level"""
@@ -133,8 +134,10 @@ class Enemy:
 class Room:
     """represents a room in the world"""
 
-    def __init__(self, enemies_list=[], can_rest=False):
+    def __init__(self, enemies_list=[], min_level=1, xp_range=(1, 1), can_rest=False):
         self.enemies_list = enemies_list
+        self.min_level = min_level
+        self.xp_range = xp_range
         self.can_rest = can_rest
 
     def name(self):
@@ -177,15 +180,16 @@ class Item:
     """represents an item"""
 
     def __init__(
-        self, type_, *, rarity=1, modifier="boring", price=1,
+        self, type_, *, name, rarity=1, modifier="boring", price=1,
         health=0, attack=0, defense=0, mana=0, level=1,
         description="what, you thought we would write flavor text for everything? pft"
     ):
-        self.type_ = ItemType(type_)
-        self.rarity = Rarity(rarity)
+        self.type_ = ItemType(type_.lower())
+        self.rarity = Rarity(int(rarity))
         self.modifier = [
-            item_modifier for item_modifier in ItemModifer
-            if item_modifier.name.lower == modifier
+            item_modifier
+            for item_modifier in ItemModifer
+            if item_modifier.name.lower() == modifier
         ][0]
         self.stats = Stats(
             generate_stats=False, health=health, attack=attack,
@@ -202,17 +206,14 @@ class Item:
             self.description
         )
 
-    def name(self):
-        return utils.get_key(all_items, self)
-
     def full_name(self):
-        return utils.join_items(self.modifier, self.name(), separator=' ', newlines=0)
+        return utils.join_items(self.modifier, self.name, separator=' ', newlines=0)
 
 
 all_items = {
-    "starter armor": Item(type_="armor", defense=5),
-    "starter weapon": Item(type_="weapon", attack=5),
-    "clarity tome": Item(type_="tome", health=20, mana=5),
+    "starter armor": Item(name="starter armor", type_="armor", defense=5),
+    "starter weapon": Item(name="starter weapon", type_="weapon", attack=5),
+    "clarity tome": Item(name="clarity tome", type_="tome", health=20, mana=5),
 }
 
 rooms = {
