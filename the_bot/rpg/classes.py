@@ -187,6 +187,7 @@ class Item:
         health=0, attack=0, defense=0, mana=0, level=1,
         description="what, you thought we would write flavor text for everything? pft"
     ):
+        self.name = name
         self.type_ = ItemType(type_.lower())
         self.rarity = Rarity(int(rarity))
         self.modifier = [
