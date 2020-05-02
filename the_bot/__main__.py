@@ -1,7 +1,6 @@
 """
 runs the bot
 """
-import bot
 import config
 import utils
 
@@ -21,10 +20,17 @@ def wipe_data(game):
         "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
         "rpg": {"rpg_players": {}}
     }
+    print(
+        f"wiping {utils.join_items(*list(data_keys[game]), separator=', ', newlines=0)}"
+        f" for game {game}"
+    )
     utils.save(**data_keys[game])
 
 
 args = config.parse_arguments()
-wipe_data(args.wipe)
+if args.wipe:
+    wipe_data(args.wipe)
+# TODO: fix this
+import bot  # prevents errors with wiping data
 current_bot = bot.bots[args.bot](args)
 current_bot.run()

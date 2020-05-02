@@ -23,9 +23,9 @@ class Handler:
         103,  # for console testing
     )
     game_managers = {
-        "/2048": Manager2048(),
-        "/rpg": RPGManager(load_sheets=False),
-        "/economy": EconomyManager(),
+        "2048": Manager2048(),
+        "rpg": RPGManager(load_sheets=False),
+        "economy": EconomyManager(),
     }
     image_folder = "the_bot/images/"
     images = {
@@ -39,7 +39,7 @@ class Handler:
     def __init__(self, *, console=False, load_sheets=True):
         self.cooldowns = defaultdict(dict)
         self.console = console
-        self.game_managers["/rpg"] = RPGManager(
+        Handler.game_managers["/rpg"] = RPGManager(
             load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
         )
         random.seed(datetime.now())

@@ -97,7 +97,7 @@ class TestBot:
         self.handler = Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
         self.commands = {
-            "/rpg": (
+            "rpg": (
                 "register testbot2", "profile",
                 "add starter armor", "add starter weapon",
                 "equip boring starter weapon", "equip boring starter armor",
@@ -107,13 +107,13 @@ class TestBot:
                 "fight", "attack", "attack", "attack", "attack", "attack",
                 "heal",
             ),
-            "/economy": (
+            "economy": (
                 "register testbot2",
                 "leaderboard", "shop", "profile",
                 "mine", "mine", "mine", "mine",
                 "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"
             ),
-            "/2048": (
+            "2048": (
                 "create testgame", "rename testgame test", "games",
                 "create qwed", "delete qwed", "test u", "<", "v", "l",
                 "confusion", "eleven", "restart", "sggstaer", "gamemodes",
