@@ -25,7 +25,7 @@ class Stats:
             self.mana = int(mana)
             self.max_mana = max(utils.default(max_mana, 0), self.mana)
         if balance is not None:
-            self.balance = int(balance)
+            self._balance = int(balance)
             self.lifetime_balance = max(
                 utils.default(lifetime_balance, 0), self.balance
             )
@@ -33,6 +33,20 @@ class Stats:
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
         self.level = level if not level else int(level)
+
+    @property
+    def balance(self):
+        return self._balance
+
+    
+    def balance(self, new_balance):
+        if new_balance > self._balance:
+            self.lifetime_balance += new_balance - self._balance
+        self._balance = new_balance
+
+    @balance.deleter
+    def balance(self):
+        del self._balance
 
     @property
     def health(self):
@@ -126,11 +140,6 @@ class Stats:
     def print_level_xp(self):
         """returns string representation of level and xp"""
         return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
-
-    def increase_balance(self, money):
-        """increases balance"""
-        self.balance += money
-        self.lifetime_balance += money
 
 
 class Enemy:

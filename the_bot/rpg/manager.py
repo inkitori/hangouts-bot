@@ -58,7 +58,7 @@ class RPGManager:
         # TODO: don't hardcode column order
         rpg_class.RPG.rooms.update({
             name: classes.Room(
-                can_rest=utils.default(can_rest, False), level=level,
+                can_rest=utils.default(can_rest, False), level=int(level),
                 enemies_list=[
                     classes.Enemy(name=enemy_name, level=int(level))
                     for enemy_name in enemies

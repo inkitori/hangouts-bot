@@ -319,12 +319,12 @@ class Player:
         text = ""
         text += f"{enemy_name} is now dead!\n"
 
-        xp_earned = enemy.level ** 2
+        xp_earned = enemy.stats.level ** 2
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
         self.stats.xp += xp_earned
-        self.stats.increase_balance(gold_earned)
+        self.stats.balance += gold_earned
         del self.fighting[enemy_name]
 
         return text
