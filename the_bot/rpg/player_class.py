@@ -80,7 +80,8 @@ class Inventory:
         output_text = ""
         modifier = next(commands)
         item_name = commands.send("remaining")
-        full_name = utils.join_items(modifier, item_name, separator=' ', newlines=0)
+        full_name = utils.join_items(
+            modifier, item_name, separator=' ', newlines=0)
 
         item_is_valid = self.validate_item_name(item_name, modifier)
         if item_is_valid != "valid":
@@ -197,7 +198,7 @@ class Player:
         self.name = name
         self.stats = classes.Stats(
             attack=5, defense=5, max_mana=100, mana=100,
-            health=100, max_health=100, level=1, xp=0,
+            health=100, max_health=100, level=1, exp=0,
             balance=0, lifetime_balance=0
         )
         self.room = "village"
@@ -317,11 +318,11 @@ class Player:
         text = ""
         text += f"{enemy_name} is now dead!\n"
 
-        xp_earned = enemy.stats.level ** 2
+        exp_earned = enemy.stats.level ** 2
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
-        text += f"You earned {xp_earned} xp and {gold_earned} gold!"
-        self.stats.xp += xp_earned
+        text += f"You earned {exp_earned} exp and {gold_earned} gold!"
+        self.stats.exp += exp_earned
         self.stats.balance += gold_earned
         del self.fighting[enemy_name]
 

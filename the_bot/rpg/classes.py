@@ -13,7 +13,7 @@ class Stats:
     def __init__(
         self, *, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,
-        max_mana=None, level=None, xp=None, balance=None, lifetime_balance=None
+        max_mana=None, level=None, exp=None, balance=None, lifetime_balance=None
     ):
         # TODO: get rid of init arguments and take **kwargs
         if generate_stats:
@@ -29,10 +29,10 @@ class Stats:
             self._lifetime_balance = max(
                 utils.default(lifetime_balance, 0), self.balance
             )
-        level = utils.default(0, level, xp)
+        level = utils.default(0, level, exp)
         self.level = level if not level else int(level)
-        xp = utils.default(0, xp, level)
-        self._xp = xp if not xp else int(xp)
+        exp = utils.default(0, exp, level)
+        self._exp = exp if not exp else int(exp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
 
@@ -91,7 +91,8 @@ class Stats:
     def max_health(self, new_max_health):
         """changes player health"""
         self.health += new_max_health - self._max_health
-        self._max_health = int(utils.default(new_max_health, 0, new_max_health > 0))
+        self._max_health = int(utils.default(
+            new_max_health, 0, new_max_health > 0))
 
     @max_health.deleter
     def max_health(self):
@@ -108,7 +109,7 @@ class Stats:
             self._mana = self.max_mana
             return
 
-        self._mana = round(new_mana, 1) 
+        self._mana = round(new_mana, 1)
         self._mana = utils.clamp(self._mana, 0, self.max_mana)
 
     @mana.deleter
@@ -130,29 +131,29 @@ class Stats:
         del self._max_mana
 
     @property
-    def xp(self):
-        return self._xp
+    def exp(self):
+        return self._exp
 
-    @xp.setter
-    def xp(self, new_xp):
-        """increases xp"""
+    @exp.setter
+    def exp(self, new_exp):
+        """increases exp"""
         notify = False
-        self._xp = new_xp
-        xp_required = self.next_level_xp()
+        self._exp = new_exp
+        exp_required = self.next_level_exp()
 
-        while self._xp > xp_required:
+        while self._exp > exp_required:
             self.level += 1
-            self._xp -= xp_required
+            self._exp -= exp_required
             notify = True
-            xp_required = self.next_level_xp()
+            exp_required = self.next_level_exp()
         if notify:
             return f"You are now level {self.level}!"
 
         return ""
 
-    @xp.deleter
-    def xp(self):
-        del self._xp
+    @exp.deleter
+    def exp(self):
+        del self._exp
 
     def generate_from_level(self, level):
         """generates stats from level"""
@@ -175,20 +176,20 @@ class Stats:
                     )
                 )
                 for stat_name, stat_value in self.__dict__.items()
-                if stat_name not in ("level", "xp") and stat_value is not None
+                if stat_name not in ("level", "exp") and stat_value is not None
             ], description_mode="short", separator="\n\t"
         )
         if self.level is not None:
-            stats_text += "\t" + self.print_level_xp()
+            stats_text += "\t" + self.print_level_exp()
         return stats_text
 
-    def next_level_xp(self):
-        """returns next level xp"""
+    def next_level_exp(self):
+        """returns next level exp"""
         return round(4 * (((self.level + 1) ** 4) / 5))
 
-    def print_level_xp(self):
-        """returns string representation of level and xp"""
-        return f"LVL: {self.level} | {self.xp} / {self.next_level_xp()}"
+    def print_level_exp(self):
+        """returns string representation of level and exp"""
+        return f"LVL: {self.level} | {self.exp} / {self.next_level_exp()}"
 
 
 class Enemy:
