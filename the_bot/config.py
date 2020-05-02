@@ -9,17 +9,17 @@ parser = argparse.ArgumentParser(description="a bot for hangouts")
 bots_args = parser.add_argument_group("Bots")
 bots_args.add_argument(
     "-o", "--hangouts",
-    action="store_const", const="hangouts", dest="bot",
+    action="store_const", const="hangouts", dest="bot", default="hangouts",
     help="runs the hangouts bot",
 )
 bots_args.add_argument(
     "-c", "--console",
-    action="store_const", const="console", dest="bot",
+    action="store_const", const="console", dest="bot", default="hangouts",
     help="runs the console bot",
 )
 bots_args.add_argument(
     "-t", "--test",
-    action="store_const", const="test", dest="bot",
+    action="store_const", const="test", dest="bot", default="hangouts",
     help="tests bot in console",
 )
 
