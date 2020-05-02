@@ -29,7 +29,7 @@ class Stats:
             self.lifetime_balance = max(
                 utils.default(lifetime_balance, 0), self.balance
             )
-        self.xp = xp if not xp else int(xp)
+        self._xp = xp if not xp else int(xp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
         self.level = level if not level else int(level)
@@ -66,12 +66,37 @@ class Stats:
     def max_health(self):
         del self._max_health
 
+    @property
+    def xp(self):
+        return self._xp
+
+    @xp.setter
+    def xp(self, new_xp):
+        """increases xp"""
+        notify = False
+        self._xp = new_xp
+        xp_required = self.next_level_xp()
+
+        while self._xp > xp_required:
+            self.level += 1
+            self._xp -= xp_required
+            notify = True
+            xp_required = self.next_level_xp()
+        if notify:
+            return f"You are now level {self.level}!"
+
+        return ""
+
+    @xp.deleter
+    def xp(self):
+        del self._xp
+
     def generate_from_level(self, level):
         """generates stats from level"""
-        attack = round(5 * level ** 1.8)
-        defense = round(5 * level ** 1.5)
-        health = round(100 * level ** 2)
-        return attack, defense, health
+        attack = 5 * level ** 1.8
+        defense = 5 * level ** 1.5
+        health = 100 * level ** 2
+        return [round(stat) for stat in (attack, defense, health)]
 
     def print_stats(self, modifiers=None):
         """returns text representation of stats"""
@@ -106,23 +131,6 @@ class Stats:
         """increases balance"""
         self.balance += money
         self.lifetime_balance += money
-
-    def give_xp(self, xp_earned):
-        """increases xp"""
-        notify = False
-        self.xp += xp_earned
-
-        xp_required = self.next_level_xp()
-
-        while self.xp > xp_required:
-            self.level += 1
-            self.xp -= xp_required
-            notify = True
-            xp_required = self.next_level_xp()
-        if notify:
-            return f"You are now level {self.level}!"
-
-        return ""
 
 
 class Enemy:

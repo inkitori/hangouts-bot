@@ -17,7 +17,10 @@ class Inventory:
         if modifier is not None:
             if not modifier:
                 return "you must pick an item"
-            elif modifier not in [item_modifier.name.lower() for item_modifier in classes.ItemModifer]:
+            elif modifier not in [
+                item_modifier.name.lower()
+                for item_modifier in classes.ItemModifer
+            ]:
                 return "that modifier does not exist"
         if not item_name:
             return "that is not a valid item name"
@@ -320,7 +323,7 @@ class Player:
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {xp_earned} xp and {gold_earned} gold!"
-        self.stats.give_xp(xp_earned)
+        self.stats.xp += xp_earned
         self.stats.increase_balance(gold_earned)
         del self.fighting[enemy_name]
 
