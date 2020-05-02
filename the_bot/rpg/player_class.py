@@ -141,7 +141,7 @@ class Inventory:
         """returns string representation of inventory"""
         if not self.items:
             return "you dont have anything in your inventory"
-        inventory_text = ""  # TODO: print # of full slots
+        inventory_text = f""  # TODO: print # of full slots
         inventory_text += utils.join_items(
             ("inventory", *[
                 f"{item.get_description()} x{item.count}"
@@ -194,14 +194,12 @@ class Player:
     """represents a player in the rpg"""
 
     def __init__(self, name):
-        # TODO: move pass as arguments in stats and get rid of the dict
-        stats = {
-            "attack": 5, "defense": 5, "max_mana": 100, "mana": 100,
-            "health": 100, "max_health": 100, "level": 1, "xp": 0,
-            "balance": 0, "lifetime_balance": 0,
-        }
         self.name = name
-        self.stats = classes.Stats(**stats)
+        self.stats = classes.Stats(
+            attack=5, defense=5, max_mana=100, mana=100,
+            health=100, max_health=100, level=1, xp=0,
+            balance=0, lifetime_balance=0
+        )
         self.room = "village"
         self.fighting = {}
         self.args = {"autofight": False, "heal_percent": 50}

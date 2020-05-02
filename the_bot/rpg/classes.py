@@ -29,10 +29,12 @@ class Stats:
             self._lifetime_balance = max(
                 utils.default(lifetime_balance, 0), self.balance
             )
+        level = utils.default(0, level, xp)
+        self.level = level if not level else int(level)
+        xp = utils.default(0, xp, level)
         self._xp = xp if not xp else int(xp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
-        self.level = level if not level else int(level)
 
     @property
     def balance(self):
