@@ -93,9 +93,9 @@ class Inventory:
 
         item_type = classes.all_items[item_name].type_
         current_equipped_item = self.get_equipped(item_type)[0]
-        if current_equipped_item == item_name:
+        if current_equipped_item == full_name:
             return "you already equipped that"
-        output_text += f"equipping {item_name} as {item_type.name.lower()}"
+        output_text += f"equipping {full_name} as {item_type.name.lower()}"
         self.equipped[item_type] = full_name
         if current_equipped_item:
             output_text += f" replacing {current_equipped_item}"
