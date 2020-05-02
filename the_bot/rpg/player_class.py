@@ -297,7 +297,6 @@ class Player:
 
         else:
             # take damage
-            print(enemy_name)
             text += enemy.attack(self)
 
             if self.stats.health <= 0:

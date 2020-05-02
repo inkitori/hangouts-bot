@@ -2,15 +2,13 @@
 handler for bots
 """
 import random
-from collections import defaultdict
-from datetime import datetime
+import collections
+import datetime
 import utils
 
 from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
 from rpg.manager import RPGManager
-
-print("loading handler")
 
 
 class Handler:
@@ -37,12 +35,12 @@ class Handler:
     }
 
     def __init__(self, *, console=False, load_sheets=True):
-        self.cooldowns = defaultdict(dict)
+        self.cooldowns = collections.defaultdict(dict)
         self.console = console
         Handler.game_managers["/rpg"] = RPGManager(
             load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
         )
-        random.seed(datetime.now())
+        random.seed(datetime.datetime.now())
 
     async def handle_message(self, event, user_id=101, bot=None):
         """handles messages"""
@@ -139,6 +137,3 @@ class Handler:
         description_mode="long"
     )
     keywords["/help"] = help_text
-
-
-print("finished loading handler")

@@ -1,7 +1,7 @@
 """
 manager for rpg
 """
-from datetime import datetime
+import datetime
 import random
 import utils
 import rpg.rpg_class as rpg_class
@@ -16,7 +16,7 @@ class RPGManager:
 
     def __init__(self, load_sheets=True):
         self.load_game(load_sheets=load_sheets)
-        random.seed(datetime.now())
+        random.seed(datetime.datetime.now())
         self.save_game()
 
     def run_game(self, player_id, commands):
@@ -36,7 +36,6 @@ class RPGManager:
         """loads the game"""
         self.game.players = utils.load("rpg_players")
         if load_sheets:
-            print("loading rpg data from sheets")
             self.load_sheets_data()
 
     def load_sheets_data(self):

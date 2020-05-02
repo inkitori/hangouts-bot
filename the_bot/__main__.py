@@ -20,10 +20,6 @@ def wipe_data(game):
         "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
         "rpg": {"rpg_players": {}}
     }
-    print(
-        f"wiping {utils.join_items(*list(data_keys[game]), separator=', ', newlines=0)}"
-        f" for game {game}"
-    )
     utils.save(**data_keys[game])
 
 
