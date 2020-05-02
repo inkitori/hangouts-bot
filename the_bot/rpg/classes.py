@@ -13,7 +13,7 @@ class Stats:
     def __init__(
         self, *, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,
-        max_mana=None, level=None, xp=None, balance=None, lifetime_balance=None
+        max_mana=None, level=None, xp=None, balance=None, _lifetime_balance=None
     ):
         # TODO: get rid of init arguments and take **kwargs
         if generate_stats:
@@ -38,7 +38,7 @@ class Stats:
     def balance(self):
         return self._balance
 
-    
+    @balance.setter
     def balance(self, new_balance):
         if new_balance > self._balance:
             self.lifetime_balance += new_balance - self._balance
