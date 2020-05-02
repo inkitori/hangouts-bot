@@ -2,7 +2,7 @@
 Pipfile
 Pipfile.lock
 .vscode/
-!/.vscode/launch.json
+!.vscode/launch.json
 my_stuff/
 **stuff**
 
