@@ -290,10 +290,10 @@ class Item:
         """returns text description of item"""
         return utils.description(
             utils.join_items(
-                self.rarity.name.lower(),
-                self.modifier, self.full_name()
+                self.rarity.name.lower(), self.full_name(),
+                separator=" ", newlines=0
             ),
-            self.description
+            self.description, newlines=0
         )
 
     def full_name(self):
