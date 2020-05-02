@@ -38,10 +38,15 @@ parser.add_argument(
     help="the token to use to login to hangouts",
 )
 
-# other
+# data loaing/deleting
 parser.add_argument(
     "-s", "--skip-sheets", dest="load_sheets", action="store_false", default=True,
     help="skips loading sheets",
+)
+parser.add_argument(
+    "-w", "--wipe-data", dest="wipe", default=None,
+    choices=["rpg", "economy", "2048"],
+    help="wipes a game's data from save_data",
 )
 
 
