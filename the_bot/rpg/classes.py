@@ -13,7 +13,7 @@ class Stats:
     def __init__(
         self, *, generate_stats=False,
         max_health=None, health=None, mana=None, attack=None, defense=None,
-        max_mana=None, level=None, xp=None, balance=None, _lifetime_balance=None
+        max_mana=None, level=None, xp=None, balance=None, lifetime_balance=None
     ):
         # TODO: get rid of init arguments and take **kwargs
         if generate_stats:
@@ -26,7 +26,7 @@ class Stats:
             self.max_mana = max(utils.default(max_mana, 0), self.mana)
         if balance is not None:
             self._balance = int(balance)
-            self.lifetime_balance = max(
+            self._lifetime_balance = max(
                 utils.default(lifetime_balance, 0), self.balance
             )
         self._xp = xp if not xp else int(xp)
@@ -47,6 +47,21 @@ class Stats:
     @balance.deleter
     def balance(self):
         del self._balance
+
+    @property
+    def lifetime_balance(self):
+        return self._lifetime_balance
+
+    @lifetime_balance.setter
+    def lifetime_balance(self, new_balance):
+        self._lifetime_balance = utils.default(
+            new_balance, self._lifetime_balance,
+            new_balance > self._lifetime_balance
+        )
+
+    @lifetime_balance.deleter
+    def lifetime_balance(self):
+        del self._lifetime_balance
 
     @property
     def health(self):
