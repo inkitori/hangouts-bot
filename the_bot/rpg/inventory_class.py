@@ -62,7 +62,7 @@ class Inventory:
         if item_is_valid != "valid":
             return item_is_valid
 
-        full_item = utils.join_items(modifier, item_name, separator=' ')
+        full_item = utils.join_items(modifier, item_name, separator=' ', newlines=0)
 
         if full_item not in self.items:
             return "you do not have that item"
