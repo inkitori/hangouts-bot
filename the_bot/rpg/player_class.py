@@ -11,7 +11,7 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.stats = classes.Stats(
-            attack=5, defense=5, max_mana=100, mana=100,
+            attack=5, defense=5, speed=10, max_mana=100, mana=100,
             health=100, max_health=100, level=1, exp=0,
             balance=0, lifetime_balance=0
         )
@@ -241,7 +241,8 @@ class Party:
             try:
                 self.doing_stuff = next(self.turns)
             except StopIteration:
-                output_text +=
+                output_text += "enemies defeated (placeholder)"
+                break
             output_text += self.do_stuff()
         return output_text
 

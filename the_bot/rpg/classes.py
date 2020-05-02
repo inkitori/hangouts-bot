@@ -12,11 +12,11 @@ class Stats:
 
     def __init__(
         self, *, generate_stats=False,
-        max_health=None, health=None, mana=None, attack=None, defense=None,
+        max_health=None, health=None, mana=None, attack=None, defense=None, speed=None,
         max_mana=None, level=None, exp=None, balance=None, lifetime_balance=None
     ):
         if generate_stats:
-            attack, defense, health = self.generate_from_level(level)
+            attack, defense, health, speed = self.generate_from_level(level)
         if health is not None:
             self._health = int(health)
             self._max_health = max(utils.default(max_health, 1), self.health)
@@ -34,7 +34,8 @@ class Stats:
         self._exp = exp if not exp else int(exp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
-
+        self.speed = speed if not speed else int(speed)
+    
     def __add__(self, stat_2):
         added_stats = {}
         for key, val_1, val_2 in zip(self.__dict__.keys, self.__dict__.values, stat_2.__dict__.values):
@@ -171,7 +172,8 @@ class Stats:
         attack = 5 * level ** 1.8
         defense = 5 * level ** 1.5
         health = 100 * level ** 2
-        return [round(stat) for stat in (attack, defense, health)]
+        speed = math.ceil(-(level/2) + 10)
+        return [round(stat) for stat in (attack, defense, health, speed)]
 
     def print_stats(self, modifiers=None, list_=False):
         """returns text representation of stats"""
