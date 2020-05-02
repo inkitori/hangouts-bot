@@ -124,14 +124,6 @@ class Stats:
 
         return ""
 
-    def change_health(self, amount):
-        """changes player health"""
-        if amount == "full":
-            self.health = self.max_health
-            return
-        self.health += amount
-        self.health = utils.clamp(self.health, 0, self.max_health)
-
 
 class Enemy:
     """represents an enemy"""
