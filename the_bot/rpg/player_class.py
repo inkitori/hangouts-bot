@@ -16,9 +16,9 @@ class Player:
             balance=0, lifetime_balance=0
         )
         self.room = "village"
-        self.fighting = {}
         self.args = {"autofight": False, "heal_percent": 50}
         self.inventory = inventory_class.Inventory()
+        self.party = Party(self)
 
     def get_id(self):
         return utils.get_key(players, self)
@@ -63,8 +63,8 @@ class Player:
             text = "You can't rest here!"
 
         return text
-
-    def heal(self, commands):
+    
+    def heal(self, commands, enemy):
         """heal the player with their tome"""
         tome_name, tome = self.inventory.get_equipped(classes.ItemType.TOME)
         if not tome_name:
@@ -84,16 +84,10 @@ class Player:
 
             return text
 
-    # TODO: merge with fight
-    def attack(self, commands):
+    def attack(self, commands, enemy):
         """attacks an enemy"""
         text = ""
 
-        if not self.fighting:
-            return "You need to be in a fight!"
-
-        enemy = random.choice(list(self.fighting.values()))
-        enemy_name = utils.get_key(self.fighting, enemy)
         player_damage = self.modified_stats().attack + self.stats.attack
         damage_dealt = round(
             player_damage * (player_damage / enemy.stats.defense), 1)
@@ -103,19 +97,29 @@ class Player:
         damage_dealt = round(damage_dealt, 1)
         enemy.stats.health -= damage_dealt
         text += utils.newline(
-            f"You dealt {damage_dealt} damage to {enemy_name}!")
+            f"You dealt {damage_dealt} damage to {enemy.name}!")
 
         if enemy.stats.health <= 0:
-            text += self.killed_enemy(enemy_name, enemy)
+            text += self.killed_enemy(enemy.name, enemy)
 
         else:
             # take damage
             text += enemy.attack(self)
 
             if self.stats.health <= 0:
-                text += self.died(enemy_name)
+                text += self.party.died(enemy, self)
 
         return text
+
+    def fight_action(self, action, commands):
+        """"""
+        if self.name is not self.party.doing_stuff:
+            return f"it is {self.party.doing_stuff}'s turn"
+        output_text = action(self, commands, self.party.get_enemy())
+        self.party.doing_stuff = None
+        self.party.fight()
+
+        return output_text
 
     def died(self, cause):
         text = utils.join_items(
@@ -126,42 +130,6 @@ class Player:
         self.stats.health = "full"
         self.warp("village" for _ in range(1))
         return text
-
-    def killed_enemy(self, enemy_name, enemy):
-        """changes stuff based on enemy"""
-        text = ""
-        text += f"{enemy_name} is now dead!\n"
-
-        exp_earned = enemy.stats.level ** 2
-        gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
-
-        text += f"You earned {exp_earned} exp and {gold_earned} gold!"
-        self.stats.exp += exp_earned
-        self.stats.balance += gold_earned
-        del self.fighting[enemy_name]
-
-        return text
-
-    def fight(self, commands):
-        """starts a with an enemy"""
-        room = classes.rooms[self.room]
-
-        if not room.enemies_list:
-            return "There are no enemies here"
-        elif self.fighting:
-            return f"You are already fighting {', '.join(self.fighting.keys())}!"
-
-        enemy_name, enemy = room.generate_enemy()
-        self.fighting[enemy_name] = enemy
-
-        if self.args["autofight"]:
-            return self.autofight(enemy_name, enemy)
-        else:
-            return utils.join_items(
-                f"{enemy_name} has approached to fight!",
-                enemy.stats.print_stats(),
-                separator="\n\t"
-            )
 
     def autofight(self, enemy_name, enemy):
         while True:
@@ -202,23 +170,109 @@ class Player:
     def profile(self):
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
         profile_text = utils.join_items(
-            ("name", self.name), ("id", self.get_id()),
-            description_mode="short", separator="\n\t"
+            *[utils.description(field) for field in [("name", self.name), ("id", self.get_id())]],
+            description_mode="long"
         )
         return utils.join_items(
             profile_text, self.stats.print_stats(self.inventory.modifers()),
             separator="\n\t"
         )
 
+    def fight(self):
+        if self.name != self.party.host.name:
+            return "only the party host can start a fight"
+        return self.party.fight()
+
     commands = {
         "rest": rest,
         "warp": warp,
-        "attack": attack,
-        "fight": fight,
-        "heal": heal,
         "set": set_,
+        "fight": fight
         # TODO: flee command to leave a fight (penalty for fleeing?)
     }
+    fight_commands = {
+        "attack": attack,
+        "heal": heal,
+    }
+
+
+class Party:
+    """party of players"""
+    def __init__(self, host, *players):
+        self.host = host
+        self.players = list(players) + [host]
+        self.fighting = {}
+        self.doing_stuff = None
+
+    def join(self, player):
+        """adds a player to a party"""
+        player.party = self
+        self.players.append(player)
+
+    def leave(self, player):
+        """removes a player"""
+        player.party = Party(player)
+        self.players.remove(player)
+
+    def killed_enemy(self, enemy, player):
+        """changes stuff based on enemy"""
+        text = ""
+        text += f"{enemy.name} is now dead!\n"
+
+        exp_earned = enemy.stats.level ** 2
+        gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
+
+        text += f"You earned {exp_earned} exp and {gold_earned} gold!"
+        self.stats.exp += exp_earned
+        self.stats.balance += gold_earned
+        del self.fighting[enemy.name]
+
+        return text
+
+    def get_enemy(self):
+        # TODO: let player pick enemy to attack
+        return random.choice(self.fighting)
+
+    def fight(self):
+        output_text = ""
+        if not self.fighting:
+            output_text += self.start_fight()
+        while not self.doing_stuff:
+            self.doing_stuff = next(self.turns)
+            output_text += self.do_stuff()
+        return output_text
+
+    def do_stuff(self):
+        output_text = f"{self.doing_stuff}'s turn"
+        if self.doing_stuff in self.fighting:
+            output_text += self.fighting[self.doing_stuff].attack(
+                random.choice(self.players.values())
+            )
+            self.doing_stuff = None
+        return output_text
+
+    def next_turn(self):
+        counter = 0
+        while self.fighting:
+            counter += 1
+            for name, thing in self.players.items() + self.fighting.items():
+                can_do_stuff = []
+                if counter % thing.stats.speed == 0:
+                    can_do_stuff.append(name)
+            while can_do_stuff:
+                yield can_do_stuff.pop()
+
+
+    def start_fight(self):
+        # get enemies from room
+        enemy_name, enemy = host.room.generate_enemy()
+        self.turns = self.next_turn()
+
+        return utils.join_items(
+            f"{enemy_name} has approached to fight!",
+            enemy.stats.print_stats(),
+            separator="\n\t"
+        )
 
 
 players = {}

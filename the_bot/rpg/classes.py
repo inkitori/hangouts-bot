@@ -34,6 +34,19 @@ class Stats:
         self._exp = exp if not exp else int(exp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
+    
+    def __add__(self, stat_2):
+        added_stats = {}
+        for key, val_1, val_2 in zip(self.__dict__.keys, self.__dict__.values, stat_2.__dict__.values):
+            if val_1 is None and val_2 is None:
+                added_stats[key] = None
+            elif val_1 is None or val_2 is None:
+                added_stats[key] = max(val_1, val_2)
+            else:
+                added_stats[key] = val_1 + val_2 if isinstance(val_1, int) else bool(val_1 + val_2)
+
+        return Stats(**added_stats)
+                    
 
     @property
     def balance(self):
@@ -161,10 +174,11 @@ class Stats:
         health = 100 * level ** 2
         return [round(stat) for stat in (attack, defense, health)]
 
-    def print_stats(self, modifiers=None):
+    def print_stats(self, modifiers=None, list_=False):
         """returns text representation of stats"""
         # this mess adds a + modifed value if there is a modified stat
         modifiers = utils.default(modifiers, Stats())
+        # stat_list = 
         stats_text = utils.join_items(
             *[
                 (
