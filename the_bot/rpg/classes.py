@@ -22,8 +22,8 @@ class Stats:
             self._health = int(health)
             self._max_health = max(utils.default(max_health, 1), self.health)
         if mana is not None:
-            self.mana = int(mana)
-            self.max_mana = max(utils.default(max_mana, 0), self.mana)
+            self._mana = int(mana)
+            self._max_mana = max(utils.default(max_mana, 0), self.mana)
         if balance is not None:
             self._balance = int(balance)
             self._lifetime_balance = max(
@@ -94,6 +94,38 @@ class Stats:
     @max_health.deleter
     def max_health(self):
         del self._max_health
+
+    @property
+    def mana(self):
+        return self._mana
+
+    @mana.setter
+    def mana(self, new_mana):
+        """changes player mana"""
+        if new_mana == "full":
+            self._mana = self.max_mana
+            return
+
+        self._mana = round(new_mana, 1) 
+        self._mana = utils.clamp(self._mana, 0, self.max_mana)
+
+    @mana.deleter
+    def mana(self):
+        del self._mana
+
+    @property
+    def max_mana(self):
+        return self._max_mana
+
+    @max_mana.setter
+    def max_mana(self, new_max_mana):
+        """changes player health"""
+        self.mana += new_max_mana - self._max_mana
+        self._max_mana = int(utils.default(new_max_mana, 0, new_max_mana > 0))
+
+    @max_mana.deleter
+    def max_mana(self):
+        del self._max_mana
 
     @property
     def xp(self):
