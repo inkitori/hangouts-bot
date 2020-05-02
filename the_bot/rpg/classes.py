@@ -15,7 +15,6 @@ class Stats:
         max_health=None, health=None, mana=None, attack=None, defense=None,
         max_mana=None, level=None, exp=None, balance=None, lifetime_balance=None
     ):
-        # TODO: get rid of init arguments and take **kwargs
         if generate_stats:
             attack, defense, health = self.generate_from_level(level)
         if health is not None:
