@@ -2,15 +2,13 @@
 handler for bots
 """
 import random
-from collections import defaultdict
-from datetime import datetime
+import collections
+import datetime
 import utils
 
 from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
 from rpg.manager import RPGManager
-
-print("loading handler")
 
 
 class Handler:
@@ -23,9 +21,9 @@ class Handler:
         103,  # for console testing
     )
     game_managers = {
-        "/2048": Manager2048(),
-        "/rpg": RPGManager(load_sheets=False),
-        "/economy": EconomyManager(),
+        "2048": Manager2048(),
+        "rpg": RPGManager(load_sheets=False),
+        "economy": EconomyManager(),
     }
     image_folder = "the_bot/images/"
     images = {
@@ -37,12 +35,12 @@ class Handler:
     }
 
     def __init__(self, *, console=False, load_sheets=True):
-        self.cooldowns = defaultdict(dict)
+        self.cooldowns = collections.defaultdict(dict)
         self.console = console
-        self.game_managers["/rpg"] = RPGManager(
+        Handler.game_managers["/rpg"] = RPGManager(
             load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
         )
-        random.seed(datetime.now())
+        random.seed(datetime.datetime.now())
 
     async def handle_message(self, event, user_id=101, bot=None):
         """handles messages"""
@@ -74,12 +72,8 @@ class Handler:
         elif command in self.game_managers:
             user_id = user_id if self.console else user.id_[0]
             output_text = self.play_game(user_id, command, commands)
-            if self.console:
-                # fixes difference in character width in hangouts vs monospaced consoles
-                output_text = output_text.replace("  ", " ")
-
-                # use this for testing formatting
-                # output_text = output_text.replace(" ", "\\s").replace("  ", "\\t")
+            # fixes difference in character width in hangouts vs monospaced consoles
+            output_text = utils.default(output_text.replace("  ", " "), output_text, self.console)
 
         else:
             # if this printed in hangouts, it would respond to every single message
@@ -94,7 +88,6 @@ class Handler:
             return "Format: /rename {name}"
         else:
             return await bot.rename_conv(new_name)
-
 
     async def id_(self, bot, user, conv):
         """get the id of a user"""
@@ -144,6 +137,3 @@ class Handler:
         description_mode="long"
     )
     keywords["/help"] = help_text
-
-
-print("finished loading handler")

@@ -1,5 +1,6 @@
 
 import rpg.player_class as player_class
+import rpg.inventory_class as inventory_class
 import rpg.classes as classes
 import utils
 import game_functions
@@ -34,12 +35,12 @@ class RPG:
         """runs functions based on player command"""
         command = next(commands)
         output_text = ""
-        player = utils.get_value(self.players, player_id)
+        player = self.players.get(player_id, None)
         if command == "register":
             output_text = self.register(player_id, commands)
         elif command == "help":
             output_text = utils.join_items(
-                ("player_class.Inventory", *player_class.Inventory.commands),
+                ("player_class.Inventory", *inventory_class.Inventory.commands),
                 ("player", "register", "profile", *player_class.Player.commands),
                 ("other", "help"),
                 description_mode="long"
@@ -47,8 +48,8 @@ class RPG:
         elif command == "profile":
             output_text = game_functions.profile(self, player, commands)
 
-        elif command in player_class.Inventory.commands:
-            output_text = player_class.Inventory.commands[command](
+        elif command in inventory_class.Inventory.commands:
+            output_text = inventory_class.Inventory.commands[command](
                 player.inventory, commands)
         elif command in player_class.Player.commands:
             output_text = player_class.Player.commands[command](

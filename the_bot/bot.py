@@ -7,8 +7,6 @@ import asyncio
 import utils
 import sys
 
-print("loading bots")
-
 
 class Bot:
     """bot for hangouts (normal use case)"""
@@ -97,8 +95,8 @@ class TestBot:
         self.handler = Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
         self.commands = {
-            "/rpg": (
-                "register testbot2", "profile",
+            "rpg": (
+                "register testbot", "profile",
                 "add starter armor", "add starter weapon",
                 "equip boring starter weapon", "equip boring starter armor",
                 "inventory",
@@ -107,13 +105,13 @@ class TestBot:
                 "fight", "attack", "attack", "attack", "attack", "attack",
                 "heal",
             ),
-            "/economy": (
-                "register testbot2",
+            "economy": (
+                "register testbot",
                 "leaderboard", "shop", "profile",
                 "mine", "mine", "mine", "mine",
                 "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"
             ),
-            "/2048": (
+            "2048": (
                 "create testgame", "rename testgame test", "games",
                 "create qwed", "delete qwed", "test u", "<", "v", "l",
                 "confusion", "eleven", "restart", "sggstaer", "gamemodes",
@@ -132,8 +130,6 @@ class TestBot:
     async def main(self, text):
         """sends inpput to handler and prints output"""
         output_text = await self.handler.handle_message(text, user_id=self.user_id)
-        # indicative of printing objects instead of strings
-        # assert not ("<" in output_text and ">" in output_text)
         print(utils.newline(output_text))
 
 
@@ -142,4 +138,3 @@ bots = {
     "console": ConsoleBot,
     "test": TestBot
 }
-print("finished loading bots")

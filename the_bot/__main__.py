@@ -1,26 +1,14 @@
 """
 runs the bot
 """
-import bot
 import config
-
-
-def stuff(handler=None):
-    """
-    for running random stuff
-    mainly used for changing data
-    """
-    return
-    import utils
-    utils.save(rpg_players={})
-    import sys
-    sys.exit()
-
-
-stuff()
-
+import utils
 
 args = config.parse_arguments()
+if args.wipe:
+    utils.wipe_data(args.wipe)
+utils.save_file_name = args.save_file
+# TODO: fix this
+import bot  # prevents errors with wiping/loading data since the import loads the data
 current_bot = bot.bots[args.bot](args)
-stuff(handler=current_bot.handler)
 current_bot.run()

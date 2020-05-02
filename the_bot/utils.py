@@ -123,17 +123,38 @@ def description(name, *description, mode="short", end="\n", newlines=1):
 
 
 # save and load data
-def save(file_name="save_data", **contents):
+save_file_name = "save_data"
+
+
+def wipe_data(game):
+    """wipes data from save_data"""
+    # TODO: make data_keys frpm managers, insteadof cpoying names
+    # TODO: get data_keys.keys() in config -wipe-data for choices instead of copying literals
+    # TODO: option to wipe all data
+    # TODO: option to wipe some data (wipe 2048 games, but not 2048 high scores)
+    # TODO: get default values from managers insteadd og  hardcoding here
+    # TODO: option to wipe and log some data (only inventories)
+    if not game:
+        return
+    data_keys = {
+        "economy": {"economy_players": {}},
+        "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
+        "rpg": {"rpg_players": {}}
+    }
+    save(**data_keys[game])
+
+
+def save(**contents):
     """saves data into a file"""
-    with shelve.open(file_name, writeback=True) as save_file:
+    with shelve.open(save_file_name, writeback=True) as save_file:
         for name, data in contents.items():
             save_file[name] = data
 
 
-def load(*names, file_name="save_data"):
+def load(*names):
     """loads data from a file"""
     data = []
-    with shelve.open(file_name) as save_file:
+    with shelve.open(save_file_name) as save_file:
         for name in names:
             data.append(save_file[name])
     if len(data) == 1:
@@ -232,20 +253,6 @@ def get_key(dictionary, item, *ignore, is_same=True):
     return list(dictionary.keys())[key_index]
 
 
-def get_value(dictionary, key, default=""):
-    """
-    gets the value of a key from a dictionary
-    returns default if the key does not exist
-    """
-    # TODO: replace all calls with builtin dict.get(key, default)
-    # TODO: then delete this function
-    try:
-        value = dictionary[key]
-    except KeyError:
-        value = default
-    return value
-
-
 def default(item, default=None, condition="no condition"):
     """returns default if not condition"""
     if condition == "no condition":
@@ -336,8 +343,3 @@ def num_to_col_letters(num):
         letters += chr(mod + 65)
         num = (num - 1) // 26
     return "".join(reversed(letters))
-
-def removeEscape(string):
-    string = string.strip()
-    string = ''.join(string)
-    return string
