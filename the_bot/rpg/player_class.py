@@ -63,7 +63,7 @@ class Player:
             text = "You can't rest here!"
 
         return text
-    
+
     def heal(self, commands, enemy):
         """heal the player with their tome"""
         tome_name, tome = self.inventory.get_equipped(classes.ItemType.TOME)
@@ -79,7 +79,6 @@ class Player:
                 f"You have been healed back up to {self.stats.health}")
 
             if self.fighting:
-                enemy = random.choice(list(self.fighting.values()))
                 text += enemy.attack(self)
 
             return text
@@ -115,6 +114,8 @@ class Player:
         """"""
         if self.name is not self.party.doing_stuff:
             return f"it is {self.party.doing_stuff}'s turn"
+        if not self.party.fighting:
+            return "you are not fighting"
         output_text = action(self, commands, self.party.get_enemy())
         self.party.doing_stuff = None
         self.party.fight()
@@ -203,6 +204,8 @@ class Party:
         self.players = list(players) + [host]
         self.fighting = {}
         self.doing_stuff = None
+        self.counter = 0
+        self.can_do_stuff = []
 
     def join(self, player):
         """adds a player to a party"""
@@ -239,7 +242,7 @@ class Party:
             output_text += self.start_fight()
         while not self.doing_stuff:
             try:
-                self.doing_stuff = next(self.turns)
+                self.doing_stuff = self.next_turn()
             except StopIteration:
                 output_text += "enemies defeated (placeholder)"
                 break
@@ -256,20 +259,17 @@ class Party:
         return output_text
 
     def next_turn(self):
-        counter = 0
-        while self.fighting:
-            counter += 1
-            for name, thing in self.players.items() + self.fighting.items():
-                can_do_stuff = []
-                if counter % thing.stats.speed == 0:
-                    can_do_stuff.append(name)
-            while can_do_stuff:
-                yield can_do_stuff.pop()
+        while not self.can_do_stuff:
+            self.counter += 1
+            for thing in self.players + list(self.fighting.values()):
+                if self.counter % thing.stats.speed == 0:
+                    self.can_do_stuff.append(thing.name)
+        return self.can_do_stuff.pop()
 
     def start_fight(self):
         # get enemies from room
         enemy_name, enemy = classes.rooms[self.host.room].generate_enemy()
-        self.turns = self.next_turn()
+        self.doing_stuff = self.next_turn()
 
         return utils.join_items(
             f"{enemy_name} has approached to fight!",

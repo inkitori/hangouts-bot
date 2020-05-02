@@ -35,10 +35,12 @@ class Stats:
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
         self.speed = speed if not speed else int(speed)
-    
+
     def __add__(self, stat_2):
         added_stats = {}
-        for key, val_1, val_2 in zip(self.__dict__.keys, self.__dict__.values, stat_2.__dict__.values):
+        for key, val_1, val_2 in zip(
+            self.__dict__.keys, self.__dict__.values, stat_2.__dict__.values
+        ):
             if val_1 is None and val_2 is None:
                 added_stats[key] = None
             elif val_1 is None or val_2 is None:
@@ -179,7 +181,7 @@ class Stats:
         """returns text representation of stats"""
         # this mess adds a + modifed value if there is a modified stat
         modifiers = utils.default(modifiers, Stats())
-        # stat_list = 
+        # stat_list =
         stats_text = utils.join_items(
             *[
                 (
