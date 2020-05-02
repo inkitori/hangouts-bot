@@ -102,7 +102,7 @@ def description(name, *description, mode="short", end="\n", newlines=1):
     """
     chendis stupid string formatting function
 
-    short - formats, like, this
+    short: formats, like, this
     long:
         formats
         like
@@ -113,7 +113,7 @@ def description(name, *description, mode="short", end="\n", newlines=1):
 
     if mode == "short":
         description = join_items(*description, separator=", ", end=end, newlines=0)
-        full_description = f"{name} - {description}"
+        full_description = f"{name}: {description}"
     elif mode == "long":
         description.insert(0, f"{name.title()}:")
         full_description = join_items(*description, separator="\n\t", end=end, newlines=0)

@@ -62,7 +62,7 @@ class Inventory:
         if item_is_valid != "valid":
             return item_is_valid
 
-        full_item = utils.join_items(modifier, item_name, separator=' ')
+        full_item = utils.join_items(modifier, item_name, separator=' ', newlines=0)
 
         if full_item not in self.items:
             return "you do not have that item"
@@ -93,9 +93,9 @@ class Inventory:
 
         item_type = classes.all_items[item_name].type_
         current_equipped_item = self.get_equipped(item_type)[0]
-        if current_equipped_item == item_name:
+        if current_equipped_item == full_name:
             return "you already equipped that"
-        output_text += f"equipping {item_name} as {item_type.name.lower()}"
+        output_text += f"equipping {full_name} as {item_type.name.lower()}"
         self.equipped[item_type] = full_name
         if current_equipped_item:
             output_text += f" replacing {current_equipped_item}"
@@ -124,7 +124,7 @@ class Inventory:
                 output_text = f"unequipped {current_equipped_item} as {type_.name.lower()}"
 
         elif name in self.equipped.values():
-            item_type = classes.all_items[name].type_
+            item_type = classes.all_items[item_name].type_
             if self.equipped[item_type] != name:
                 output_text = "that item is not equipped"
             else:

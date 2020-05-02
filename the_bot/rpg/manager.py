@@ -78,7 +78,7 @@ class RPGManager:
         ).execute()
         field_names, *item_data = item_data.get("values", [])
         rpg_class.RPG.all_items.update({
-            item[0]: classes.Item(
+            item[0].lower(): classes.Item(
                 **{
                     name: data
                     for name, data in dict(zip(field_names, item)).items()
