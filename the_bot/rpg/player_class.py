@@ -80,8 +80,7 @@ class Inventory:
         output_text = ""
         modifier = next(commands)
         item_name = commands.send("remaining")
-        full_name = utils.join_items(modifier, item_name, separator=' ')
-        full_name = utils.removeEscape(full_name)
+        full_name = utils.join_items(modifier, item_name, separator=' ', newlines=0)
 
         item_is_valid = self.validate_item_name(item_name, modifier)
         if item_is_valid != "valid":
