@@ -34,7 +34,7 @@ class RPG:
         """runs functions based on player command"""
         command = next(commands)
         output_text = ""
-        player = utils.get_value(self.players, player_id)
+        player = self.players.get(player_id, None)
         if command == "register":
             output_text = self.register(player_id, commands)
         elif command == "help":

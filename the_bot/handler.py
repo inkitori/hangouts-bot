@@ -74,12 +74,8 @@ class Handler:
         elif command in self.game_managers:
             user_id = user_id if self.console else user.id_[0]
             output_text = self.play_game(user_id, command, commands)
-            if self.console:
-                # fixes difference in character width in hangouts vs monospaced consoles
-                output_text = output_text.replace("  ", " ")
-
-                # use this for testing formatting
-                # output_text = output_text.replace(" ", "\\s").replace("  ", "\\t")
+            # fixes difference in character width in hangouts vs monospaced consoles
+            output_text = utils.default(output_text.replace("  ", " "), output_text, self.console)
 
         else:
             # if this printed in hangouts, it would respond to every single message
@@ -94,7 +90,6 @@ class Handler:
             return "Format: /rename {name}"
         else:
             return await bot.rename_conv(new_name)
-
 
     async def id_(self, bot, user, conv):
         """get the id of a user"""

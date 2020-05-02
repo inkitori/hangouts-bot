@@ -2,7 +2,6 @@
 sets up parser for arguments
 """
 import argparse
-import utils
 
 parser = argparse.ArgumentParser(description="a bot for hangouts")
 

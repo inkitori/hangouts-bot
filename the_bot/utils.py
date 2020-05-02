@@ -235,20 +235,6 @@ def get_key(dictionary, item, *ignore, is_same=True):
     return list(dictionary.keys())[key_index]
 
 
-def get_value(dictionary, key, default=""):
-    """
-    gets the value of a key from a dictionary
-    returns default if the key does not exist
-    """
-    # TODO: replace all calls with builtin dict.get(key, default)
-    # TODO: then delete this function
-    try:
-        value = dictionary[key]
-    except KeyError:
-        value = default
-    return value
-
-
 def default(item, default=None, condition="no condition"):
     """returns default if not condition"""
     if condition == "no condition":
