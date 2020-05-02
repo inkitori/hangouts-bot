@@ -37,7 +37,7 @@ class Player:
         room = next(commands)
         if not room:
             output_text = "Invalid argument! use warp {room}"
-        elif self.fighting:
+        elif self.party.fighting:
             output_text = "You can't warp while in a fight!"
 
         elif room not in rooms:
@@ -178,7 +178,7 @@ class Player:
             separator="\n\t"
         )
 
-    def fight(self):
+    def fight(self, commands):
         if self.name != self.party.host.name:
             return "only the party host can start a fight"
         return self.party.fight()
@@ -238,7 +238,10 @@ class Party:
         if not self.fighting:
             output_text += self.start_fight()
         while not self.doing_stuff:
-            self.doing_stuff = next(self.turns)
+            try:
+                self.doing_stuff = next(self.turns)
+            except StopIteration:
+                output_text += 
             output_text += self.do_stuff()
         return output_text
 
@@ -262,10 +265,9 @@ class Party:
             while can_do_stuff:
                 yield can_do_stuff.pop()
 
-
     def start_fight(self):
         # get enemies from room
-        enemy_name, enemy = host.room.generate_enemy()
+        enemy_name, enemy = classes.rooms[self.host.room].generate_enemy()
         self.turns = self.next_turn()
 
         return utils.join_items(
