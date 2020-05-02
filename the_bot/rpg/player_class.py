@@ -236,7 +236,7 @@ class Player:
     def rest(self, commands):
         """rests player"""
         if classes.rooms[self.room].can_rest:
-            self.stats.change_health("full")
+            self.stats.health = "full"
             # TODO: change mana to max
             text = utils.join_items(
                 "You feel well rested...",
@@ -256,7 +256,7 @@ class Player:
             return "You do not have enough mana to heal!"
         else:
             self.stats.mana -= tome.stats.mana
-            self.stats.change_health(tome.stats.health)
+            self.stats.health += tome.stats.health
 
             text = utils.newline(
                 f"You have been healed back up to {self.stats.health}")
@@ -284,8 +284,7 @@ class Player:
         multiplier = random.choice((1, -1))
         damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
         damage_dealt = round(damage_dealt, 1)
-        enemy.stats.change_health(-damage_dealt)
-        enemy.stats.health = round(enemy.stats.health, 1)
+        enemy.stats.health -= damage_dealt
         text += utils.newline(
             f"You dealt {damage_dealt} damage to {enemy_name}!")
 
@@ -308,7 +307,7 @@ class Player:
             "You woke up back in the village"
         )
         self.fighting = {}
-        self.stats.change_health("full")
+        self.stats.health = "full"
         self.warp("village" for _ in range(1))
         return text
 

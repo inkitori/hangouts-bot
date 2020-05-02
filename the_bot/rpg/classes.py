@@ -19,8 +19,8 @@ class Stats:
         if generate_stats:
             attack, defense, health = self.generate_from_level(level)
         if health is not None:
-            self.health = int(health)
-            self.max_health = max(utils.default(max_health, 1), self.health)
+            self._health = int(health)
+            self._max_health = max(utils.default(max_health, 1), self.health)
         if mana is not None:
             self.mana = int(mana)
             self.max_mana = max(utils.default(max_mana, 0), self.mana)
@@ -33,6 +33,38 @@ class Stats:
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
         self.level = level if not level else int(level)
+
+    @property
+    def health(self):
+        return self._health
+
+    @health.setter
+    def health(self, new_health):
+        """changes player health"""
+        if new_health == "full":
+            self._health = self.max_health
+            return
+
+        self._health = round(new_health, 1)
+        self._health = utils.clamp(self._health, 0, self.max_health)
+
+    @health.deleter
+    def health(self):
+        del self._health
+
+    @property
+    def max_health(self):
+        return self._max_health
+
+    @max_health.setter
+    def max_health(self, new_max_health):
+        """changes player health"""
+        self.health += new_max_health - self._max_health
+        self._max_health = int(utils.default(new_max_health, 0, new_max_health > 0))
+
+    @max_health.deleter
+    def max_health(self):
+        del self._max_health
 
     def generate_from_level(self, level):
         """generates stats from level"""
@@ -120,10 +152,8 @@ class Enemy:
 
         multiplier = random.choice((1, -1))
         damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
-        damage_dealt = round(damage_dealt, 1)
 
-        player.stats.change_health(-damage_dealt)
-        player.stats.health = round(player.stats.health)
+        player.stats.health -= damage_dealt
 
         text = utils.join_items(
             f"{self.name} dealt {damage_dealt} to you!",
