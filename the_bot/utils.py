@@ -123,17 +123,20 @@ def description(name, *description, mode="short", end="\n", newlines=1):
 
 
 # save and load data
-def save(file_name="save_data", **contents):
+save_file_name = "save_data"
+
+
+def save(**contents):
     """saves data into a file"""
-    with shelve.open(file_name, writeback=True) as save_file:
+    with shelve.open(save_file_name, writeback=True) as save_file:
         for name, data in contents.items():
             save_file[name] = data
 
 
-def load(*names, file_name="save_data"):
+def load(*names):
     """loads data from a file"""
     data = []
-    with shelve.open(file_name) as save_file:
+    with shelve.open(save_file_name) as save_file:
         for name in names:
             data.append(save_file[name])
     if len(data) == 1:

@@ -30,6 +30,7 @@ def wipe_data(game):
 args = config.parse_arguments()
 if args.wipe:
     wipe_data(args.wipe)
+utils.save_file_name = args.save_file
 # TODO: fix this
 import bot  # prevents errors with wiping data
 current_bot = bot.bots[args.bot](args)
