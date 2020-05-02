@@ -241,7 +241,7 @@ class Party:
             try:
                 self.doing_stuff = next(self.turns)
             except StopIteration:
-                output_text += 
+                output_text +=
             output_text += self.do_stuff()
         return output_text
 

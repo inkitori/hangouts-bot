@@ -34,7 +34,7 @@ class Stats:
         self._exp = exp if not exp else int(exp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
-    
+
     def __add__(self, stat_2):
         added_stats = {}
         for key, val_1, val_2 in zip(self.__dict__.keys, self.__dict__.values, stat_2.__dict__.values):
@@ -46,7 +46,6 @@ class Stats:
                 added_stats[key] = val_1 + val_2 if isinstance(val_1, int) else bool(val_1 + val_2)
 
         return Stats(**added_stats)
-                    
 
     @property
     def balance(self):
