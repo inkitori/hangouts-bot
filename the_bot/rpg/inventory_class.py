@@ -124,7 +124,7 @@ class Inventory:
                 output_text = f"unequipped {current_equipped_item} as {type_.name.lower()}"
 
         elif name in self.equipped.values():
-            item_type = classes.all_items[name].type_
+            item_type = classes.all_items[item_name].type_
             if self.equipped[item_type] != name:
                 output_text = "that item is not equipped"
             else:
