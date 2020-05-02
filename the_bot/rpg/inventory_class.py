@@ -110,7 +110,7 @@ class Inventory:
         except ValueError:
             type_ = None
             modifier, *item_name = name.split()
-            item_name = ''.join(item_name)
+            item_name = ' '.join(item_name)
             item_is_valid = self.validate_item_name(item_name, modifier)
             if item_is_valid != "valid":
                 return item_is_valid
