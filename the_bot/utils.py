@@ -336,3 +336,8 @@ def num_to_col_letters(num):
         letters += chr(mod + 65)
         num = (num - 1) // 26
     return "".join(reversed(letters))
+
+def removeEscape(string):
+    string = string.strip()
+    string = ''.join(string)
+    return string

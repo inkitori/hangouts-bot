@@ -81,6 +81,7 @@ class Inventory:
         modifier = next(commands)
         item_name = commands.send("remaining")
         full_name = utils.join_items(modifier, item_name, separator=' ')
+        full_name = utils.removeEscape(full_name)
 
         item_is_valid = self.validate_item_name(item_name, modifier)
         if item_is_valid != "valid":
@@ -144,7 +145,7 @@ class Inventory:
         inventory_text = ""  # TODO: print # of full slots
         inventory_text += utils.join_items(
             ("inventory", *[
-                f"{item.description()} x{item.count}"
+                f"{item.get_description()} x{item.count}"
                 for item in self.items.values()
             ]), newlines=2, description_mode="long"
         )
@@ -152,6 +153,7 @@ class Inventory:
             inventory_text += "you don't have anything equipped, use equip to equip something"
         else:
             inventory_text += self.print_equipped()
+
         return inventory_text
 
     def print_equipped(self):
@@ -350,7 +352,7 @@ class Player:
                 separator="\n\t"
             )
 
-    def autofight(self, enemy_name):
+    def autofight(self, enemy_name, enemy):
         while True:
             # this might get deleted so leave it alone for now
             pass

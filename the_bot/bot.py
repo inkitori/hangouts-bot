@@ -98,17 +98,17 @@ class TestBot:
         self.user_id = args.user_id
         self.commands = {
             "/rpg": (
-                "register testbot", "profile",
+                "register testbot2", "profile",
                 "add starter armor", "add starter weapon",
-                "equip starter weapon", "equip starter armor",
+                "equip boring starter weapon", "equip boring starter armor",
                 "inventory",
-                "unequip starter armor", "remove starter armor",
+                "unequip boring starter armor", "remove boring starter armor",
                 "warp village", "rest", "warp potatoland",
                 "fight", "attack", "attack", "attack", "attack", "attack",
                 "heal",
             ),
             "/economy": (
-                "register testbot",
+                "register testbot2",
                 "leaderboard", "shop", "profile",
                 "mine", "mine", "mine", "mine",
                 "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"

@@ -284,8 +284,9 @@ class Item:
             generate_stats=False, health=health, attack=attack,
             defense=defense, mana=mana, level=level,
         )
+        self.description = description
 
-    def description(self):
+    def get_description(self):
         """returns text description of item"""
         return utils.description(
             utils.join_items(
