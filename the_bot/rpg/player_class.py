@@ -237,10 +237,10 @@ class Party:
         if not self.fighting:
             output_text += self.start_fight()
         while not self.doing_stuff:
-            try:
-                self.doing_stuff = self.next_turn()
-            except StopIteration:
+            self.doing_stuff = self.next_turn()
+            if not self.fighting:
                 output_text += "enemies defeated (placeholder)"
+                self.counter = 0
                 break
             output_text += self.do_stuff()
         return output_text
@@ -264,11 +264,12 @@ class Party:
 
     def start_fight(self):
         # get enemies from room
-        enemy_name, enemy = classes.rooms[self.host.room].generate_enemy()
+        enemy = classes.rooms[self.host.room].generate_enemy()
+        self.fighting[enemy.name] = enemy
         self.doing_stuff = self.next_turn()
 
         return utils.description(
-            f"{enemy_name} has approached to fight!",
+            f"{enemy.name} has approached to fight!",
             *[
                 utils.description(*field)
                 for field in enemy.stats.print_stats(list_=True)

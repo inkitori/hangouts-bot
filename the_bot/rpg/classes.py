@@ -261,7 +261,7 @@ class Room:
 
     def generate_enemy(self):
         enemy = random.choice(self.enemies_list)
-        return enemy.name, enemy
+        return enemy
 
     def generate_encounter(self, party):
         # trying to figure out how to get parites to work, just leave this alone
