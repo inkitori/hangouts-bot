@@ -95,16 +95,6 @@ class TestBot:
         self.handler = Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
         self.commands = {
-            "rpg": (
-                "register testbot", "profile",
-                "add starter armor", "add starter weapon",
-                "equip boring starter weapon", "equip boring starter armor",
-                "inventory",
-                "unequip boring starter armor", "remove boring starter armor",
-                "warp village", "rest", "warp potatoland",
-                "fight", "attack", "attack", "attack", "attack", "attack",
-                "heal",
-            ),
             "economy": (
                 "register testbot",
                 "leaderboard", "shop", "profile",
@@ -116,12 +106,23 @@ class TestBot:
                 "create qwed", "delete qwed", "test u", "<", "v", "l",
                 "confusion", "eleven", "restart", "sggstaer", "gamemodes",
                 "move", "scores", "reserved",
-            )
+            ),
+            "rpg": (
+                "register testbot", "profile",
+                "add starter armor", "add starter weapon",
+                "equip boring starter weapon", "equip boring starter armor",
+                "inventory",
+                "unequip boring starter armor", "remove boring starter armor",
+                "warp village", "rest", "warp potatoland",
+                "fight", "attack", "attack", "attack", "attack", "attack",
+                "heal",
+            ),
         }
 
     def run(self):
         """main bot loop"""
         for prefix, commands in self.commands.items():
+            print(f"====={prefix.upper()}=====")
             for command in commands:
                 command = f"{prefix} {command}"
                 print(f"running command {command}")

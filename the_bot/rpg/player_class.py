@@ -99,7 +99,7 @@ class Player:
             f"You dealt {damage_dealt} damage to {enemy.name}!")
 
         if enemy.stats.health <= 0:
-            text += self.killed_enemy(enemy.name, enemy)
+            text += self.party.killed_enemy(enemy, self)
 
         else:
             # take damage
@@ -113,7 +113,10 @@ class Player:
     def fight_action(self, action, commands):
         """"""
         if not self.party.fighting:
-            return self.fight(commands)
+            if not self.name == self.party.host.name:
+                return "you are not in a fight. Only hosts may start fights"
+            else:
+                return self.fight(commands)
         elif self.name is not self.party.doing_stuff:
             return f"it is {self.party.doing_stuff}'s turn"
         output_text = action(self, commands, self.party.get_enemy())
@@ -222,34 +225,36 @@ class Party:
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
         text += f"You earned {exp_earned} exp and {gold_earned} gold!"
-        self.stats.exp += exp_earned
-        self.stats.balance += gold_earned
+        player.stats.exp += exp_earned
+        player.stats.balance += gold_earned
         del self.fighting[enemy.name]
 
         return text
 
     def get_enemy(self):
         # TODO: let player pick enemy to attack
-        return random.choice(self.fighting)
+        return random.choice(list(self.fighting.values()))
 
     def fight(self):
         output_text = ""
         if not self.fighting:
             output_text += self.start_fight()
+        else:
+            output_text += f"currently fighting {utils.join_items(*self.fighting, separator=', ')}"
         while not self.doing_stuff:
             self.doing_stuff = self.next_turn()
             if not self.fighting:
                 output_text += "enemies defeated (placeholder)"
                 self.counter = 0
                 break
-            output_text += self.do_stuff()
+        output_text += self.do_stuff()
         return output_text
 
     def do_stuff(self):
-        output_text = f"{self.doing_stuff}'s turn"
+        output_text = f"it is {self.doing_stuff}'s turn"
         if self.doing_stuff in self.fighting:
             output_text += self.fighting[self.doing_stuff].attack(
-                random.choice(self.players.values())
+                random.choice(self.players)
             )
             self.doing_stuff = None
         return output_text
