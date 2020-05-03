@@ -196,12 +196,12 @@ class Player:
         party.players.append(self)
         return (
             f"joined party {self.party} with players"
-            f" {utils.join_items(party.players, separator=', ')}"
+            f" {utils.join_items([player.name for player in party.players], separator=', ')}"
         )
 
     def leave(self, commands):
         """removes a player"""
-        party = parties[self.party.name()]
+        party = parties[self.party]
         if party.host is self and len(party.players) > 1:
             return "hosts cannot leave their party while their party has other members"
 
@@ -209,6 +209,7 @@ class Player:
         if party.host is not self:
             del parties[self.name]
         self.party = Party(self).name()
+        return "left party"
 
     def kick(self, commands):
         kick_name = next(commands)
@@ -256,7 +257,6 @@ class Party:
 
     def __init__(self, host, *players):
         parties[host.name] = self
-        print(parties)
         self.host = host
         self.players = list(players) + [host]
         self.fighting = {}
