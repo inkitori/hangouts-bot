@@ -112,10 +112,10 @@ class Player:
 
     def fight_action(self, action, commands):
         """"""
-        if self.name is not self.party.doing_stuff:
-            return f"it is {self.party.doing_stuff}'s turn"
         if not self.party.fighting:
-            return "you are not fighting"
+            return self.fight(commands)
+        elif self.name is not self.party.doing_stuff:
+            return f"it is {self.party.doing_stuff}'s turn"
         output_text = action(self, commands, self.party.get_enemy())
         self.party.doing_stuff = None
         self.party.fight()
@@ -170,14 +170,14 @@ class Player:
 
     def profile(self):
         # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
-        profile_text = utils.join_items(
-            *[utils.description(field) for field in [("name", self.name), ("id", self.get_id())]],
-            description_mode="long"
-        )
-        return utils.join_items(
-            profile_text, self.stats.print_stats(self.inventory.modifers()),
-            separator="\n\t"
-        )
+        profile_list = [
+            utils.description(*field, newlines=0)
+            for field in [("name", self.name), ("id", self.get_id())] +
+            self.stats.print_stats(self.inventory.modifers(), list_=True)
+        ]
+        print()
+
+        return utils.join_items(profile_list, description_mode="long")
 
     def fight(self, commands):
         if self.name != self.party.host.name:
@@ -205,7 +205,7 @@ class Party:
         self.fighting = {}
         self.doing_stuff = None
         self.counter = 0
-        self.can_do_stuff = []
+        self.action_queue = []
 
     def join(self, player):
         """adds a player to a party"""
@@ -259,12 +259,12 @@ class Party:
         return output_text
 
     def next_turn(self):
-        while not self.can_do_stuff:
+        while not self.action_queue:
             self.counter += 1
             for thing in self.players + list(self.fighting.values()):
                 if self.counter % thing.stats.speed == 0:
-                    self.can_do_stuff.append(thing.name)
-        return self.can_do_stuff.pop()
+                    self.action_queue.append(thing.name)
+        return self.action_queue.pop()
 
     def start_fight(self):
         # get enemies from room

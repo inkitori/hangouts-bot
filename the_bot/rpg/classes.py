@@ -181,31 +181,35 @@ class Stats:
         """returns text representation of stats"""
         # this mess adds a + modifed value if there is a modified stat
         modifiers = utils.default(modifiers, Stats())
-        # stat_list =
-        stats_text = utils.join_items(
-            *[
-                (
-                    stat_name, str(stat_value) +
-                    utils.default(
-                        f" +{modifiers.__dict__.get(stat_name, 0)}",
-                        "", modifiers.__dict__.get(stat_name, 0)
-                    )
+        stats_list = [
+            (
+                stat_name, str(stat_value) +
+                utils.default(
+                    f" +{modifiers.__dict__.get(stat_name, 0)}",
+                    "", modifiers.__dict__.get(stat_name, 0)
                 )
-                for stat_name, stat_value in self.__dict__.items()
-                if stat_name not in ("level", "exp") and stat_value is not None
-            ], description_mode="short", separator="\n\t"
-        )
+            )
+            for stat_name, stat_value in self.__dict__.items()
+            if stat_name not in ("exp", ) and stat_value is not None
+        ]
         if self.level is not None:
-            stats_text += "\t" + self.print_level_exp()
+            stats_list += [self.print_level_exp(list_=list_)]
+        if list_:
+            return stats_list
+        stats_text = utils.join_items(
+            *stats_list,
+            description_mode="short",
+        )
         return stats_text
 
     def next_level_exp(self):
         """returns next level exp"""
         return round(4 * (((self.level + 1) ** 4) / 5))
 
-    def print_level_exp(self):
+    def print_level_exp(self, list_=False):
         """returns string representation of level and exp"""
-        return f"LVL: {self.level} | {self.exp} / {self.next_level_exp()}"
+        xp_list = ["exp", f"{self.exp}/{self.next_level_exp()}"]
+        return utils.default(xp_list, utils.description(*xp_list, newlines=0), list_)
 
 
 class Enemy:
