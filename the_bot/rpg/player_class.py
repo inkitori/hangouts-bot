@@ -3,6 +3,7 @@ import random
 import math
 import rpg.classes as classes
 import rpg.inventory_class as inventory_class
+import game_utils
 
 
 class Player:
@@ -18,8 +19,8 @@ class Player:
         self.room = "village"
         self.args = {"autofight": False, "heal_percent": 50}
         self.inventory = inventory_class.Inventory()
-        self.party = self.name
-        Party(self)
+        self.party_name = self.name
+        Party(self.name)
 
     def get_id(self):
         return utils.get_key(players, self)
@@ -38,7 +39,7 @@ class Player:
         room = next(commands)
         if not room:
             output_text = "Invalid argument! use warp {room}"
-        elif parties[self.party].fighting:
+        elif parties[self.party_name].fighting:
             output_text = "You can't warp while in a fight!"
 
         elif room not in rooms:
@@ -101,22 +102,22 @@ class Player:
             f"You dealt {damage_dealt} damage to {enemy.name}!")
 
         if enemy.stats.health <= 0:
-            text += parties[self.party].killed_enemy(enemy, self)
+            text += parties[self.party_name].killed_enemy(enemy, self)
 
         else:
             # take damage
             text += enemy.attack(self)
 
             if self.stats.health <= 0:
-                text += self.party.died(enemy, self)
+                text += self.party_name.died(enemy, self)
 
         return text
 
     def fight_action(self, action, commands):
         """"""
-        party = parties[self.party]
+        party = parties[self.party_name]
         if not party.fighting:
-            if not self.name == party.host.name:
+            if self.name != party.host_name:
                 return "you are not in a fight. Only hosts may start fights"
             else:
                 return party.fight(commands)
@@ -187,40 +188,83 @@ class Player:
         party_name = next(commands)
         if not party_name:
             return "you must provide a party name"
+        elif party_name == self.party_name:
+            return "you are already in that party"
         party = parties.get(party_name, None)
         if not party:
             return "that party does not exist"
 
-        self.leave(self.party)
-        self.party = party_name
-        party.players.append(self)
-        return (
-            f"joined party {self.party} with players"
-            f" {utils.join_items([player.name for player in party.players], separator=', ')}"
+        output_text = self.leave(self.party_name, joining=True)
+        if not output_text.startswith("left"):
+            return output_text
+        self.party_name = party_name
+        output_text += (
+            f"joined party {self.party_name} with players"
+            f" {utils.join_items(*party.player_names, separator=', ')}"
         )
+        party.player_names.append(self.name)
+        return output_text
 
-    def leave(self, commands):
+    def leave(self, commands, joining=False):
         """removes a player"""
-        party = parties[self.party]
-        if party.host is self and len(party.players) > 1:
-            return "hosts cannot leave their party while their party has other members"
+        party = parties[self.party_name]
+        if party.host_name == self.name:
+            if len(party.player_names) > 1:
+                return "hosts cannot leave their party while their party has other members"
+            elif not joining:
+                return "theres no one but you, why would you leave?"
 
-        party.players.remove(self)
-        if party.host is not self:
+        party.player_names.remove(self.name)
+        if not party.player_names:
             del parties[self.name]
-        self.party = Party(self).name()
-        return "left party"
+        if not joining:
+            self.party_name = Party(self.name).name()
+        return utils.newline(f"left party")
+
+    def accept(self, commands):
+        player_name = next(commands)
+        if not player_name:
+            return "you must provide a player name"
+        party = parties.get(self.party_name, None)
+        if party.host_name != self.name:
+            return "only hosts can accept join invites"
+        player = self.join_invites.get(player_name, None)
+        if not player:
+            return "no valid player"
+
+        # JOSEPH this makes no sense
+        output_text = utils.join_items(
+            f"{player_name} has joined the party!", player.join(self.party_name), separator='\n')
+        del self.join_invites[player_name]
+        return output_text
+
+    def decline(self, commands):
+        # TODOLATER: connect to code
+        player_name = next(commands)
+        if not player_name:
+            return "you must provide a player name"
+        party = parties.get(self.party_name, None)
+        if party.host_name != self.name:
+            return "only hosts can decline join invites"
+        player = self.join_invites.get(player_name, None)
+        if not player:
+            return "no valid player"
+
+        del self.join_invites[player_name]
+        return f"{player_name} has been declined from joining the party"
 
     def kick(self, commands):
         kick_name = next(commands)
         if not kick_name:
             return "you must specify a player to kick"
-        party = parties[self.party.name()]
-        if party.host is not self:
+        party = parties[self.party_name]
+        if party.host_name != self.name:
             return "You must be the host to kick"
-        for player in party.players:
-            if kick_name == player.name:
-                player.leave(commands)
+        for player_name in party.player_names:
+            if kick_name == player_name:
+                game_utils.get_players(
+                    players, player_name, single=True
+                ).leave(commands)
                 return f"{kick_name} has been kicked from your party"
 
         return "no users in your party go by that name"
@@ -228,7 +272,7 @@ class Player:
     def parties(self, commands):
         return utils.join_items(
             *[
-                [party_name] + [player.name for player in party.players]
+                [party_name] + party.player_names
                 for party_name, party in parties.items()
             ],
             description_mode="short",
@@ -255,10 +299,10 @@ class Player:
 class Party:
     """party of players"""
 
-    def __init__(self, host, *players):
-        parties[host.name] = self
-        self.host = host
-        self.players = list(players) + [host]
+    def __init__(self, host_name, *player_names):
+        parties[host_name] = self
+        self.host_name = host_name
+        self.player_names = list(player_names) + [host_name]
         self.fighting = {}
         self.doing_stuff = None
         self.counter = 0
@@ -275,7 +319,8 @@ class Party:
         exp_earned = enemy.stats.level ** 2
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
-        text += utils.newline(f"You earned {exp_earned} exp and {gold_earned} gold!")
+        text += utils.newline(
+            f"You earned {exp_earned} exp and {gold_earned} gold!")
         player.stats.exp += exp_earned
         player.stats.balance += gold_earned
         del self.fighting[enemy.name]
@@ -309,7 +354,10 @@ class Party:
         output_text = f"it is {self.doing_stuff}'s turn"
         if self.doing_stuff in self.fighting:
             output_text += self.fighting[self.doing_stuff].attack(
-                random.choice(self.players)
+                random.choice([
+                    player for player in players.values()
+                    if player.name in self.player_names
+                ])
             )
             self.doing_stuff = None
         return utils.newline(output_text)
@@ -318,14 +366,22 @@ class Party:
         if not self.doing_stuff:
             while not self.action_queue:
                 self.counter += 1
-                for thing in self.players + list(self.fighting.values()):
-                    if self.counter % thing.stats.speed == 0:
-                        self.action_queue.append(thing.name)
+                for name in self.player_names + list(self.fighting):
+                    if name in self.fighting:
+                        speed = self.fighting[name].stats.speed
+                    elif name in self.player_names:
+                        speed = game_utils.get_players(players, name, single=True).stats.speed
+                    if self.counter % speed == 0:
+                        self.action_queue.append(name)
+                random.shuffle(self.action_queue)
             self.doing_stuff = self.action_queue.pop()
 
     def start_fight(self):
         # get enemies from room
-        enemy = classes.rooms[self.host.room].generate_enemy()
+        enemy = classes.rooms[
+            game_utils.get_players(
+                players, self.host_name, single=True).room
+        ].generate_enemy()
         self.fighting[enemy.name] = enemy
         self.next_turn()
 
