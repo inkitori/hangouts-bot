@@ -122,7 +122,7 @@ class Player:
                 return party.fight(commands)
         if self.name != party.doing_stuff:
             party.fight()
-            return f"it is {party.doing_stuff}'s turn"
+            return f"it is {party.doing_stuff}'s turn (not urs)" 
         output_text = action(self, commands, party.get_enemy())
         party.doing_stuff = None
         party.fight()
