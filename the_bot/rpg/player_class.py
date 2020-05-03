@@ -89,7 +89,8 @@ class Player:
 
         player_damage = self.modified_stats().attack + self.stats.attack
         damage_dealt = round(
-            player_damage * (player_damage / enemy.stats.defense), 1)
+            player_damage * (player_damage / enemy.stats.defense), 1
+        )
 
         multiplier = random.choice((1, -1))
         damage_dealt += round(multiplier * math.sqrt(damage_dealt / 2), 1)
@@ -117,7 +118,8 @@ class Player:
                 return "you are not in a fight. Only hosts may start fights"
             else:
                 return self.fight(commands)
-        elif self.name is not self.party.doing_stuff:
+        if self.name is not self.party.doing_stuff:
+            self.party.fight()
             return f"it is {self.party.doing_stuff}'s turn"
         output_text = action(self, commands, self.party.get_enemy())
         self.party.doing_stuff = None
@@ -178,16 +180,10 @@ class Player:
             self.stats.print_stats(self.inventory.modifers(), list_=True)
         ], mode="long")
 
-    def fight(self, commands):
-        if self.name != self.party.host.name:
-            return "only the party host can start a fight"
-        return self.party.fight()
-
     commands = {
         "rest": rest,
         "warp": warp,
         "set": set_,
-        "fight": fight
         # TODO: flee command to leave a fight (penalty for fleeing?)
     }
     fight_commands = {
@@ -216,6 +212,9 @@ class Party:
         player.party = Party(player)
         self.players.remove(player)
 
+    def kick(self, player_name):
+        pass
+
     def killed_enemy(self, enemy, player):
         """changes stuff based on enemy"""
         text = ""
@@ -229,25 +228,29 @@ class Party:
         player.stats.balance += gold_earned
         del self.fighting[enemy.name]
 
+        if not self.fighting:
+            text += "enemies defeated (placeholder)"
+            self.counter = 0
+
         return text
 
     def get_enemy(self):
         # TODO: let player pick enemy to attack
         return random.choice(list(self.fighting.values()))
 
-    def fight(self):
+    def fight(self, *args):
         output_text = ""
         if not self.fighting:
             output_text += self.start_fight()
         else:
             output_text += f"currently fighting {utils.join_items(*self.fighting, separator=', ')}"
-        while not self.doing_stuff:
-            self.doing_stuff = self.next_turn()
-            if not self.fighting:
-                output_text += "enemies defeated (placeholder)"
-                self.counter = 0
-                break
+        if not self.doing_stuff:
+            self.next_turn()
+
         output_text += self.do_stuff()
+        if not self.fighting:
+            output_text += "enemies defeated (placeholder)"
+            self.counter = 0
         return output_text
 
     def do_stuff(self):
@@ -257,21 +260,22 @@ class Party:
                 random.choice(self.players)
             )
             self.doing_stuff = None
-        return output_text
+        return utils.newline(output_text)
 
     def next_turn(self):
-        while not self.action_queue:
-            self.counter += 1
-            for thing in self.players + list(self.fighting.values()):
-                if self.counter % thing.stats.speed == 0:
-                    self.action_queue.append(thing.name)
-        return self.action_queue.pop()
+        if not self.doing_stuff:
+            while not self.action_queue:
+                self.counter += 1
+                for thing in self.players + list(self.fighting.values()):
+                    if self.counter % thing.stats.speed == 0:
+                        self.action_queue.append(thing.name)
+            self.doing_stuff = self.action_queue.pop()
 
     def start_fight(self):
         # get enemies from room
         enemy = classes.rooms[self.host.room].generate_enemy()
         self.fighting[enemy.name] = enemy
-        self.doing_stuff = self.next_turn()
+        self.next_turn()
 
         return utils.description(
             f"{enemy.name} has approached to fight!",
@@ -280,6 +284,12 @@ class Party:
                 for field in enemy.stats.print_stats(list_=True)
             ], mode="long"
         )
+
+    commands = {
+        "join": join,
+        "leave": leave,
+        "kick": kick
+    }
 
 
 players = {}

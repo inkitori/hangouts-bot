@@ -114,7 +114,7 @@ class TestBot:
                 "inventory",
                 "unequip boring starter armor", "remove boring starter armor",
                 "warp village", "rest", "warp potatoland",
-                "fight", "attack", "attack", "attack", "attack", "attack",
+                "attack", "attack", "attack", "attack", "attack",
                 "heal",
             ),
         }

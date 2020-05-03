@@ -126,7 +126,7 @@ class Handler:
         "/help": ""  # this avoids errors where keywords and help_text reference eachother
     }
     help_text = utils.join_items(
-        "I'm a bot by Yeah and Chendi.",
+        "I'm a bot by Astolfo and Chendi.",
         "You can view my source at https://github.com/YellowPapaya/hangouts-bot"
         " or suggest at https://saberbot.page.link/R6GT",
     ) + utils.join_items(
