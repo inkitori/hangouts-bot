@@ -139,7 +139,7 @@ def wipe_data(game):
     data_keys = {
         "economy": {"economy_players": {}},
         "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
-        "rpg": {"rpg_players": {}}
+        "rpg": {"rpg_players": {}, "rpg_parties": {}}
     }
     save(**data_keys[game])
 

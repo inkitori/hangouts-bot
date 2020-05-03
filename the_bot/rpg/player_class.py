@@ -228,7 +228,7 @@ class Player:
         return utils.join_items(
             *[
                 [party_name] + [player.name for player in party.players]
-                for party_name, party in parties
+                for party_name, party in parties.items()
             ],
             description_mode="short",
         )
@@ -256,6 +256,7 @@ class Party:
 
     def __init__(self, host, *players):
         parties[host.name] = self
+        print(parties)
         self.host = host
         self.players = list(players) + [host]
         self.fighting = {}

@@ -34,7 +34,7 @@ class RPGManager:
 
     def load_game(self, load_sheets):
         """loads the game"""
-        self.game.players = utils.load("rpg_players")
+        self.game.players, player_class.parties = utils.load("rpg_players", "rpg_parties")
         if load_sheets:
             self.load_sheets_data()
 
@@ -89,5 +89,5 @@ class RPGManager:
 
     def save_game(self):
         """saves the game"""
-        utils.save(rpg_players=self.game.players)
+        utils.save(rpg_players=self.game.players, rpg_parties=player_class.parties)
         player_class.players = self.game.players
