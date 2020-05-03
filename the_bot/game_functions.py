@@ -4,7 +4,7 @@ functions shared between games that don't fit in utils
 import utils
 import math
 
-hangouts_char_limit = 2000
+HANGOUTS_CHAR_LIMIT = 2000
 
 
 def profile(self, player, commands):
