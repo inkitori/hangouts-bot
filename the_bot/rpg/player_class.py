@@ -38,7 +38,7 @@ class Player:
         room = next(commands)
         if not room:
             output_text = "Invalid argument! use warp {room}"
-        elif self.party.fighting:
+        elif parties[self.party].fighting:
             output_text = "You can't warp while in a fight!"
 
         elif room not in rooms:
@@ -114,17 +114,18 @@ class Player:
 
     def fight_action(self, action, commands):
         """"""
-        if not self.party.fighting:
-            if not self.name == self.party.host.name:
+        party = parties[self.party]
+        if not party.fighting:
+            if not self.name == party.host.name:
                 return "you are not in a fight. Only hosts may start fights"
             else:
-                return self.fight(commands)
-        if self.name is not self.party.doing_stuff:
-            self.party.fight()
-            return f"it is {self.party.doing_stuff}'s turn"
-        output_text = action(self, commands, self.party.get_enemy())
-        self.party.doing_stuff = None
-        self.party.fight()
+                return party.fight(commands)
+        if self.name is not party.doing_stuff:
+            party.fight()
+            return f"it is {party.doing_stuff}'s turn"
+        output_text = action(self, commands, party.get_enemy())
+        party.doing_stuff = None
+        party.fight()
 
         return output_text
 
@@ -193,7 +194,10 @@ class Player:
         self.leave(self.party)
         self.party = party_name
         party.players.append(self)
-        return f"joined party {self.party} with players {utils.join_items(party.players, separator=', ')}"
+        return (
+            f"joined party {self.party} with players"
+            f" {utils.join_items(party.players, separator=', ')}"
+        )
 
     def leave(self, commands):
         """removes a player"""
@@ -220,6 +224,15 @@ class Player:
 
         return "no users in your party go by that name"
 
+    def parties(self, commands):
+        return utils.join_items(
+            *[
+                [party_name] + [player.name for player in party.players]
+                for party_name, party in parties
+            ],
+            description_mode="short",
+        )
+
     commands = {
         "rest": rest,
         "warp": warp,
@@ -233,7 +246,8 @@ class Player:
     party_commands = {
         "join": join,
         "leave": leave,
-        "kick": kick
+        "kick": kick,
+        "parties": parties,
     }
 
 
