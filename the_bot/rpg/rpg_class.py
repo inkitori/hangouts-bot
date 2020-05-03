@@ -63,7 +63,8 @@ class RPG:
             )
         elif command in player_class.Player.party_commands:
             output_text = player_class.Player.party_commands[command](
-                player, commands)
+                player, commands
+            )
         else:
             output_text = "invalid command for rpg"
 

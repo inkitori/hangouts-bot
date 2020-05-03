@@ -17,7 +17,8 @@ class Player:
             balance=0, lifetime_balance=0
         )
         self.room = "village"
-        self.args = {"autofight": False, "heal_percent": 50}
+        self.options = {"autofight": False,
+                        "heal_percent": 50, "auto_join_party": True}
         self.inventory = inventory_class.Inventory()
         self.party_name = self.name
         Party(self.name)
@@ -150,31 +151,31 @@ class Player:
         value = next(commands)
 
         # input validation
-        if arg not in self.args:
+        if arg not in self.options:
             return "That is not a valid arg!"
         elif not arg:
             return "you must provide an arg"
         elif not value:
             return "you must provide a value"
 
-        elif isinstance(self.args[arg], bool):
+        elif isinstance(self.options[arg], bool):
             value = value[0]
             if value in ("t", "y"):
-                self.args[arg] = True
+                self.options[arg] = True
 
             elif value in ("f", "n"):
-                self.args[arg] = False
+                self.options[arg] = False
             else:
                 # TODO make this error a template
                 return f"invalid value {value} for boolean arg {arg}, use true/false"
 
-        elif isinstance(self.args[arg], int):
+        elif isinstance(self.options[arg], int):
             if value.isdigit():
-                self.args[arg] = int(value)
+                self.options[arg] = int(value)
             else:
                 return f"invalid value {value} for integer arg {arg}, use an integer"
 
-        return f"Successfully set {arg} to {self.args[arg]}"
+        return f"Successfully set {arg} to {self.options[arg]}"
 
     def profile(self):
         return utils.description(*[
@@ -183,9 +184,10 @@ class Player:
             self.stats.print_stats(self.inventory.modifers(), list_=True)
         ], mode="long")
 
-    def join(self, commands):
+    def join(self, commands=utils.command_parser(""), has_permission=False, party_name=""):
         """adds player to a party"""
-        party_name = next(commands)
+        output_text = ""
+        party_name = utils.default(party_name, next(commands))
         if not party_name:
             return "you must provide a party name"
         elif party_name == self.party_name:
@@ -194,15 +196,25 @@ class Player:
         if not party:
             return "that party does not exist"
 
-        output_text = self.leave(self.party_name, joining=True)
-        if not output_text.startswith("left"):
-            return output_text
-        self.party_name = party_name
-        output_text += (
-            f"joined party {self.party_name} with players"
-            f" {utils.join_items(*party.player_names, separator=', ')}"
-        )
-        party.player_names.append(self.name)
+        host = game_utils.get_players(players, party.host_name, single=True)
+        if host.options["auto_join_party"] or has_permission:
+            output_text += self.leave(self.party_name, joining=True)
+            if not output_text.startswith("left"):
+                return output_text
+            self.party_name = party_name
+            output_text += (
+                f"joined party {self.party_name} with players"
+                f" {utils.join_items(*party.player_names, separator=', ')}"
+            )
+            party.player_names.append(self.name)
+        else:
+            output_text += utils.join_items(
+                f"party host {host.name} has auto join set to false,",
+                "so you need to await approval to join.",
+                "Your request has been added to the party requests list",
+                separator=" "
+            )
+            party.join_requests.append(self.name)
         return output_text
 
     def leave(self, commands, joining=False):
@@ -225,32 +237,30 @@ class Player:
         player_name = next(commands)
         if not player_name:
             return "you must provide a player name"
-        party = parties.get(self.party_name, None)
+        party = parties[self.party_name]
         if party.host_name != self.name:
-            return "only hosts can accept join invites"
-        player = self.join_invites.get(player_name, None)
-        if not player:
-            return "no valid player"
+            return "only hosts can accept join requests"
+        elif player_name not in party.join_requests:
+            return "that player has not requested to join"
 
-        # JOSEPH this makes no sense
-        output_text = utils.join_items(
-            f"{player_name} has joined the party!", player.join(self.party_name), separator='\n')
-        del self.join_invites[player_name]
-        return output_text
+        party.join_requests.remove(player_name)
+        return utils.newline(
+            game_utils.get_players(players, player_name, single=True).join(
+                party_name=self.party_name, has_permission=True
+            )
+        )
 
     def decline(self, commands):
-        # TODOLATER: connect to code
         player_name = next(commands)
         if not player_name:
             return "you must provide a player name"
-        party = parties.get(self.party_name, None)
+        party = parties[self.party_name]
         if party.host_name != self.name:
-            return "only hosts can decline join invites"
-        player = self.join_invites.get(player_name, None)
-        if not player:
-            return "no valid player"
+            return "only hosts can decline join requests"
+        elif player_name not in party.join_requests:
+            return "that player has not requested to join"
 
-        del self.join_invites[player_name]
+        party.join_requests.remove(player_name)
         return f"{player_name} has been declined from joining the party"
 
     def kick(self, commands):
@@ -293,6 +303,9 @@ class Player:
         "leave": leave,
         "kick": kick,
         "parties": parties,
+        "accept": accept,
+        "decline": decline
+
     }
 
 
@@ -307,6 +320,7 @@ class Party:
         self.doing_stuff = None
         self.counter = 0
         self.action_queue = []
+        self.join_requests = []
 
     def name(self):
         return utils.get_key(parties, self)
@@ -370,7 +384,8 @@ class Party:
                     if name in self.fighting:
                         speed = self.fighting[name].stats.speed
                     elif name in self.player_names:
-                        speed = game_utils.get_players(players, name, single=True).stats.speed
+                        speed = game_utils.get_players(
+                            players, name, single=True).stats.speed
                     if self.counter % speed == 0:
                         self.action_queue.append(name)
                 random.shuffle(self.action_queue)
