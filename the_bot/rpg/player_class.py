@@ -101,7 +101,7 @@ class Player:
             f"You dealt {damage_dealt} damage to {enemy.name}!")
 
         if enemy.stats.health <= 0:
-            text += self.party.killed_enemy(enemy, self)
+            text += parties[self.party].killed_enemy(enemy, self)
 
         else:
             # take damage
@@ -120,7 +120,7 @@ class Player:
                 return "you are not in a fight. Only hosts may start fights"
             else:
                 return party.fight(commands)
-        if self.name is not party.doing_stuff:
+        if self.name != party.doing_stuff:
             party.fight()
             return f"it is {party.doing_stuff}'s turn"
         output_text = action(self, commands, party.get_enemy())
