@@ -169,15 +169,11 @@ class Player:
         return f"Successfully set {arg} to {self.args[arg]}"
 
     def profile(self):
-        # TODO: change to use description_mode="long" by changing print_stats to have a lsit arg
-        profile_list = [
+        return utils.description(*[
             utils.description(*field, newlines=0)
             for field in [("name", self.name), ("id", self.get_id())] +
             self.stats.print_stats(self.inventory.modifers(), list_=True)
-        ]
-        print()
-
-        return utils.join_items(profile_list, description_mode="long")
+        ], mode="long")
 
     def fight(self, commands):
         if self.name != self.party.host.name:
@@ -271,10 +267,12 @@ class Party:
         enemy_name, enemy = classes.rooms[self.host.room].generate_enemy()
         self.doing_stuff = self.next_turn()
 
-        return utils.join_items(
+        return utils.description(
             f"{enemy_name} has approached to fight!",
-            enemy.stats.print_stats(),
-            separator="\n\t"
+            *[
+                utils.description(*field)
+                for field in enemy.stats.print_stats(list_=True)
+            ], mode="long"
         )
 
 

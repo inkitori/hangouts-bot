@@ -193,7 +193,7 @@ class Stats:
             if stat_name not in ("exp", ) and stat_value is not None
         ]
         if self.level is not None:
-            stats_list += [self.print_level_exp(list_=list_)]
+            stats_list += [self.print_level_exp(list_=True)]
         if list_:
             return stats_list
         stats_text = utils.join_items(
