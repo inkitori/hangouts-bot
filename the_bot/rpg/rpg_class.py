@@ -59,6 +59,8 @@ class RPG:
             output_text = player.fight_action(
                 player_class.Player.fight_commands[command], commands
             )
+        elif command in player_class.Party.commands:
+            output_text = player_class.Party.commands[command](player, commands)
         else:
             output_text = "invalid command for rpg"
 

@@ -18,7 +18,8 @@ class Player:
         self.room = "village"
         self.args = {"autofight": False, "heal_percent": 50}
         self.inventory = inventory_class.Inventory()
-        self.party = Party(self)
+        self.party = self.name
+        Party(self)
 
     def get_id(self):
         return utils.get_key(players, self)
@@ -180,6 +181,45 @@ class Player:
             self.stats.print_stats(self.inventory.modifers(), list_=True)
         ], mode="long")
 
+    def join(self, commands):
+        """adds player to a party"""
+        party_name = next(commands)
+        if not party_name:
+            return "you must provide a party name"
+        party = parties.get(party_name, None)
+        if not party:
+            return "that party does not exist"
+
+        self.leave(self.party)
+        self.party = party_name
+        party.players.append(self)
+        return f"joined party {self.party} with players {utils.join_items(party.players, separator=', ')}"
+
+    def leave(self, commands):
+        """removes a player"""
+        party = parties[self.party.name()]
+        if party.host is self and len(party.players) > 1:
+            return "hosts cannot leave their party while their party has other members"
+
+        party.players.remove(self)
+        if party.host is not self:
+            del parties[self.name]
+        self.party = Party(self).name()
+
+    def kick(self, commands):
+        kick_name = next(commands)
+        if not kick_name:
+            return "you must specify a player to kick"
+        party = parties[self.party.name()]
+        if party.host is not self:
+            return "You must be the host to kick"
+        for player in party.players:
+            if kick_name == player.name:
+                player.leave(commands)
+                return f"{kick_name} has been kicked from your party"
+
+        return "no users in your party go by that name"
+
     commands = {
         "rest": rest,
         "warp": warp,
@@ -190,11 +230,18 @@ class Player:
         "attack": attack,
         "heal": heal,
     }
+    party_commands = {
+        "join": join,
+        "leave": leave,
+        "kick": kick
+    }
 
 
 class Party:
     """party of players"""
+
     def __init__(self, host, *players):
+        parties[host.name] = self
         self.host = host
         self.players = list(players) + [host]
         self.fighting = {}
@@ -202,18 +249,8 @@ class Party:
         self.counter = 0
         self.action_queue = []
 
-    def join(self, player):
-        """adds a player to a party"""
-        player.party = self
-        self.players.append(player)
-
-    def leave(self, player):
-        """removes a player"""
-        player.party = Party(player)
-        self.players.remove(player)
-
-    def kick(self, player_name):
-        pass
+    def name(self):
+        return utils.get_key(parties, self)
 
     def killed_enemy(self, enemy, player):
         """changes stuff based on enemy"""
@@ -223,7 +260,7 @@ class Party:
         exp_earned = enemy.stats.level ** 2
         gold_earned = int(enemy.stats.max_health / 10) + random.randint(1, 10)
 
-        text += f"You earned {exp_earned} exp and {gold_earned} gold!"
+        text += utils.newline(f"You earned {exp_earned} exp and {gold_earned} gold!")
         player.stats.exp += exp_earned
         player.stats.balance += gold_earned
         del self.fighting[enemy.name]
@@ -249,7 +286,7 @@ class Party:
 
         output_text += self.do_stuff()
         if not self.fighting:
-            output_text += "enemies defeated (placeholder)"
+            output_text += "enemies defeated!"
             self.counter = 0
         return output_text
 
@@ -284,12 +321,6 @@ class Party:
                 for field in enemy.stats.print_stats(list_=True)
             ], mode="long"
         )
-
-    commands = {
-        "join": join,
-        "leave": leave,
-        "kick": kick
-    }
 
 
 players = {}
