@@ -233,8 +233,8 @@ class Player:
                 return "hosts cannot leave their party while their party has other members"
             elif not joining:
                 return "theres no one but you, why would you leave?"
-
-        party.player_names.remove(self.name)
+        else:
+            party.player_names.remove(self.name)
         if not party:
             del parties[self.name]
         if not joining:
