@@ -35,7 +35,7 @@ class Player:
         modified_defense = modifiers.defense + self.stats.defense
         return classes.Stats(attack=modified_attack, defense=modified_defense)
 
-    def  warp(self, commands):
+    def warp(self, commands):
         """warps to rooms"""
         rooms = classes.rooms
         room = next(commands)

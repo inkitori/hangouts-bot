@@ -129,7 +129,7 @@ class Manager2048:
                         game_name, game.mode_name, game.score)
                     for game_name, game in self.games.items()
                     if game_name != classes.Keywords.CURRENT_GAME
-                ], 
+                ],
             ), "there are no games"), 2)
 
         elif command in self.help_texts:

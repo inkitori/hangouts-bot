@@ -40,7 +40,7 @@ class Inventory:
         if item_is_valid != "valid":
             return item_is_valid
 
-        if sum([item.count for item in self.items.values()]) >= self.max_items:
+        if self.full_slots() >= self.max_items:
             return "your inventory is full, remove something first"
 
         item = classes.all_items[item_name]
@@ -139,11 +139,14 @@ class Inventory:
         item = self.items[item_name] if item_name else None
         return item_name, item
 
+    def full_slots(self):
+        return sum([item.count for item in self.items.values()])
+
     def print_inventory(self, commands):
         """returns string representation of inventory"""
         if not self.items:
             return "you dont have anything in your inventory"
-        inventory_text = utils.newline(f"{sum([item.count for item in self.items.values()])} slots full")
+        inventory_text = utils.newline(f"{self.full_slots()} slots full")
         inventory_text += utils.join_items(
             ("inventory", *[
                 f"{item.get_description()} x{item.count}"
