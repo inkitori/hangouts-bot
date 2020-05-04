@@ -3,7 +3,7 @@ manager for economy
 """
 import economy.classes as classes
 import utils
-import game_functions
+import game_utils
 
 
 class EconomyManager:
@@ -110,7 +110,7 @@ class EconomyManager:
     commands = {
         "leaderboard": leaderboard,
         "shop": shop,
-        "profile": game_functions.profile
+        "profile": game_utils.profile
     }
     help_text = utils.join_items(
         ("informational", *commands, "help"),

@@ -60,10 +60,6 @@ class Stats:
             self.lifetime_balance += new_balance - self._balance
         self._balance = new_balance
 
-    @balance.deleter
-    def balance(self):
-        del self._balance
-
     @property
     def lifetime_balance(self):
         return self._lifetime_balance
@@ -74,10 +70,6 @@ class Stats:
             new_balance, self._lifetime_balance,
             new_balance > self._lifetime_balance
         )
-
-    @lifetime_balance.deleter
-    def lifetime_balance(self):
-        del self._lifetime_balance
 
     @property
     def health(self):
@@ -93,10 +85,6 @@ class Stats:
         self._health = round(new_health, 1)
         self._health = utils.clamp(self._health, 0, self.max_health)
 
-    @health.deleter
-    def health(self):
-        del self._health
-
     @property
     def max_health(self):
         return self._max_health
@@ -107,10 +95,6 @@ class Stats:
         self.health += new_max_health - self._max_health
         self._max_health = int(utils.default(
             new_max_health, 0, new_max_health > 0))
-
-    @max_health.deleter
-    def max_health(self):
-        del self._max_health
 
     @property
     def mana(self):
@@ -126,10 +110,6 @@ class Stats:
         self._mana = round(new_mana, 1)
         self._mana = utils.clamp(self._mana, 0, self.max_mana)
 
-    @mana.deleter
-    def mana(self):
-        del self._mana
-
     @property
     def max_mana(self):
         return self._max_mana
@@ -139,10 +119,6 @@ class Stats:
         """changes player health"""
         self.mana += new_max_mana - self._max_mana
         self._max_mana = int(utils.default(new_max_mana, 0, new_max_mana > 0))
-
-    @max_mana.deleter
-    def max_mana(self):
-        del self._max_mana
 
     @property
     def exp(self):
@@ -164,10 +140,6 @@ class Stats:
             return f"You are now level {self.level}!"
 
         return ""
-
-    @exp.deleter
-    def exp(self):
-        del self._exp
 
     def generate_from_level(self, level):
         """generates stats from level"""

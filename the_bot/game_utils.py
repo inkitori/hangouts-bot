@@ -4,7 +4,7 @@ functions shared between games that don't fit in utils
 import utils
 import math
 
-hangouts_char_limit = 2000
+HANGOUTS_CHAR_LIMIT = 2000
 
 
 def profile(self, player, commands):
@@ -49,12 +49,17 @@ def profile(self, player, commands):
     return output_text
 
 
-def get_possible_players(players, player_name, running_player=None):
+def get_players(players, player_name, running_player=None, single=False):
     possible_players = []
     for possible_player in players.values():
-        if player_name in possible_player.name:
+        if (
+            (not single and player_name in possible_player.name)
+            or (single and player_name == possible_player.name)
+        ):
             possible_players.append(possible_player)
+
     if player_name.isdigit() and int(player_name) in players:
         possible_players.append(players[int(player_name)])
     elif player_name == "self" and running_player:
         possible_players.append(running_player)
+    return utils.default(possible_players[0], possible_players, single)

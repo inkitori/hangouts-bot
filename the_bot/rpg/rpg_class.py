@@ -3,7 +3,7 @@ import rpg.player_class as player_class
 import rpg.inventory_class as inventory_class
 import rpg.classes as classes
 import utils
-import game_functions
+import game_utils
 
 
 class RPG:
@@ -40,7 +40,7 @@ class RPG:
             output_text = self.register(player_id, commands)
         elif command == "help":
             output_text = utils.join_items(
-                ("player_class.Inventory", *inventory_class.Inventory.commands),
+                ("inventory", *inventory_class.Inventory.commands),
                 ("player", "register", "profile", *player_class.Player.commands),
                 ("other", "help"),
                 ("combat", *player_class.Player.fight_commands),
@@ -48,7 +48,7 @@ class RPG:
                 description_mode="long"
             )
         elif command == "profile":
-            output_text = game_functions.profile(self, player, commands)
+            output_text = game_utils.profile(self, player, commands)
 
         elif command in inventory_class.Inventory.commands:
             output_text = inventory_class.Inventory.commands[command](
@@ -62,7 +62,9 @@ class RPG:
                 player_class.Player.fight_commands[command], commands
             )
         elif command in player_class.Player.party_commands:
-            output_text = player_class.Player.party_commands[command](player, commands)
+            output_text = player_class.Player.party_commands[command](
+                player, commands
+            )
         else:
             output_text = "invalid command for rpg"
 

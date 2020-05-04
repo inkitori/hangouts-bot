@@ -108,14 +108,15 @@ class TestBot:
                 "move", "scores", "reserved",
             ),
             "rpg": (
-                "register testbot", "profile",
+                "register qwerty", "profile",
                 "add starter armor", "add starter weapon",
                 "equip boring starter weapon", "equip boring starter armor",
-                "inventory",
+                "inventory", "set auto_join_party false",
                 "unequip boring starter armor", "remove boring starter armor",
                 "warp village", "rest", "warp potatoland",
                 "attack", "attack", "attack", "attack", "attack",
-                "heal",
+                "heal", "join ether", "parties", "leave", "join qwerty", "kick qwerty",
+                "accept ether", "decline testbot"
             ),
         }
 

@@ -68,7 +68,7 @@ class Inventory:
             return "you do not have that item"
 
         item = self.items[full_item]
-        if (full_item in self.equipped and item.count == 1):
+        if full_item in self.equipped.values() and item.count == 1:
             return "you must unequip that item first"
 
         item.count -= 1
