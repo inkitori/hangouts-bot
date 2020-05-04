@@ -41,7 +41,7 @@ data_args.add_argument(
 )
 data_args.add_argument(
     "-w", "--wipe-data", dest="wipe", default=None,
-    choices=["rpg", "economy", "2048"],
+    choices=["rpg", "eco", "2048"],
     help="wipes a game's data from save_data",
 )
 data_args.add_argument(

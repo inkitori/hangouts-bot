@@ -1,9 +1,11 @@
-import utils
-import random
 import math
+import random
+import string
+
+import game_utils
 import rpg.classes as classes
 import rpg.inventory_class as inventory_class
-import game_utils
+import utils
 
 
 class Player:
@@ -35,29 +37,32 @@ class Player:
 
     def warp(self, commands):
         """warps to rooms"""
-        output_text = ""
         rooms = classes.rooms
         room = next(commands)
+        party = parties[self.party_name]
+
         if not room:
-            output_text = "Invalid argument! use warp {room}"
-        elif parties[self.party_name].fighting:
-            output_text = "You can't warp while in a fight!"
+            return "Invalid argument! use warp {room}"
+        elif party.fighting:
+            return "You can't warp while in a fight!"
+
+        elif self.name != party.host_name:
+            return "only the host of a party can warp"
 
         elif room not in rooms:
-            output_text = "That room doesn't exist!"
+            return "That room doesn't exist!"
 
         elif room == self.room:
-            output_text = "You are already in that room!"
-        else:
-            self.room = room
-            output_text = "Successfully warped!"
-        return output_text
+            return "You are already in that room!"
+
+        self.room = room
+        return "Successfully warped!"
 
     def rest(self, commands):
         """rests player"""
         if classes.rooms[self.room].can_rest:
             self.stats.health = "full"
-            # TODO: change mana to max
+            self.stats.mana = "full"
             text = utils.join_items(
                 "You feel well rested...",
                 f"Your health is back up to {self.stats.health}!",
@@ -149,6 +154,7 @@ class Player:
     def set_(self, commands):
         arg = next(commands)
         value = next(commands)
+        error_template = string.Template("invalid value $value for $type arg $arg, use $valid")
 
         # input validation
         if arg not in self.options:
@@ -158,22 +164,22 @@ class Player:
         elif not value:
             return "you must provide a value"
 
-        elif isinstance(self.options[arg], bool):
-            value = value[0]
-            if value in ("t", "y"):
+        if isinstance(self.options[arg], bool):
+            if value.startswith("t"):
                 self.options[arg] = True
 
-            elif value in ("f", "n"):
+            elif value.startswith("f"):
                 self.options[arg] = False
             else:
-                # TODO make this error a template
-                return f"invalid value {value} for boolean arg {arg}, use true/false"
+                return error_template.substitute(value=value, type="bool", arg=arg, valid="t/f")
 
         elif isinstance(self.options[arg], int):
             if value.isdigit():
                 self.options[arg] = int(value)
             else:
-                return f"invalid value {value} for integer arg {arg}, use an integer"
+                return error_template.substitute(
+                    value=value, type="integer", arg=arg, valid="a whole number"
+                )
 
         return f"Successfully set {arg} to {self.options[arg]}"
 
@@ -193,7 +199,7 @@ class Player:
         elif party_name == self.party_name:
             return "you are already in that party"
         party = parties.get(party_name, None)
-        if not party:
+        if party is None:
             return "that party does not exist"
 
         host = game_utils.get_players(players, party.host_name, single=True)
@@ -204,7 +210,7 @@ class Player:
             self.party_name = party_name
             output_text += (
                 f"joined party {self.party_name} with players"
-                f" {utils.join_items(*party.player_names, separator=', ')}"
+                f" {utils.join_items(*party.all_players(), separator=', ')}"
             )
             party.player_names.append(self.name)
         else:
@@ -221,13 +227,13 @@ class Player:
         """removes a player"""
         party = parties[self.party_name]
         if party.host_name == self.name:
-            if len(party.player_names) > 1:
+            if party:
                 return "hosts cannot leave their party while their party has other members"
             elif not joining:
                 return "theres no one but you, why would you leave?"
 
         party.player_names.remove(self.name)
-        if not party.player_names:
+        if not party:
             del parties[self.name]
         if not joining:
             self.party_name = Party(self.name).name()
@@ -282,10 +288,10 @@ class Player:
     def parties(self, commands):
         return utils.join_items(
             *[
-                [party_name] + party.player_names
+                [party_name] + party.all_players()
                 for party_name, party in parties.items()
             ],
-            description_mode="short",
+            description_mode="long",
         )
 
     commands = {
@@ -315,7 +321,7 @@ class Party:
     def __init__(self, host_name, *player_names):
         parties[host_name] = self
         self.host_name = host_name
-        self.player_names = list(player_names) + [host_name]
+        self.player_names = list(player_names)
         self.fighting = {}
         self.doing_stuff = None
         self.counter = 0
@@ -324,6 +330,12 @@ class Party:
 
     def name(self):
         return utils.get_key(parties, self)
+
+    def all_players(self):
+        return self.player_names + [self.host_name]
+
+    def __bool__(self):
+        return bool(self.player_names)
 
     def killed_enemy(self, enemy, player):
         """changes stuff based on enemy"""
@@ -370,7 +382,7 @@ class Party:
             output_text += self.fighting[self.doing_stuff].attack(
                 random.choice([
                     player for player in players.values()
-                    if player.name in self.player_names
+                    if player.name in self.all_players()
                 ])
             )
             self.doing_stuff = None
@@ -380,10 +392,10 @@ class Party:
         if not self.doing_stuff:
             while not self.action_queue:
                 self.counter += 1
-                for name in self.player_names + list(self.fighting):
+                for name in self.all_players() + list(self.fighting):
                     if name in self.fighting:
                         speed = self.fighting[name].stats.speed
-                    elif name in self.player_names:
+                    elif name in self.all_players():
                         speed = game_utils.get_players(
                             players, name, single=True).stats.speed
                     if self.counter % speed == 0:

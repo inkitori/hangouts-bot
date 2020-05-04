@@ -23,7 +23,7 @@ class Handler:
     game_managers = {
         "2048": Manager2048(),
         "rpg": RPGManager(load_sheets=False),
-        "economy": EconomyManager(),
+        "eco": EconomyManager(),
     }
     image_folder = "the_bot/images/"
     images = {
@@ -91,12 +91,7 @@ class Handler:
 
     async def id_(self, bot, user, conv):
         """get the id of a user"""
-        try:
-            output_text = user.id_[0]
-        except Exception:
-            # not sure why this ould happen, but just in case
-            output_text = "Could not get id"
-        return output_text
+        return user.id_[0]
 
     def play_game(self, user_id, game_name, commands):
         """plays a game"""

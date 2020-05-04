@@ -95,7 +95,7 @@ class TestBot:
         self.handler = Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
         self.commands = {
-            "economy": (
+            "eco": (
                 "register testbot",
                 "leaderboard", "shop", "profile",
                 "mine", "mine", "mine", "mine",

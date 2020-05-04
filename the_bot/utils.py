@@ -10,6 +10,16 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+# TODO: make data_keys frpm managers, insteadof cpoying names
+# TODO: get data_keys.keys() in config -wipe-data for choices instead of copying literals
+# TODO: get default values from managers insteadd og  hardcoding here
+data_keys = {
+    "eco": {"economy_players": {}},
+    "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
+    "rpg": {"rpg_players": {}, "rpg_parties": {}}
+}
+save_file_name = "save_data"
+
 
 # hangouts
 def to_seg(text):
@@ -22,24 +32,6 @@ def get_user_and_conv(conversations, event):
     conv = conversations.get(event.conversation_id)
     user = conv.get_user(event.user_id)
     return user, conv
-
-
-def cooldown(cooldowns, user, event, cooldown):
-    """checks cooldown for a command and user"""
-    # TODO: either delete (this is unused) or clean up
-    text = clean(event.text)
-    command = get_item(text)
-    stripped_time = event.timestamp.replace(tzinfo=None)
-    cooldown_time = cooldowns[user][command]
-
-    if user in cooldowns and command in cooldowns[user]:
-        if (stripped_time - cooldown_time).seconds < cooldown:
-            return cooldown - (stripped_time - cooldown_time).seconds
-        else:
-            cooldown_time = stripped_time
-    else:
-        cooldown_time = stripped_time
-    cooldowns[user][command] = cooldown_time
 
 
 def user_in(user_list, user):
@@ -123,24 +115,10 @@ def description(name, *description, mode="short", end="\n", newlines=1):
 
 
 # save and load data
-save_file_name = "save_data"
-
-
 def wipe_data(game):
     """wipes data from save_data"""
-    # TODO: make data_keys frpm managers, insteadof cpoying names
-    # TODO: get data_keys.keys() in config -wipe-data for choices instead of copying literals
-    # TODO: option to wipe all data
-    # TODO: option to wipe some data (wipe 2048 games, but not 2048 high scores)
-    # TODO: get default values from managers insteadd og  hardcoding here
-    # TODO: option to wipe and log some data (only inventories)
     if not game:
         return
-    data_keys = {
-        "economy": {"economy_players": {}},
-        "2048": {"games_2048": {"current game": None}, "scores_2048": {}},
-        "rpg": {"rpg_players": {}, "rpg_parties": {}}
-    }
     save(**data_keys[game])
 
 
@@ -190,7 +168,7 @@ def trim(text, number=1, default=[""]):
 def command_parser(command_text):
     """
     returns a generator of commands
-    retunrs empty string if there are no more commands
+    generator yields empty string if there are no more commands
     """
     commands = clean(command_text)
     current_index = 0

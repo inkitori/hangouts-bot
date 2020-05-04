@@ -1,8 +1,9 @@
 """
 inventory
 """
-import rpg.classes as classes
 import copy
+
+import rpg.classes as classes
 import utils
 
 
@@ -143,7 +144,7 @@ class Inventory:
         """returns string representation of inventory"""
         if not self.items:
             return "you dont have anything in your inventory"
-        inventory_text = f""  # TODO: print # of full slots
+        inventory_text = utils.newline(f"{sum([item.count for item in self.items.values()])} slots full")
         inventory_text += utils.join_items(
             ("inventory", *[
                 f"{item.get_description()} x{item.count}"
