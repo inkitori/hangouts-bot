@@ -235,8 +235,8 @@ class Player:
                 return "theres no one but you, why would you leave?"
         else:
             party.player_names.remove(self.name)
-        if not party:
-            del parties[self.name]
+        # if not party:
+            # del parties[self.name] # i'm pretty sure this only applies if the party host is leaving
         if not joining:
             self.party_name = Party(self.name).name()
         return utils.newline(f"left party")
