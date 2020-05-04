@@ -130,7 +130,7 @@ class Player:
                 return party.fight(commands)
         if self.name != party.doing_stuff:
             party.fight()
-            return f"it is {party.doing_stuff}'s turn"
+            return f"it is {party.doing_stuff}'s turn (not urs)" 
         output_text = action(self, commands, party.get_enemy())
         party.doing_stuff = None
         if party.fighting:
@@ -235,8 +235,8 @@ class Player:
                 return "theres no one but you, why would you leave?"
         else:
             party.player_names.remove(self.name)
-        if not party:
-            del parties[self.name]
+        # if not party:
+            # del parties[self.name] # i'm pretty sure this only applies if the party host is leaving
         if not joining:
             self.party_name = Party(self.name).name()
         return utils.newline(f"left party")
