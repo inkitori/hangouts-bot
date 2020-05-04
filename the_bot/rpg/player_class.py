@@ -300,7 +300,6 @@ class Player:
         "rest": rest,
         "warp": warp,
         "set": set_,
-        # TODO: flee command to leave a fight (penalty for fleeing?)
     }
     fight_commands = {
         "attack": attack,
@@ -361,7 +360,6 @@ class Party:
         return text
 
     def get_enemy(self):
-        # TODO: let player pick enemy to attack
         return random.choice(list(self.fighting.values()))
 
     def fight(self, *args):

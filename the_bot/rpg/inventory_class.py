@@ -43,7 +43,6 @@ class Inventory:
         if sum([item.count for item in self.items.values()]) >= self.max_items:
             return "your inventory is full, remove something first"
 
-        # TODO: this still lets the player add anything if they know the name
         item = classes.all_items[item_name]
         if item.full_name() in self.items:
             self.items[item.full_name()].count += 1
@@ -171,7 +170,6 @@ class Inventory:
     def modifers(self):
         modifier_attack = 0
         modifier_defense = 0
-        # TODO: make this a loop later
         weapon = self.get_equipped(classes.ItemType.WEAPON)[1]
         armor = self.get_equipped(classes.ItemType.ARMOR)[1]
         if weapon:
@@ -183,11 +181,9 @@ class Inventory:
         return classes.Stats(attack=modifier_attack, defense=modifier_defense)
 
     commands = {
-        # TODO: dont let player add anything to inventory
         "add": add,
         "remove": remove,
         "equip": equip,
         "unequip": unequip,
         "inventory": print_inventory,
-        # TODO: details {item_name} command to view stats of an item
     }

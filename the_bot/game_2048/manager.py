@@ -89,7 +89,6 @@ class Manager2048:
 
     def run_game(self, user, commands):
         """runs the game based on commands"""
-        # TODO: clean this mess up
         output_text = ""
         command = next(commands)
         play_game_name = ""

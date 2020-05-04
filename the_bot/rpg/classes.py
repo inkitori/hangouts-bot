@@ -255,8 +255,6 @@ class Room:
         # trying to figure out how to get parites to work, just leave this alone
         pass
 
-    # TODO: do something with bosses
-
 
 @enum.unique
 class Rarity(enum.IntEnum):

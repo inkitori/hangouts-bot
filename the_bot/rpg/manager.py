@@ -54,7 +54,6 @@ class RPGManager:
             function_(fields, game_data)
 
     def load_rooms(self, fields, room_data):
-        # TODO: don't hardcode column order
         rpg_class.RPG.rooms.update({
             name: classes.Room(
                 can_rest=utils.default(can_rest, False), level=int(level),

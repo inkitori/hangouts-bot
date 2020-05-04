@@ -10,9 +10,6 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-# TODO: make data_keys frpm managers, insteadof cpoying names
-# TODO: get data_keys.keys() in config -wipe-data for choices instead of copying literals
-# TODO: get default values from managers insteadd og  hardcoding here
 data_keys = {
     "eco": {"economy_players": {}},
     "2048": {"games_2048": {"current game": None}, "scores_2048": {}},

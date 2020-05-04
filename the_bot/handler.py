@@ -66,7 +66,6 @@ class Handler:
             if self.console:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
-                # TODO: add cooldowns
                 output_text = await self.commands[command](self, bot, user, conv, commands)
 
         elif command in self.game_managers:
