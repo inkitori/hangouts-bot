@@ -9,6 +9,7 @@ import math
 
 class Stats:
     """class for stats"""
+    MAX_SPEED = 10
 
     def __init__(
         self, *, generate_stats=False,
@@ -34,7 +35,7 @@ class Stats:
         self._exp = exp if not exp else int(exp)
         self.attack = attack if not attack else int(attack)
         self.defense = defense if not defense else int(defense)
-        self.speed = speed if not speed else int(speed)
+        self._speed = speed if not speed else int(speed)
 
     def __add__(self, stat_2):
         added_stats = {}
@@ -46,7 +47,8 @@ class Stats:
             elif val_1 is None or val_2 is None:
                 added_stats[key] = max(val_1, val_2)
             else:
-                added_stats[key] = val_1 + val_2 if isinstance(val_1, int) else bool(val_1 + val_2)
+                added_stats[key] = val_1 + \
+                    val_2 if isinstance(val_1, int) else bool(val_1 + val_2)
 
         return Stats(**added_stats)
 
@@ -141,12 +143,22 @@ class Stats:
 
         return ""
 
+    @property
+    def speed(self):
+        return (self.MAX_SPEED + 1) - self._speed  # so we don't divide by 0
+
+    @speed.setter
+    def speed(self, new_speed):
+        self._speed = self._seed + new_speed
+        if self.speed > self.MAX_SPEED:
+            self._speed = self.MAX_SPEED
+
     def generate_from_level(self, level):
         """generates stats from level"""
         attack = 5 * level ** 1.8
         defense = 5 * level ** 1.5
         health = 100 * level ** 2
-        speed = math.ceil(-(level/2) + 10)
+        speed = math.ceil(level/2)
         return [round(stat) for stat in (attack, defense, health, speed)]
 
     def print_stats(self, modifiers=None, list_=False):
@@ -164,7 +176,7 @@ class Stats:
             for stat_name, stat_value in self.__dict__.items()
             if stat_name not in ("exp", ) and stat_value is not None
         ]
-        if self.level is not None:
+        if self.exp is not None and self.level:
             stats_list += [self.print_level_exp(list_=True)]
         if list_:
             return stats_list
@@ -187,10 +199,14 @@ class Stats:
 class Enemy:
     """represents an enemy"""
 
-    def __init__(self, name, level=1, attack=0, defense=0, health=1):
+    def __init__(
+        self, name,
+        level=1, attack=0, defense=0, health=1,
+        generate_stats=True
+    ):
         self.name = name
         self.stats = Stats(
-            generate_stats=True, level=level,
+            generate_stats=generate_stats, level=level,
             attack=attack, defense=defense, health=health
         )
 

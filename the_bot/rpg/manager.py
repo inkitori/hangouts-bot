@@ -3,10 +3,11 @@ manager for rpg
 """
 import datetime
 import random
-import utils
-import rpg.rpg_class as rpg_class
-import rpg.player_class as player_class
+
 import rpg.classes as classes
+import rpg.player_class as player_class
+import rpg.rpg_class as rpg_class
+import utils
 
 
 class RPGManager:
@@ -39,22 +40,20 @@ class RPGManager:
             self.load_sheets_data()
 
     def load_sheets_data(self):
+        data = {"rooms": self.load_rooms, "items": self.load_items}
         sheets = utils.create_sheets_service().spreadsheets()
         named_ranges = utils.get_named_ranges(
             sheets, spreadsheet_id=self.spreadsheet_id,
-            sheet_name="RPG", included=("items", "enemies", "rooms")
+            sheet_name="RPG", included=data.keys()
         )
-        for function_ in (self.load_items, self.load_rooms):
-            function_(named_ranges, sheets)
+        for range_name, function_ in data.items():
+            fields, *game_data = sheets.values().get(
+                spreadsheetId=self.spreadsheet_id,
+                range=named_ranges[range_name]
+            ).execute().get("values", [])
+            function_(fields, game_data)
 
-    def load_rooms(self, named_ranges, sheets):
-        # TODO: make 1 function for this instead of copying load_items
-        room_data = sheets.values().get(
-            spreadsheetId=self.spreadsheet_id,
-            range=named_ranges["rooms"]
-        ).execute()
-        field_names, *room_data = room_data.get("values", [])
-        # TODO: don't hardcode column order
+    def load_rooms(self, fields, room_data):
         rpg_class.RPG.rooms.update({
             name: classes.Room(
                 can_rest=utils.default(can_rest, False), level=int(level),
@@ -71,17 +70,13 @@ class RPGManager:
             boss_name, boss_attack, boss_defense, drops in room_data
         })
 
-    def load_items(self, named_ranges, sheets):
-        item_data = sheets.values().get(
-            spreadsheetId=self.spreadsheet_id,
-            range=named_ranges["items"]
-        ).execute()
-        field_names, *item_data = item_data.get("values", [])
+    def load_items(self, fields, item_data):
+        """loads items from google sheets"""
         rpg_class.RPG.all_items.update({
             item[0].lower(): classes.Item(
                 **{
                     name: data
-                    for name, data in dict(zip(field_names, item)).items()
+                    for name, data in dict(zip(fields, item)).items()
                     if data
                 }
             ) for item in item_data if item

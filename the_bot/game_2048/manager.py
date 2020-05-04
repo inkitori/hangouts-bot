@@ -89,7 +89,6 @@ class Manager2048:
 
     def run_game(self, user, commands):
         """runs the game based on commands"""
-        # TODO: clean this mess up
         output_text = ""
         command = next(commands)
         play_game_name = ""
@@ -130,7 +129,7 @@ class Manager2048:
                         game_name, game.mode_name, game.score)
                     for game_name, game in self.games.items()
                     if game_name != classes.Keywords.CURRENT_GAME
-                ], 
+                ],
             ), "there are no games"), 2)
 
         elif command in self.help_texts:

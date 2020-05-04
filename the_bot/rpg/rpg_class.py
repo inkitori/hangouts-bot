@@ -1,9 +1,9 @@
 
-import rpg.player_class as player_class
-import rpg.inventory_class as inventory_class
-import rpg.classes as classes
-import utils
 import game_utils
+import rpg.classes as classes
+import rpg.inventory_class as inventory_class
+import rpg.player_class as player_class
+import utils
 
 
 class RPG:
@@ -27,6 +27,8 @@ class RPG:
             return "you must provide a name"
         elif name in [player.name for player in self.players.values()]:
             return "that name is taken by a player"
+        elif name.isdigit():
+            return "names cannot be numbers"
 
         self.players[player_id] = player_class.Player(name=name)
         return "Successfully registered!"
