@@ -126,16 +126,6 @@ class Stats:
     def exp(self):
         return self._exp
 
-    @property
-    def speed(self):
-        return (self.MAX_SPEED + 1) - self._speed  # so we don't divide by 0
-
-    @speed.setter
-    def speed(self, new_speed):
-        self._speed = self._seed + new_speed
-        if self.speed > self.MAX_SPEED:
-            self._speed = self.MAX_SPEED
-
     @exp.setter
     def exp(self, new_exp):
         """increases exp"""
@@ -152,6 +142,16 @@ class Stats:
             return f"You are now level {self.level}!"
 
         return ""
+
+    @property
+    def speed(self):
+        return (self.MAX_SPEED + 1) - self._speed  # so we don't divide by 0
+
+    @speed.setter
+    def speed(self, new_speed):
+        self._speed = self._seed + new_speed
+        if self.speed > self.MAX_SPEED:
+            self._speed = self.MAX_SPEED
 
     def generate_from_level(self, level):
         """generates stats from level"""
@@ -176,7 +176,7 @@ class Stats:
             for stat_name, stat_value in self.__dict__.items()
             if stat_name not in ("exp", ) and stat_value is not None
         ]
-        if self.level is not None:
+        if self.exp is not None and self.level:
             stats_list += [self.print_level_exp(list_=True)]
         if list_:
             return stats_list

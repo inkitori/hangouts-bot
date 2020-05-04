@@ -44,6 +44,7 @@ class Player:
         if not room:
             return "Invalid argument! use warp {room}"
         elif party.fighting:
+            print(party.fighting)
             return "You can't warp while in a fight!"
 
         elif self.name != party.host_name:
@@ -132,7 +133,8 @@ class Player:
             return f"it is {party.doing_stuff}'s turn"
         output_text = action(self, commands, party.get_enemy())
         party.doing_stuff = None
-        party.fight()
+        if party.fighting:
+            party.fight()
 
         return output_text
 
@@ -352,7 +354,8 @@ class Party:
         del self.fighting[enemy.name]
 
         if not self.fighting:
-            text += "enemies defeated (placeholder)"
+            text += "enemies defeated"
+            self.fighting = {}
             self.counter = 0
 
         return text
