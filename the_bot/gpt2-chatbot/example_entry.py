@@ -10,8 +10,10 @@ Preprocessing:
     - everything lowercase
 """
 EXAMPLE_ENTRY = {
-    "personality": ["i like to remodel homes .", "i like to go hunting .",
-                    "i like to shoot a bow .", "my favorite holiday is halloween ."],
+    "personality": [
+        "i like to remodel homes .", "i like to go hunting .",
+        "i like to shoot a bow .", "my favorite holiday is halloween ."
+    ],
     "utterances": [
         {"candidates": [
             "my mom was single with 3 boys , so we never left the projects .",
@@ -38,32 +40,34 @@ EXAMPLE_ENTRY = {
             "hi , how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape .",
         ]
         },
-        {"candidates": ["hello i am doing well how are you ?",
-                        "ll something like that . do you play games ?",
-                        "does anything give you relief ? i hate taking medicine "
-                        "for mine .",
-                        "i decorate cakes at a local bakery ! and you ?",
-                        "do you eat lots of meat",
-                        "i am so weird that i like to collect people and cats",
-                        "how are your typing skills ?",
-                        "yeah . i am headed to the gym in a bit to weight lift .",
-                        "yeah you have plenty of time",
-                        "metal is my favorite , but i can accept that people "
-                        "listen to country . haha",
-                        "that's why you desire to be controlled . let me control "
-                        "you person one .",
-                        "two dogs they are the best , how about you ?",
-                        "you do art ? what kind of art do you do ?",
-                        "i love watching baseball outdoors on sunny days .",
-                        "oh i see . do you ever think about moving ? i do , "
-                        "it is what i want .",
-                        "sure . i wish it were winter . the sun really hurts my "
-                        "blue eyes .",
-                        "are we pretending to play tennis",
-                        "i am rich and have all of my dreams fulfilled already",
-                        "they tire me so , i probably sleep about 10 hrs a day "
-                        "because of them .",
-                        "i also remodel homes when i am not out bow hunting ."],
+        {"candidates": [
+            "hello i am doing well how are you ?",
+            "ll something like that . do you play games ?",
+            "does anything give you relief ? i hate taking medicine "
+            "for mine .",
+            "i decorate cakes at a local bakery ! and you ?",
+            "do you eat lots of meat",
+            "i am so weird that i like to collect people and cats",
+            "how are your typing skills ?",
+            "yeah . i am headed to the gym in a bit to weight lift .",
+            "yeah you have plenty of time",
+            "metal is my favorite , but i can accept that people "
+            "listen to country . haha",
+            "that's why you desire to be controlled . let me control "
+            "you person one .",
+            "two dogs they are the best , how about you ?",
+            "you do art ? what kind of art do you do ?",
+            "i love watching baseball outdoors on sunny days .",
+            "oh i see . do you ever think about moving ? i do , "
+            "it is what i want .",
+            "sure . i wish it were winter . the sun really hurts my "
+            "blue eyes .",
+            "are we pretending to play tennis",
+            "i am rich and have all of my dreams fulfilled already",
+            "they tire me so , i probably sleep about 10 hrs a day "
+            "because of them .",
+            "i also remodel homes when i am not out bow hunting ."
+        ],
          "history": [
             "hi , how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape .",
              "you must be very fast . hunting is one of my favorite hobbies .",

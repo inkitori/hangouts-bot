@@ -15,7 +15,10 @@ class TestSpecialTokenTreatment(unittest.TestCase):
         shutil.rmtree(self.save_dir)
 
     def test_special_tokens_checkpoint_behavior(self):
-        toks = [OpenAIGPTTokenizer.from_pretrained('openai-gpt'), GPT2Tokenizer.from_pretrained('gpt2')]
+        toks = [
+            OpenAIGPTTokenizer.from_pretrained('openai-gpt'),
+            GPT2Tokenizer.from_pretrained('gpt2')
+        ]
         for tok in toks:
             self.assertEqual(len(tok.added_tokens_encoder), 0)
             tok.add_special_tokens(ATTR_TO_SPECIAL_TOKEN)

@@ -3,18 +3,22 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 import random
+import warnings
 from argparse import ArgumentParser
 from itertools import chain
-from pprint import pformat
 
 import torch
 import torch.nn.functional as F
+from train import (
+    SPECIAL_TOKENS, add_special_tokens_,
+    build_input_from_segments
+)
+from transformers import (
+    GPT2LMHeadModel, GPT2Tokenizer, OpenAIGPTLMHeadModel,
+    OpenAIGPTTokenizer
+)
+from utils import download_pretrained_model, get_dataset
 
-from transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, GPT2LMHeadModel, GPT2Tokenizer
-from train import SPECIAL_TOKENS, build_input_from_segments, add_special_tokens_
-from utils import get_dataset, download_pretrained_model
-
-import warnings
 warnings.filterwarnings("ignore")
 
 
@@ -38,7 +42,10 @@ class Bot:
         self.history = []
         self.run()
 
-    def top_filtering(self, logits, top_k=0., top_p=0.9, threshold=-float('Inf'), filter_value=-float('Inf')):
+    def top_filtering(
+        self, logits, top_k=0., top_p=0.9,
+        threshold=-float('Inf'), filter_value=-float('Inf')
+    ):
         """
         Filter a distribution of logits using top-k, top-p (nucleus) and/or threshold filtering
 
@@ -47,11 +54,12 @@ class Bot:
             top_k: <=0: no filtering, >0: keep only top k tokens with highest probability.
             top_p: <=0.0: no filtering, >0.0: keep only a subset S of candidates, where S is the smallest subset
                 whose total probability mass is greater than or equal to the threshold top_p.
-                In practice, we select the highest probability tokens whose cumulative probability mass exceeds
-                the threshold top_p.
+                In practice, we select the highest probability tokens
+                whose cumulative probability mass exceeds the threshold top_p.
         threshold: a minimal threshold to keep logits
         """
-        assert logits.dim() == 1  # Only work for batch size 1 for now - could update but it would obfuscate a bit the code
+        # Only work for batch size 1 for now - could update but it would obfuscate a bit the code
+        assert logits.dim() == 1
         top_k = min(top_k, logits.size(-1))
         if top_k > 0:
             # Remove all tokens with a probability less than the last token in the top-k tokens
@@ -68,8 +76,9 @@ class Bot:
             # Remove tokens with cumulative probability above the threshold
             sorted_indices_to_remove = cumulative_probabilities > top_p
             # Shift the indices to the right to keep also the first token above the threshold
-            sorted_indices_to_remove[...,
-                                     1:] = sorted_indices_to_remove[..., :-1].clone()
+            sorted_indices_to_remove[..., 1:] = (
+                sorted_indices_to_remove[..., :-1].clone()
+            )
             sorted_indices_to_remove[..., 0] = 0
 
             # Back to unsorted indices and set them to -infinity
@@ -207,13 +216,13 @@ class Bot:
         ]
         self.personality = random.choice(personalities)
 
-        self.perStr = self.tokenizer.decode(chain(*self.personality))
-        self.perStr = self.perStr.split(". ")
-        for i in range(len(self.perStr)):
-            self.perStr[i] = self.perStr[i][0].upper() + \
-                self.perStr[i][1:] + "."
-        self.perStr = "\n".join(self.perStr).replace("..", ".")
-        print("/nSelected personality:", self.perStr)
+        self.per_str = self.tokenizer.decode(chain(*self.personality))
+        self.per_str = self.per_str.split(". ")
+        for i in range(len(self.per_str)):
+            self.per_str[i] = self.per_str[i][0].upper() + \
+                self.per_str[i][1:] + "."
+        self.per_str = "\n".join(self.per_str).replace("..", ".")
+        print("/nSelected personality:", self.per_str)
 
     def get_response(self, raw_text):
         """

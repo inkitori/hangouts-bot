@@ -15,9 +15,6 @@ from transformers import cached_path
 PERSONACHAT_URL = "https://s3.amazonaws.com/datasets.huggingface.co/personachat/personachat_self_original.json"
 HF_FINETUNED_MODEL = "https://s3.amazonaws.com/models.huggingface.co/transfer-learning-chatbot/gpt_personachat_cache.tar.gz"
 
-# logging.basicConfig(level = logging.ERROR)
-# logger = logging.getLogger(__file__)
-
 
 def download_pretrained_model():
     """ Download and extract finetuned model from S3 """

@@ -1,5 +1,7 @@
 # Copyright (c) 2019-present, HuggingFace Inc.
-# All rights reserved. This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.
+# All rights reserved.
+# This source code is licensed under the BSD-style license
+# found in the LICENSE file in the root directory of this source tree.
 import os
 import math
 from pprint import pformat
@@ -10,6 +12,7 @@ from itertools import chain
 import torch
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader, TensorDataset
+
 from ignite.engine import Engine, Events
 from ignite.handlers import ModelCheckpoint
 from ignite.metrics import Accuracy, Loss, MetricsLambda, RunningAverage
@@ -38,7 +41,10 @@ logger = logging.getLogger(__file__)
 
 
 def average_distributed_scalar(scalar, args):
-    """ Average a scalar over the nodes if we are in distributed training. We use this for distributed evaluation. """
+    """
+    Average a scalar over the nodes if we are in distributed training.
+    We use this for distributed evaluation.
+    """
     if args.local_rank == -1:
         return scalar
     scalar_t = torch.tensor(scalar, dtype=torch.float,
@@ -48,11 +54,17 @@ def average_distributed_scalar(scalar, args):
 
 
 def pad_dataset(dataset, padding=0):
-    """ Pad the dataset. This could be optimized by defining a Dataset class and padding at the batch level, but this is simpler. """
+    """
+    Pad the dataset.
+    This could be optimized by defining a Dataset class
+    and padding at the batch level, but this is simpler.
+    """
     max_l = max(len(x) for x in dataset["input_ids"])
     for name in PADDED_INPUTS:
-        dataset[name] = [x + [padding if name != "lm_labels" else -100]
-                         * (max_l - len(x)) for x in dataset[name]]
+        dataset[name] = [
+            x + [padding if name != "lm_labels" else -100]
+            * (max_l - len(x)) for x in dataset[name]
+        ]
     return dataset
 
 
@@ -72,17 +84,23 @@ def build_input_from_segments(persona, history, reply, tokenizer, lm_labels=Fals
         SPECIAL_TOKENS[:-1])
     sequence = [[bos] + list(chain(*persona))] + \
         history + [reply + ([eos] if with_eos else [])]
-    sequence = [sequence[0]] + [[speaker2 if (len(sequence)-i) %
-                                 2 else speaker1] + s for i, s in enumerate(sequence[1:])]
+    sequence = [sequence[0]] + [
+        [speaker2 if (len(sequence)-i) % 2 else speaker1] + s
+        for i, s in enumerate(sequence[1:])
+    ]
     instance = {}
     instance["input_ids"] = list(chain(*sequence))
-    instance["token_type_ids"] = [speaker2 if i %
-                                  2 else speaker1 for i, s in enumerate(sequence) for _ in s]
+    instance["token_type_ids"] = [
+        speaker2 if i % 2 else speaker1
+        for i, s in enumerate(sequence) for _ in s
+    ]
     instance["mc_token_ids"] = len(instance["input_ids"]) - 1
     instance["lm_labels"] = [-100] * len(instance["input_ids"])
     if lm_labels:
-        instance["lm_labels"] = ([-100] * sum(len(s)
-                                              for s in sequence[:-1])) + [-100] + sequence[-1][1:]
+        instance["lm_labels"] = (
+            ([-100] * sum(len(s) for s in sequence[:-1]))
+            + [-100] + sequence[-1][1:]
+        )
     return instance
 
 
@@ -133,20 +151,20 @@ def get_data_loaders(args, tokenizer):
         train_dataset) if args.distributed else None
     valid_sampler = torch.utils.data.distributed.DistributedSampler(
         valid_dataset) if args.distributed else None
-    train_loader = DataLoader(train_dataset, sampler=train_sampler,
-                              batch_size=args.train_batch_size, shuffle=(not args.distributed))
-    valid_loader = DataLoader(valid_dataset, sampler=valid_sampler,
-                              batch_size=args.valid_batch_size, shuffle=False)
+    train_loader = DataLoader(
+        train_dataset, sampler=train_sampler,
+        batch_size=args.train_batch_size, shuffle=(not args.distributed)
+    )
+    valid_loader = DataLoader(
+        valid_dataset, sampler=valid_sampler,
+        batch_size=args.valid_batch_size, shuffle=False
+    )
 
-    logger.info("Train dataset (Batch, Candidates, Seq length): {}".format(
-        train_dataset.tensors[0].shape))
-    logger.info("Valid dataset (Batch, Candidates, Seq length): {}".format(
-        valid_dataset.tensors[0].shape))
+    logger.info(f"Train dataset (Batch, Candidates, Seq length): {train_dataset.tensors[0].shape}")
+    logger.info(f"Valid dataset (Batch, Candidates, Seq length): {valid_dataset.tensors[0].shape}"
     return train_loader, valid_loader, train_sampler, valid_sampler
 
-
-def train():
-
+def parse_arguments():
     parser = ArgumentParser()
     parser.add_argument("--dataset_path", type=str, default="",
                         help="Path or url of the dataset. If empty download from S3.")
@@ -186,7 +204,12 @@ def train():
                         help="Set to O0, O1, O2 or O3 for fp16 training (see apex documentation)")
     parser.add_argument("--local_rank", type=int, default=-1,
                         help="Local rank for distributed training (-1: not distributed)")
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def train():
+
+    args = parse_arguments()
 
     # logging is set to INFO (resp. WARN) for main (resp. auxiliary) process.
     #  logger.info => log main process only, logger.warning => log all processes
@@ -222,7 +245,8 @@ def train():
     if args.fp16:
         from apex import amp  # Apex is only required if we use fp16 training
         model, optimizer = amp.initialize(
-            model, optimizer, opt_level=args.fp16)
+            model, optimizer, opt_level=args.fp16
+        )
     if args.distributed:
         model = DistributedDataParallel(
             model, device_ids=[args.local_rank], output_device=args.local_rank)
@@ -305,15 +329,24 @@ def train():
 
     # Prepare metrics - note how we compute distributed metrics
     RunningAverage(output_transform=lambda x: x).attach(trainer, "loss")
-    metrics = {"nll": Loss(torch.nn.CrossEntropyLoss(ignore_index=-100), output_transform=lambda x: (x[0][0], x[1][0])),
-               "accuracy": Accuracy(output_transform=lambda x: (x[0][1], x[1][1]))}
-    metrics.update({"average_nll": MetricsLambda(average_distributed_scalar, metrics["nll"], args),
-                    "average_accuracy": MetricsLambda(average_distributed_scalar, metrics["accuracy"], args)})
+    metrics = {
+        "nll": Loss(
+            torch.nn.CrossEntropyLoss(ignore_index=-100),
+            output_transform=lambda x: (x[0][0], x[1][0])
+        ),
+        "accuracy": Accuracy(output_transform=lambda x: (x[0][1], x[1][1]))
+        }
+    metrics.update({
+        "average_nll": MetricsLambda(average_distributed_scalar, metrics["nll"], args),
+        "average_accuracy": MetricsLambda(average_distributed_scalar, metrics["accuracy"], args)
+    })
     metrics["average_ppl"] = MetricsLambda(math.exp, metrics["average_nll"])
     for name, metric in metrics.items():
         metric.attach(evaluator, name)
 
-    # On the main process: add progress bar, tensorboard, checkpoints and save model, configuration and tokenizer before we start to train
+    # On the main process: add progress bar, tensorboard,
+    # checkpoints and save model, configuration and tokenizer
+    # before we start to train
     if args.local_rank in [-1, 0]:
         pbar = ProgressBar(persist=True)
         pbar.attach(trainer, metric_names=["loss"])
@@ -343,7 +376,9 @@ def train():
     # Run the training
     trainer.run(train_loader, max_epochs=args.n_epochs)
 
-    # On the main process: close tensorboard logger and rename the last checkpoint (for easy re-loading with OpenAIGPTModel.from_pretrained method)
+    # On the main process:
+    # close tensorboard logger and rename the last checkpoint
+    # (for easy re-loading with OpenAIGPTModel.from_pretrained method)
     if args.local_rank in [-1, 0] and args.n_epochs > 0:
         # TODO: PR in ignite to have better access to saved file paths (cleaner)
         os.rename(os.path.join(

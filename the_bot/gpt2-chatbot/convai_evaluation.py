@@ -3,25 +3,35 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 import random
-from pprint import pformat
 from collections import defaultdict
 from functools import partial
-from tqdm import trange
 
 import torch
 import torch.nn.functional as F
+from interact import sample_sequence
 from parlai.core.agents import Agent
 from parlai.scripts.eval_model import setup_args as base_setup_args
-from projects.convai2.eval_hits import eval_hits, setup_args as setup_args_hits
-from projects.convai2.eval_f1 import eval_f1, setup_args as setup_args_f1
-from projects.convai2.eval_ppl import eval_ppl, setup_args as setup_args_ppl
-from projects.convai2.build_dict import build_dict
-from transformers import (OpenAIGPTDoubleHeadsModel, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
-                                  GPT2DoubleHeadsModel, GPT2LMHeadModel, GPT2Tokenizer)
 
-from train import build_input_from_segments, pad_dataset, SPECIAL_TOKENS, add_special_tokens_
-from utils import download_pretrained_model, AttrDict
-from interact import sample_sequence
+from projects.convai2.build_dict import build_dict
+from projects.convai2.eval_f1 import eval_f1
+from projects.convai2.eval_f1 import setup_args as setup_args_f1
+from projects.convai2.eval_hits import eval_hits
+from projects.convai2.eval_hits import setup_args as setup_args_hits
+from projects.convai2.eval_ppl import eval_ppl
+from projects.convai2.eval_ppl import setup_args as setup_args_ppl
+
+from tqdm import trange
+from train import (
+    SPECIAL_TOKENS, add_special_tokens_,
+    build_input_from_segments, pad_dataset
+)
+from transformers import (
+    GPT2DoubleHeadsModel, GPT2LMHeadModel, GPT2Tokenizer,
+    OpenAIGPTDoubleHeadsModel, OpenAIGPTLMHeadModel,
+    OpenAIGPTTokenizer
+)
+from utils import AttrDict, download_pretrained_model
+
 
 class TransformerAgent(Agent):
     @staticmethod
@@ -45,10 +55,6 @@ class TransformerAgent(Agent):
 
         args = AttrDict(opt)  # to keep most commands identical to the interact.py script
         self.args = args
-
-        # logging.basicConfig(level = logging.ERROR)
-        # self.logger = logging.getLogger(__file__)
-        # self.logger.info(pformat(args))
 
         random.seed(args.seed)
         torch.random.manual_seed(args.seed)
