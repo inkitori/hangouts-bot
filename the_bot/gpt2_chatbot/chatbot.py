@@ -17,19 +17,9 @@ from transformers import (
     GPT2LMHeadModel, GPT2Tokenizer, OpenAIGPTLMHeadModel,
     OpenAIGPTTokenizer
 )
-from utils import download_pretrained_model, get_dataset
+from bot_utils import download_pretrained_model, get_dataset
 
 warnings.filterwarnings("ignore")
-
-
-class DevNull:
-    def __init__(self):
-        return
-
-    def write(self, text):
-        return
-
-# sys.stderr = DevNull()
 
 
 class Bot:
@@ -44,7 +34,7 @@ class Bot:
 
     def top_filtering(
         self, logits, top_k=0., top_p=0.9,
-        threshold=-float('Inf'), filter_value=-float('Inf')
+        threshold=-float("Inf"), filter_value=-float("Inf")
     ):
         """
         Filter a distribution of logits using top-k, top-p (nucleus) and/or threshold filtering
@@ -100,9 +90,11 @@ class Bot:
                 personality, history, current_output, tokenizer, with_eos=False)
 
             input_ids = torch.tensor(
-                instance["input_ids"], device=args.device).unsqueeze(0)
+                instance["input_ids"], device=args.device
+            ).unsqueeze(0)
             token_type_ids = torch.tensor(
-                instance["token_type_ids"], device=args.device).unsqueeze(0)
+                instance["token_type_ids"], device=args.device
+            ).unsqueeze(0)
 
             logits = model(input_ids, token_type_ids=token_type_ids)
             if isinstance(logits, tuple):  # for gpt2 and maybe others
@@ -112,8 +104,10 @@ class Bot:
                 logits, top_k=args.top_k, top_p=args.top_p)
             probs = F.softmax(logits, dim=-1)
 
-            prev = torch.topk(probs, 1)[
-                1] if args.no_sample else torch.multinomial(probs, 1)
+            prev = (
+                torch.topk(probs, 1)[1] if args.no_sample
+                else torch.multinomial(probs, 1)
+            )
             if i < args.min_length and prev.item() in special_tokens_ids:
                 while prev.item() in special_tokens_ids:
                     if probs.max().item() == 1:
@@ -135,11 +129,11 @@ class Bot:
         )
         parser.add_argument(
             "--dataset_cache", type=str,
-            default='./dataset_cache', help="Path or url of the dataset cache"
+            default="./dataset_cache", help="Path or url of the dataset cache"
         )
         parser.add_argument(
             "--model", type=str, default="openai-gpt", help="Model type (openai-gpt or gpt2)",
-            choices=['openai-gpt', 'gpt2']
+            choices=["openai-gpt", "gpt2"]
         )  # anything besides gpt2 will load openai-gpt
         parser.add_argument(
             "--model_checkpoint", type=str,
@@ -155,7 +149,7 @@ class Bot:
         )
 
         parser.add_argument(
-            "--no_sample", action='store_true',
+            "--no_sample", action="store_true",
             help="Set to use greedy decoding instead of sampling"
         )
         parser.add_argument(
@@ -182,7 +176,7 @@ class Bot:
         self.args = parser.parse_args()
 
         if self.args.model_checkpoint == "":
-            if self.args.model == 'gpt2':
+            if self.args.model == "gpt2":
                 raise ValueError(
                     "Interacting with GPT2 requires passing a finetuned model_checkpoint"
                 )
@@ -196,9 +190,8 @@ class Bot:
             torch.cuda.manual_seed(seed)
 
         tokenizer_class, model_class = (
-            GPT2Tokenizer, GPT2LMHeadModel
-        ) if self.args.model == 'gpt2' else (
-            OpenAIGPTTokenizer, OpenAIGPTLMHeadModel
+            (GPT2Tokenizer, GPT2LMHeadModel) if self.args.model == "gpt2"
+            else (OpenAIGPTTokenizer, OpenAIGPTLMHeadModel)
         )
         self.tokenizer = tokenizer_class.from_pretrained(
             self.args.model_checkpoint
@@ -208,7 +201,8 @@ class Bot:
         add_special_tokens_(self.model, self.tokenizer)
 
         dataset = get_dataset(
-            self.tokenizer, self.args.dataset_path, self.args.dataset_cache)
+            self.tokenizer, self.args.dataset_path, self.args.dataset_cache
+        )
         personalities = [
             dialog["personality"]
             for dataset in dataset.values()
@@ -219,8 +213,9 @@ class Bot:
         self.per_str = self.tokenizer.decode(chain(*self.personality))
         self.per_str = self.per_str.split(". ")
         for i in range(len(self.per_str)):
-            self.per_str[i] = self.per_str[i][0].upper() + \
-                self.per_str[i][1:] + "."
+            self.per_str[i] = (
+                f"{self.per_str[i][0].upper()}{self.per_str[i][1:]}."
+            )
         self.per_str = "\n".join(self.per_str).replace("..", ".")
         print("/nSelected personality:", self.per_str)
 
@@ -234,7 +229,9 @@ class Bot:
         self.history.append(self.tokenizer.encode(raw_text))
         with torch.no_grad():
             out_ids = self.sample_sequence(
-                self.personality, self.history, self.tokenizer, self.model, self.args)
+                self.personality, self.history,
+                self.tokenizer, self.model, self.args
+            )
         self.history.append(out_ids)
         self.history = self.history[-(2 * self.args.max_history + 1):]
         out_text = self.tokenizer.decode(out_ids, skip_special_tokens=True)
