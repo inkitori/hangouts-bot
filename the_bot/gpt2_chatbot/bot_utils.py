@@ -60,10 +60,6 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-class Blank:
-    pass
-
-
 def make_logdir(model_name: str):
     """Create unique path to save results and checkpoints, e.g. runs/Sep22_19-45-59_gpu-7_gpt2"""
     # Code copied from ignite repo
