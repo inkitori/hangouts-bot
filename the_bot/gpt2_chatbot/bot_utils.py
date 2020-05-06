@@ -7,7 +7,6 @@ import os
 import tarfile
 import tempfile
 import socket
-
 import torch
 
 from transformers import cached_path
@@ -59,6 +58,10 @@ class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
         self.__dict__ = self
+
+
+class Blank:
+    pass
 
 
 def make_logdir(model_name: str):

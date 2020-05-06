@@ -4,12 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 import random
 import warnings
-from argparse import ArgumentParser
+import argparse
 from itertools import chain
 
 import torch
 import torch.nn.functional as F
-from train import (
+from gpt2_chatbot.train import (
     SPECIAL_TOKENS, add_special_tokens_,
     build_input_from_segments
 )
@@ -17,7 +17,7 @@ from transformers import (
     GPT2LMHeadModel, GPT2Tokenizer, OpenAIGPTLMHeadModel,
     OpenAIGPTTokenizer
 )
-from bot_utils import download_pretrained_model, get_dataset
+from gpt2_chatbot.bot_utils import download_pretrained_model, get_dataset
 
 warnings.filterwarnings("ignore")
 
@@ -112,7 +112,6 @@ class Bot:
             if i < args.min_length and prev.item() in special_tokens_ids:
                 while prev.item() in special_tokens_ids:
                     if probs.max().item() == 1:
-                        # warnings.warn("Warning: model generating special token with probability 1.")
                         break  # avoid infinitely looping over special token
                     prev = torch.multinomial(probs, num_samples=1)
 
@@ -123,7 +122,7 @@ class Bot:
         return current_output
 
     def parse_arguments(self):
-        parser = ArgumentParser()
+        parser = argparse.ArgumentParser()
         parser.add_argument(
             "--dataset_path", type=str, default="",
             help="Path or url of the dataset. If empty download from S3."

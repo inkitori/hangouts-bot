@@ -9,6 +9,7 @@ import utils
 from game_2048.manager import Manager2048
 from economy.manager import EconomyManager
 from rpg.manager import RPGManager
+import gpt2_chatbot.chatbot as gpt2
 
 
 class Handler:
@@ -33,6 +34,7 @@ class Handler:
         "penguins": "penguins2.GIF",
         "more_penguins": "penguins3.GIF"
     }
+    chatbot = gpt2.Bot()
 
     def __init__(self, *, console=False, load_sheets=True):
         self.cooldowns = collections.defaultdict(dict)
@@ -67,6 +69,8 @@ class Handler:
                 output_text = f"command {command} is not available outside of hangouts"
             else:
                 output_text = await self.commands[command](self, bot, user, conv, commands)
+        elif command == "gpt2":
+            output_text = self.chatbot.get_response(text)
 
         elif command in self.game_managers:
             user_id = user_id if self.console else user.id_[0]

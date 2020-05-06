@@ -1,7 +1,7 @@
 """
 bot for hangouts
 """
-from handler import Handler
+import handler
 import hangups
 import asyncio
 import utils
@@ -20,7 +20,7 @@ class Bot:
     def __init__(self, args):
         self.cookies = hangups.get_auth_stdin(args.token, True)
         self.client = hangups.Client(self.cookies)
-        self.handler = Handler(load_sheets=args.load_sheets)
+        self.handler = handler.Handler(load_sheets=args.load_sheets)
 
     def run(self):
         """main loop for running bot"""
@@ -69,7 +69,7 @@ class ConsoleBot:
     """console based bot (for testing)"""
 
     def __init__(self, args):
-        self.handler = Handler(console=True, load_sheets=args.load_sheets)
+        self.handler = handler.Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
 
     def run(self):
@@ -92,7 +92,7 @@ class TestBot:
     """bot for testing commands"""
 
     def __init__(self, args):
-        self.handler = Handler(console=True, load_sheets=args.load_sheets)
+        self.handler = handler.Handler(console=True, load_sheets=args.load_sheets)
         self.user_id = args.user_id
         self.commands = {
             "eco": (

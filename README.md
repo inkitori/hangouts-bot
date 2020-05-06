@@ -1,19 +1,25 @@
 # Hangouts Bot
 
-A bot for hangouts
+A bot for hangouts (but also the console)
 
 ## Running
 
 ### Setup
 
 Create a file named token.txt in hangouts with your google account's oauth login token(see hangups documentation)
+If you want to use custom
 Then in console run "python -m the_bot" (python3.6+, tested/developed on 3.7)
+
+### Usage
+
+Then in console run "python -m the_bot" (python3.6+, tested/developed on 3.7)
+For the hangouts bot, wait untill
 
 ### Dependencies
 
 For using hangouts: hangups  
 For loading items/rooms in RPG: googleapiclient, google_auth_oauthlib, google
-For GTP2 bot:
+For GTP2 bot: torch, pytorch-ignite, transformers
 
 ### Options
 

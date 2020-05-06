@@ -20,7 +20,7 @@ from projects.convai2.eval_ppl import eval_ppl
 from projects.convai2.eval_ppl import setup_args as setup_args_ppl
 
 import tqdm
-from train import (
+from gpt2_chatbot.train import (
     SPECIAL_TOKENS, add_special_tokens_,
     build_input_from_segments, pad_dataset
 )
@@ -29,7 +29,7 @@ from transformers import (
     OpenAIGPTDoubleHeadsModel, OpenAIGPTLMHeadModel,
     OpenAIGPTTokenizer
 )
-import bot_utils
+import gpt2_chatbot.bot_utils
 
 
 class TransformerAgent(parlai.core.agents.Agent):
