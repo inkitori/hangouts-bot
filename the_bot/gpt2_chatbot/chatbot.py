@@ -42,7 +42,8 @@ class Bot:
         Args:
             logits: logits distribution shape (vocabulary size)
             top_k: <=0: no filtering, >0: keep only top k tokens with highest probability.
-            top_p: <=0.0: no filtering, >0.0: keep only a subset S of candidates, where S is the smallest subset
+            top_p: <=0.0: no filtering, >0.0: keep only a subset S of candidates,
+                where S is the smallest subset
                 whose total probability mass is greater than or equal to the threshold top_p.
                 In practice, we select the highest probability tokens
                 whose cumulative probability mass exceeds the threshold top_p.
@@ -121,7 +122,7 @@ class Bot:
 
         return current_output
 
-    def run(self):
+    def parse_arguments(self):
         parser = ArgumentParser()
         parser.add_argument(
             "--dataset_path", type=str, default="",
@@ -175,6 +176,9 @@ class Bot:
         )
         self.args = parser.parse_args()
 
+    def run(self):
+        self.parse_arguments()
+
         if self.args.model_checkpoint == "":
             if self.args.model == "gpt2":
                 raise ValueError(
@@ -210,13 +214,11 @@ class Bot:
         ]
         self.personality = random.choice(personalities)
 
-        self.per_str = self.tokenizer.decode(chain(*self.personality))
-        self.per_str = self.per_str.split(". ")
-        for i in range(len(self.per_str)):
-            self.per_str[i] = (
-                f"{self.per_str[i][0].upper()}{self.per_str[i][1:]}."
-            )
-        self.per_str = "\n".join(self.per_str).replace("..", ".")
+        self.per_str = self.tokenizer.decode(chain(*self.personality)).split(". ")
+        self.per_str = "\n".join([
+            f"{string_[0].upper()}{string_[1:]}."
+            for string_ in self.per_str
+        ]).replace("..", ".")  # Prevents duplicates
         print("/nSelected personality:", self.per_str)
 
     def get_response(self, raw_text):

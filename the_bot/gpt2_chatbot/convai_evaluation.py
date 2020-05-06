@@ -1,17 +1,16 @@
-# # Copyright (c) 2019-present, HuggingFace Inc.
-# All rights reserved.
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
+"""
+Copyright (c) 2019-present, HuggingFace Inc.
+All rights reserved.
+This source code is licensed under the BSD-style license found in the
+LICENSE file in the root directory of this source tree.
+"""
 import random
-from collections import defaultdict
-from functools import partial
+import collections
+import functools
 
 import torch
-import torch.nn.functional as F
-from interact import sample_sequence
-from parlai.core.agents import Agent
-from parlai.scripts.eval_model import setup_args as base_setup_args
-
+import interact
+import parlai
 from projects.convai2.build_dict import build_dict
 from projects.convai2.eval_f1 import eval_f1
 from projects.convai2.eval_f1 import setup_args as setup_args_f1
@@ -33,7 +32,7 @@ from transformers import (
 import bot_utils
 
 
-class TransformerAgent(Agent):
+class TransformerAgent(parlai.core.agents.Agent):
     @staticmethod
     def add_cmdline_args(argparser):
         agent_args = argparser.add_argument_group("Agent parameters")
@@ -83,11 +82,17 @@ class TransformerAgent(Agent):
                 self.tokenizer = GPT2Tokenizer.from_pretrained(
                     args.model_checkpoint
                 )
-                model_class = GPT2DoubleHeadsModel if self.args.eval_type == "hits@1" else GPT2LMHeadModel
+                model_class = (
+                    GPT2DoubleHeadsModel if self.args.eval_type == "hits@1"
+                    else GPT2LMHeadModel
+                )
             else:
                 self.tokenizer = OpenAIGPTTokenizer.from_pretrained(
                     args.model_checkpoint)
-                model_class = OpenAIGPTDoubleHeadsModel if self.args.eval_type == "hits@1" else OpenAIGPTLMHeadModel
+                model_class = (
+                    OpenAIGPTDoubleHeadsModel if self.args.eval_type == "hits@1"
+                    else OpenAIGPTLMHeadModel
+                )
 
             self.model_checkpoint = model_class.from_pretrained(
                 args.model_checkpoint)
@@ -150,7 +155,7 @@ class TransformerAgent(Agent):
         reply = {}
 
         if self.args.eval_type == "hits@1" and len(self.candidates) > 0:
-            instances = defaultdict(list)
+            instances = collections.defaultdict(list)
             for candidate, _ in self.candidates:
                 instance = build_input_from_segments(
                     self.persona, self.history, candidate, self.tokenizer)
@@ -181,7 +186,7 @@ class TransformerAgent(Agent):
         else:
             # We are in interactive of f1 evaluation mode => just sample
             with torch.no_grad():
-                out_ids = sample_sequence(
+                out_ids = interact.sample_sequence(
                     self.persona, self.history, self.tokenizer, self.model_checkpoint, self.args)
             out_text = self.tokenizer.decode(
                 out_ids, skip_special_tokens=True,
@@ -196,8 +201,10 @@ class TransformerAgent(Agent):
         partial true output. This is used to calculate the per-word perplexity.
         """
         partial_out_ids = self.tokenizer.encode(" ".join(partial_out))
-        instance = build_input_from_segments(self.persona, self.history, partial_out_ids,
-                                             self.tokenizer, with_eos=False)
+        instance = build_input_from_segments(
+            self.persona, self.history, partial_out_ids,
+            self.tokenizer, with_eos=False
+        )
 
         input_ids = torch.tensor(
             instance["input_ids"], device=self.args.device).unsqueeze(0)
@@ -210,7 +217,7 @@ class TransformerAgent(Agent):
 
         if isinstance(logits, tuple):  # for gpt2 and maybe others
             logits = logits[0]
-        probs = F.softmax(logits[0, -1], dim=0)
+        probs = torch.nn.functionalF.softmax(logits[0, -1], dim=0)
 
         dist = {}
         for prefix_id, words in self.prefix2words.items():
@@ -220,7 +227,7 @@ class TransformerAgent(Agent):
 
     def get_prefix2words(self, convai_dict, smoothing_freq=5):
         """ map BPE-prefix => dict(full_words beginning with BPE-prefix, associated words_counts) """
-        prefix2words = defaultdict(dict)
+        prefix2words = collections.defaultdict(dict)
         for i in tqdm.trange(len(convai_dict)):
             word = convai_dict[i]
             freq = convai_dict.freq[word] + smoothing_freq
@@ -252,20 +259,20 @@ class TransformerAgent(Agent):
 
 
 if __name__ == "__main__":
-    parser = base_setup_args(None)
+    parser = parlai.scripts.eval_model.setup_args(None)
     parser.set_params(
         model="convai_evaluation:TransformerAgent")
     opt = parser.parse_args(print_args=False)
 
     if opt["eval_type"] == "hits@1":
         setup_args = setup_args_hits(None)
-        eval_fct = partial(eval_hits, print_parser=setup_args)
+        eval_fct = functools.partial(eval_hits, print_parser=setup_args)
     elif opt["eval_type"] == "ppl":
         setup_args = setup_args_ppl(None)
         eval_fct = eval_ppl
     elif opt["eval_type"] == "f1":
         setup_args = setup_args_f1(None)
-        eval_fct = partial(eval_f1, print_parser=setup_args)
+        eval_fct = functools.partial(eval_f1, print_parser=setup_args)
     else:
         raise ValueError
 

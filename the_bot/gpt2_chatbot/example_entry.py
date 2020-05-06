@@ -1,10 +1,12 @@
 """
-Each entry in personachat is a dict with two keys personality and utterances, the dataset is a list of entries.
+Each entry in personachat is a dict with two keys personality and utterances
+the dataset is a list of entries.
 personality:  list of strings containing the personality of the agent
 utterances: list of dictionaries, each of which has two keys which are lists of strings.
     candidates: [next_utterance_candidate_1, ..., next_utterance_candidate_19]
         The last candidate is the ground truth response observed in the conversational data
-    history: [dialog_turn_0, ... dialog_turn N], where N is an odd number since the other user starts every conversation.
+    history: [dialog_turn_0, ... dialog_turn N],
+        where N is an odd number since the other user starts every conversation.
 Preprocessing:
     - Spaces before periods at end of sentences
     - everything lowercase
@@ -72,46 +74,52 @@ EXAMPLE_ENTRY = {
                 "i also remodel homes when i am not out bow hunting ."
             ],
             "history": [
-                "hi , how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape .",
+                "hi , how are you doing ?"
+                "i'm getting ready to do some cheetah chasing to stay in shape .",
                 "you must be very fast . hunting is one of my favorite hobbies .",
                 "i am ! for my hobby i like to do canning or some whittling .",
             ]
         },
-        {"candidates": ["yes they do but i say no to them lol",
-                        "i have trouble getting along with family .",
-                        "i live in texas , what kind of stuff do you do in "
-                        "toronto ?",
-                        "that's so unique ! veganism and line dancing usually "
-                        "don't mix !",
-                        "no , it isn't that big . do you travel a lot",
-                        "that's because they are real ; what do you do for "
-                        "work ?",
-                        "i am lazy all day lol . my mom wants me to get a job "
-                        "and move out",
-                        "i was born on arbor day , so plant a tree in my name",
-                        "okay , i should not tell you , its against the rules "
-                        "but my name is sarah , call me o",
-                        "hello how are u tonight",
-                        "cool . . . my parents love country music that's why i "
-                        "hate it",
-                        "i am an accountant . what do you do ?",
-                        "what do your parents do ? my dad is a mechanic .",
-                        "how are you liking it ?",
-                        "i really am too . great talking to you too .",
-                        "cool . whats it like working there ?",
-                        "one daughter . she's pre med",
-                        "no and all men is taller than me why can't i find a "
-                        "man to dance with",
-                        "i live in utah , and my family live in england , "
-                        "so i understand",
-                        "that's awesome . do you have a favorite season or "
-                        "time of year ?"],
-         "history": [
-             "hi , how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape .",
-             "you must be very fast . hunting is one of my favorite hobbies .",
-             "i am ! for my hobby i like to do canning or some whittling .",
-             "i also remodel homes when i am not out bow hunting .",
-             "that's neat . when i was in high school i placed 6th in 100m dash !", ]
-         },
+        {
+            "candidates": [
+                "yes they do but i say no to them lol",
+                "i have trouble getting along with family .",
+                "i live in texas , what kind of stuff do you do in "
+                "toronto ?",
+                "that's so unique ! veganism and line dancing usually "
+                "don't mix !",
+                "no , it isn't that big . do you travel a lot",
+                "that's because they are real ; what do you do for "
+                "work ?",
+                "i am lazy all day lol . my mom wants me to get a job "
+                "and move out",
+                "i was born on arbor day , so plant a tree in my name",
+                "okay , i should not tell you , its against the rules "
+                "but my name is sarah , call me o",
+                "hello how are u tonight",
+                "cool . . . my parents love country music that's why i "
+                "hate it",
+                "i am an accountant . what do you do ?",
+                "what do your parents do ? my dad is a mechanic .",
+                "how are you liking it ?",
+                "i really am too . great talking to you too .",
+                "cool . whats it like working there ?",
+                "one daughter . she's pre med",
+                "no and all men is taller than me why can't i find a "
+                "man to dance with",
+                "i live in utah , and my family live in england , "
+                "so i understand",
+                "that's awesome . do you have a favorite season or "
+                "time of year ?"
+            ],
+            "history":[
+                "hi , how are you doing ?"
+                "i'm getting ready to do some cheetah chasing to stay in shape .",
+                "you must be very fast . hunting is one of my favorite hobbies .",
+                "i am ! for my hobby i like to do canning or some whittling .",
+                "i also remodel homes when i am not out bow hunting .",
+                "that's neat . when i was in high school i placed 6th in 100m dash !",
+            ]
+        },
     ]
 }

@@ -1,7 +1,9 @@
-# Copyright (c) 2019-present, HuggingFace Inc.
-# All rights reserved.
-# This source code is licensed under the BSD-style license
-# found in the LICENSE file in the root directory of this source tree.
+"""
+Copyright (c) 2019-present, HuggingFace Inc.
+All rights reserved.
+This source code is licensed under the BSD-style license
+found in the LICENSE file in the root directory of this source tree.
+"""
 import os
 import math
 from pprint import pformat
@@ -162,8 +164,9 @@ def get_data_loaders(args, tokenizer):
 
     logger.info(
         f"Train dataset (Batch, Candidates, Seq length): {train_dataset.tensors[0].shape}")
-    logger.info(f"Valid dataset (Batch, Candidates, Seq length): {valid_dataset.tensors[0].shape}"
+    logger.info(f"Valid dataset (Batch, Candidates, Seq length): {valid_dataset.tensors[0].shape}")
     return train_loader, valid_loader, train_sampler, valid_sampler
+
 
 def parse_arguments():
     parser=ArgumentParser()
