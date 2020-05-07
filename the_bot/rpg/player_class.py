@@ -19,8 +19,9 @@ class Player:
             balance=0, lifetime_balance=0
         )
         self.room = "village"
-        self.options = {"autofight": False,
-                        "heal_percent": 50, "auto_join_party": True}
+        self.options = {
+            "autofight": False, "heal_percent": 50, "auto_join_party": True
+        }
         self.inventory = inventory_class.Inventory()
         self.party_name = self.name
         Party(self.name)
@@ -44,7 +45,6 @@ class Player:
         if not room:
             return "Invalid argument! use warp {room}"
         elif party.fighting:
-            print(party.fighting)
             return "You can't warp while in a fight!"
 
         elif self.name != party.host_name:
@@ -235,8 +235,8 @@ class Player:
                 return "theres no one but you, why would you leave?"
         else:
             party.player_names.remove(self.name)
-        # if not party:
-            # del parties[self.name] # i'm pretty sure this only applies if the party host is leaving
+        if not party:
+            del parties[self.name]
         if not joining:
             self.party_name = Party(self.name).name()
         return utils.newline(f"left party")

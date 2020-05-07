@@ -21,7 +21,7 @@ For the hangouts bot, wait until "Connected!" is printed in console before sendi
 ### Dependencies
 
 For using hangouts: hangups  
-For loading items/rooms in RPG from google sheets: googleapiclient, google_auth_oauthlib, google
+For loading items/rooms in RPG from google sheets: googleapiclient, google_auth_oauthlib, google (check google sheets api for installation details)
 For GTP2 bot: torch, pytorch-ignite, transformers
 
 ### Options
@@ -48,6 +48,8 @@ economy, the text equivlant of a clicker game
 rpg, a combat based role playing game  
 
 ### GPT2 Chatbot
+
+Note that due to issues with python version compatibility, the chatbot is not currently connected to the main bot and can be run by running gpt2_chatbot/chatbot.py. Works on 3.6 but not 3.7.
 
 We changed a bit of the [OpenAI GPT2 bot](https://github.com/huggingface/pytorch-openai-transformer-lm) which was derived from the [OpenAI GPT2 model](https://openai.com/blog/better-language-models/) to plug into our chatbot. It's located in `./the-bot/gpt2-chatbot`.
 
