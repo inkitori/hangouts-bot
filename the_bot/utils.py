@@ -6,9 +6,6 @@ import shelve
 import inspect
 import pickle
 import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 
 data_keys = {
     "eco": {"economy_players": {}},
@@ -261,6 +258,11 @@ def convert_items(items, type_, default=""):
 
 # google api
 def create_sheets_service(pickled_token_file="token.pickle"):
+    # put here to avoid issues with missing dependencies
+    # if user does not want to load sheets data
+    from googleapiclient.discovery import build
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from google.auth.transport.requests import Request
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first

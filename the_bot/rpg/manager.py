@@ -14,6 +14,7 @@ class RPGManager:
     """manager for rpg"""
     game = rpg_class.RPG()
     spreadsheet_id = "1H9m57A7vcSvGnEIrAKAHjg-GmvKw1GqQqQdAMeuN5do"
+    sheet_name = "RPG"
 
     def __init__(self, load_sheets=True):
         self.load_game(load_sheets=load_sheets)
@@ -44,7 +45,7 @@ class RPGManager:
         sheets = utils.create_sheets_service().spreadsheets()
         named_ranges = utils.get_named_ranges(
             sheets, spreadsheet_id=self.spreadsheet_id,
-            sheet_name="RPG", included=data.keys()
+            sheet_name=self.sheet_name, included=data.keys()
         )
         for range_name, function_ in data.items():
             fields, *game_data = sheets.values().get(

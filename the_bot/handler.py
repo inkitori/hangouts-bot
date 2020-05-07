@@ -26,7 +26,7 @@ class Handler:
         "rpg": RPGManager(load_sheets=False),
         "eco": EconomyManager(),
     }
-    image_folder = "the_bot/images/"
+    image_folder = "./images/"
     images = {
         "llama": "llama.JPG",
         "ether": "ether.PNG",
