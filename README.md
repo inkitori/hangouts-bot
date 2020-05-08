@@ -90,6 +90,7 @@ these are features which were considered and/or partially implemented, but never
 #### RPG
 
 party commands - impllemented, but commented out because of bugs we did not have the time or commitment to fix
+atuofight- fights for a player automatically (already in Player.options)
 rpg.classes.Room.generate_encounter() - intended to be an extension of generate_enemy() to account for large party sizes, but never finished
 the method is defined, but has no body and is never called. should be called in place of generate_enemy()  
 rpg.player_class.inventory.add() - this works fine, but was never supposed to be a command.currently, any item can be added if the player knows the name. this should be changed to only allow players to pick up items in the room_data  

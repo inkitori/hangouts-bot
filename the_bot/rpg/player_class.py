@@ -20,7 +20,7 @@ class Player:
         )
         self.room = "village"
         self.options = {
-            "autofight": False, "heal_percent": 50, "auto_join_party": True
+            "autofight": False, "auto_join_party": True
         }
         self.inventory = inventory_class.Inventory()
         self.party_name = self.name
