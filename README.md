@@ -45,7 +45,7 @@ There are 3 bots, which all run the same games and commands
 ### Games
 
 economy, the text equivlant of a clicker game  
-2048, 2048 with mutiple gamemodes adapted from Creonalia's pygame GUI version (supports multiple games simultameuosly)  
+2048, 2048 with mutiple gamemodes adapted from [Creonalia's pygame version](https://github.com/Creonalia/Games/tree/master/2048) (supports multiple games simultameuosly)  
 rpg, a combat based role playing game  
 
 ### GPT2 Chatbot
