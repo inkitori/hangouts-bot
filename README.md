@@ -12,6 +12,7 @@ To load it, you will need access to the google sheets api. TO setup, create a go
 Download configuration.json into the root directory. If you do not want to load the data, use the -s flag.
 If you want to use custom data, replace the sheet ID and name in RPG manager and add named ranges(see the sheet for layout)
 Then in console run "python -m the_bot" (python3.6+, tested/developed on 3.7)
+use the id command from the account you want to bot on and add to bot.Bot.ignore to avoid the bot triggering itself or other copies of the bot
 
 ### Usage
 
@@ -88,6 +89,7 @@ these are features which were considered and/or partially implemented, but never
 
 #### RPG
 
+party commands - impllemented, but commented out because of bugs we did not have the time or commitment to fix
 rpg.classes.Room.generate_encounter() - intended to be an extension of generate_enemy() to account for large party sizes, but never finished
 the method is defined, but has no body and is never called. should be called in place of generate_enemy()  
 rpg.player_class.inventory.add() - this works fine, but was never supposed to be a command.currently, any item can be added if the player knows the name. this should be changed to only allow players to pick up items in the room_data  

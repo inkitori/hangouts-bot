@@ -13,6 +13,10 @@ def profile(self, player, commands):
     output_text = ""
     player_name = next(commands)
     page = utils.default(next(commands), 1)
+    try:
+        page = int(page)
+    except TypeError:
+        page = 1
 
     # create list of players
     possible_players = []
@@ -23,6 +27,8 @@ def profile(self, player, commands):
         possible_players.append(players[int(player_name)])
     elif player_name == "self":
         possible_players.append(player)
+    elif player_name == "all":
+        possible_players = list(players.values())
 
     # input validation
     if not possible_players:
@@ -32,8 +38,9 @@ def profile(self, player, commands):
         output_text += utils.newline(
             f"{len(possible_players)} player(s) go by that name:")
     try:
-        possible_players_slice = possible_players[(
-            page - 1) * 5: ((page - 1) * 5) + 4]
+        possible_players_slice = possible_players[
+            (page - 1) * 5: ((page - 1) * 5) + 4
+        ]
     except IndexError:
         if page * 5 > len(possible_players):
             possible_players_slice = possible_players[0:]

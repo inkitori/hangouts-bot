@@ -80,17 +80,11 @@ class Player:
             return "you do not have a tome equipped"
         if self.stats.mana < tome.stats.mana:
             return "You do not have enough mana to heal!"
-        else:
-            self.stats.mana -= tome.stats.mana
-            self.stats.health += tome.stats.health
 
-            text = utils.newline(
-                f"You have been healed back up to {self.stats.health}")
+        self.stats.mana -= tome.stats.mana
+        self.stats.health += tome.stats.health
 
-            if self.fighting:
-                text += enemy.attack(self)
-
-            return text
+        return utils.newline(f"You have been healed back up to {self.stats.health}")
 
     def attack(self, commands, enemy):
         """attacks an enemy"""
@@ -111,19 +105,15 @@ class Player:
         if enemy.stats.health <= 0:
             text += parties[self.party_name].killed_enemy(enemy, self)
 
-        else:
-            # take damage
-            text += enemy.attack(self)
-
-            if self.stats.health <= 0:
-                text += self.party_name.died(enemy, self)
+        elif self.stats.health <= 0:
+            text += self.party_name.died(enemy, self)
 
         return text
 
     def fight_action(self, action, commands):
         """"""
         party = parties[self.party_name]
-        if not party.fighting:
+        if not party.fighting and action is Player.attack:
             if self.name != party.host_name:
                 return "you are not in a fight. Only hosts may start fights"
             else:
@@ -305,6 +295,8 @@ class Player:
         "attack": attack,
         "heal": heal,
     }
+    """
+    removed due to obnoxious bugs which were not worth fixing
     party_commands = {
         "join": join,
         "leave": leave,
@@ -312,8 +304,8 @@ class Player:
         "parties": parties,
         "accept": accept,
         "decline": decline
-
     }
+    """
 
 
 class Party:
