@@ -38,7 +38,9 @@ class Handler:
         self.cooldowns = collections.defaultdict(dict)
         self.console = console
         Handler.game_managers["/rpg"] = RPGManager(
-            load_sheets=utils.default(load_sheets, not console, load_sheets is not None)
+            load_sheets=utils.default(
+                load_sheets, not console, load_sheets is not None
+            )
         )
         random.seed(datetime.datetime.now())
 
@@ -72,7 +74,8 @@ class Handler:
             user_id = user_id if self.console else user.id_[0]
             output_text = self.play_game(user_id, command, commands)
             # fixes difference in character width in hangouts vs monospaced consoles
-            output_text = utils.default(output_text.replace("  ", " "), output_text, self.console)
+            output_text = utils.default(output_text.replace(
+                "  ", " "), output_text, self.console)
 
         else:
             # if this printed in hangouts, it would respond to every single message
