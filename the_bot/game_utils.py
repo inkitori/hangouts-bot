@@ -9,6 +9,7 @@ HANGOUTS_CHAR_LIMIT = 2000
 
 def profile(self, player, commands):
     """returns player profiles"""
+    PLAYERS_PER_PAGE = 5
     players = self.players
     output_text = ""
     player_name = next(commands)
@@ -34,25 +35,25 @@ def profile(self, player, commands):
     if not possible_players:
         return "No players go by that name/id!"
 
-    elif len(possible_players) > 1:
+    if len(possible_players) > 1:
         output_text += utils.newline(
             f"{len(possible_players)} player(s) go by that name:")
     try:
         possible_players_slice = possible_players[
-            (page - 1) * 5: ((page - 1) * 5) + 4
+            (page - 1) * PLAYERS_PER_PAGE: ((page - 1) * PLAYERS_PER_PAGE) + 4
         ]
     except IndexError:
         if page * 5 > len(possible_players):
             possible_players_slice = possible_players[0:]
         else:
-            possible_players_slice = possible_players[(page - 1) * 5:]
+            possible_players_slice = possible_players[(page - 1) * PLAYERS_PER_PAGE:]
 
     output_text += utils.join_items(
         *[
             player.profile()
             for player in possible_players_slice
         ], separator="\n" * 2
-    ) + f"{page}/{math.ceil(len(possible_players)/5)}"
+    ) + f"{page}/{math.ceil(len(possible_players) / PLAYERS_PER_PAGE)}"
     return output_text
 
 
