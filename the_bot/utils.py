@@ -134,6 +134,10 @@ def load(*names):
     return data
 
 
+def to_dict(obj):
+    return obj.__dict__
+
+
 # processing strings
 def clean(text, split=True):
     """cleans user input and returns as a list"""
@@ -145,18 +149,6 @@ def clean(text, split=True):
             return text
     else:
         return [""]
-
-
-def trim(text, number=1, default=[""]):
-    """
-    removes the first number items from a sequence
-    returns default if number is greater than len(sequence)
-    """
-    try:
-        text = text[number:]
-    except IndexError:
-        text = default
-    return text
 
 
 def command_parser(command_text):
@@ -234,7 +226,7 @@ def default(item, default=None, condition="no condition"):
 
 # random
 def clamp(value, min_value, max_value):
-    """makes value less than max and greater than min"""
+    """makes value equal max if greater than max and min if less than min"""
     return max(min_value, min(value, max_value))
 
 
