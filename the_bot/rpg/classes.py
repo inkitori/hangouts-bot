@@ -37,6 +37,8 @@ class Stats:
         self.defense = defense if not defense else int(defense)
         self._speed = speed if not speed else int(speed)
 
+    """
+    BROKEN
     def __add__(self, stat_2):
         added_stats = {}
         for key, val_1, val_2 in zip(
@@ -51,6 +53,7 @@ class Stats:
                     val_2 if isinstance(val_1, int) else bool(val_1 + val_2)
 
         return Stats(**added_stats)
+    """
 
     @property
     def balance(self):

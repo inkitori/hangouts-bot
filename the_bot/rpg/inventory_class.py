@@ -103,7 +103,6 @@ class Inventory:
         return output_text
 
     def unequip(self, commands):
-        output_text = ""
         name = commands.send("remaining")
         try:
             type_ = classes.ItemType(name)
@@ -117,22 +116,21 @@ class Inventory:
 
         if type_:
             if not self.equipped[type_]:
-                output_text = "you do not have anything equipped of that type"
-            else:
-                current_equipped_item = self.equipped[type_]
-                self.equipped[type_] = None
-                output_text = f"unequipped {current_equipped_item} as {type_.name.lower()}"
+                return "you do not have anything equipped of that type"
+
+            current_equipped_item = self.equipped[type_]
+            self.equipped[type_] = None
+            return f"unequipped {current_equipped_item} as {type_.name.lower()}"
 
         elif name in self.equipped.values():
             item_type = classes.all_items[item_name].type_
             if self.equipped[item_type] != name:
-                output_text = "that item is not equipped"
-            else:
-                self.equipped[item_type] = None
-                output_text = f"unequipped {name} as {item_type.name.lower()}"
-        else:
-            output_text = "invalid type or name"
-        return output_text
+                return "that item is not equipped"
+
+            self.equipped[item_type] = None
+            return f"unequipped {name} as {item_type.name.lower()}"
+
+        return "invalid type or name"
 
     def get_equipped(self, type_):
         item_name = self.equipped[type_]
