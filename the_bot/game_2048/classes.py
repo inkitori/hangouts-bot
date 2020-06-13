@@ -225,7 +225,7 @@ class Game:
             self.draw_game()
             self.text += "you won"
         elif self.state == "lost":
-            self.text += "you lost, use restart to restart, or gamemodes to get a list of gamemodes"
+            self.text += "you lost, use restart to restart"
         elif self.state == "restart":
             self.restart()
         self.state = None
@@ -302,7 +302,10 @@ class Game:
         else:
             if (x, positive) == (None, None):
                 if command in self.modes:
-                    self.restart(command)
+                    if self.mode().size == self.modes[command].size:
+                        self.mode_name = command
+                    else:
+                        self.restart(command)
                 elif command in self.game_commands and not command.startswith("{"):
                     self.state = command
                 elif command != "":

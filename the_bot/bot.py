@@ -104,7 +104,7 @@ class TestBot:
             "2048": (
                 "create testgame", "rename testgame test", "games",
                 "create qwed", "delete qwed", "test u", "<", "v", "l",
-                "confusion", "eleven", "restart", "sggstaer", "gamemodes",
+                "confusion", "eleven", "restart", "sggstaer", "modes",
                 "move", "scores", "reserved",
             ),
             "rpg": (

@@ -25,7 +25,7 @@ class Manager2048:
     ]
     help_texts = {
         "help": "",  # avoids probelems with referencing itself
-        "gamemodes": utils.join_items(
+        "modes": utils.join_items(
             *[
                 (mode_name, mode.description)
                 for mode_name, mode in classes.Game.modes.items()
