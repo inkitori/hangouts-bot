@@ -52,7 +52,10 @@ class Bot:
 
         # sends message to hangouts
         if output_text:
-            await conv.send_message(utils.to_seg(output_text))
+            await self.send_message(output_text, conv)
+
+    async def send_message(self, message, conv):
+        await conv.send_message(utils.to_seg(message))
 
     async def send_image(self, image, conv):
         await conv.send_message(utils.to_seg(""), image)

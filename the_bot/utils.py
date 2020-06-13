@@ -168,6 +168,8 @@ def command_parser(command_text):
             item = join_items(*commands[current_index:], separator=" ", newlines=0)
         elif val == "all":
             item = commands
+        elif val == "raw":
+            item = command_text
         else:
             item = get_item(commands, indexes=(current_index, ))
             current_index += 1
