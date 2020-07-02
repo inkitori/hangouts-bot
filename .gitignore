@@ -1,5 +1,4 @@
 #chendi's configuration stuff
-Pipfile
 Pipfile.lock
 .vscode/
 !.vscode/launch.json

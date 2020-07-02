@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+hangups = "*"
+flake8 = "*"
+autopep8 = "*"
+torch = "*"
+pytorch-ignite = "*"
+transformers = "*"
+ftfy = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
