@@ -40,7 +40,7 @@ def profile(self, player, commands):
             f"{len(possible_players)} player(s) go by that name:")
     try:
         possible_players_slice = possible_players[
-            (page - 1) * PLAYERS_PER_PAGE: ((page - 1) * PLAYERS_PER_PAGE) + 4
+            (page - 1) * PLAYERS_PER_PAGE: page * PLAYERS_PER_PAGE
         ]
     except IndexError:
         if page * 5 > len(possible_players):
