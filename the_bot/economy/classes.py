@@ -115,7 +115,7 @@ class EconomyPlayer:
             self.items[item_type] = shop_items[item_type].index(purchase)
             self.change_balance(- purchase.price)
 
-            return f"Successful purchase of the {purchase.name}!"
+            return f"Successful purchase of the {purchase.name()}!"
 
         elif item_type not in shop_items or modifier not in Item.modifiers[item_type]:
             return "That item doesn't exist!"
