@@ -89,7 +89,7 @@ class Handler:
         if not new_name:
             return "Format: /rename {name}"
         else:
-            return await bot.rename_conv(new_name)
+            return await bot.rename_conv(new_name, conv)
 
     async def id_(self, bot, user, conv):
         """get the id of a user"""
