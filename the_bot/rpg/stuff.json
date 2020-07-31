@@ -1,0 +1,164 @@
+{
+    "range": "RPG!A21:N37",
+    "majorDimension": "ROWS",
+    "values": [
+        [
+            "name",
+            "can_rest",
+            "level",
+            "enemies_list",
+            "",
+            "",
+            "",
+            "",
+            "boss_name",
+            "boss_atk",
+            "boss_def",
+            "boss_hp",
+            "drops"
+        ],
+        [
+            "village",
+            "TRUE",
+            "0",
+            "kid wiht a stick",
+            "",
+            "",
+            "",
+            "",
+            "super potato",
+            "1",
+            "1",
+            "100"
+        ],
+        [
+            "potatoland",
+            "",
+            "10",
+            "potato"
+        ],
+        [
+            "Layer1",
+            "",
+            "1",
+            "Tortu",
+            "Cattus",
+            "Fuiret",
+            "Pandita",
+            "Ugly Mosquito"
+        ],
+        [
+            "Layer2",
+            "",
+            "2",
+            "Pebble Worm",
+            "Tarse",
+            "Bitan",
+            "Kamelos",
+            "Doudo"
+        ],
+        [
+            "Layer3",
+            "",
+            "3",
+            "Vulture's Beak",
+            "Ferus",
+            "Civette",
+            "Schurke",
+            "Serpere"
+        ],
+        [
+            "Layer4",
+            "",
+            "5",
+            "Giant Hornet",
+            "Hungry Corel",
+            "Krabbe",
+            "Duncan",
+            "Aigle"
+        ],
+        [
+            "Layer5",
+            "",
+            "7",
+            "Valk",
+            "Giant Klamme",
+            "Glow Worm",
+            "Gibbon",
+            "Gaufre"
+        ],
+        [
+            "Layer6",
+            "",
+            "9",
+            "Mamont",
+            "Xolotl",
+            "Long Panda",
+            "Tarantola",
+            "River Tortue"
+        ],
+        [
+            "Layer7",
+            "",
+            "12",
+            "Wendigo",
+            "Death Worm",
+            "Succubus",
+            "Jikininki",
+            "Fae"
+        ],
+        [
+            "Layer8",
+            "",
+            "13",
+            "Draugr",
+            "Ittan-Momen",
+            "Ygo-Thogos",
+            "Yempu",
+            "Yee Naaldlooshiit"
+        ],
+        [
+            "Layer9",
+            "",
+            "14",
+            "Black Dog",
+            "Kelpie",
+            "Gargoyle",
+            "Hydra",
+            "Cerberus"
+        ],
+        [
+            "Layer10",
+            "",
+            "15",
+            "Typhon",
+            "Hypnos"
+        ],
+        [
+            "The Nest",
+            "",
+            "16",
+            "",
+            "Giant Hornet",
+            "Giant Hornet",
+            "Giant Hornet",
+            "Hornet Queen"
+        ],
+        [
+            "Mother's Womb",
+            "",
+            "17",
+            "Limb"
+        ],
+        [
+            "???",
+            "",
+            "",
+            "Lust",
+            "Gluttony",
+            "Greed",
+            "Sloth",
+            "Wrath"
+        ]
+    ]
+}

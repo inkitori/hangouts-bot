@@ -2,11 +2,9 @@
 Pipfile.lock
 .vscode/
 !.vscode/launch.json
-my_stuff/
-**stuff**
 
 # for privacy
-**token.txt
+**token*.txt
 **tokens/
 **token.pickle
 **credentials.json

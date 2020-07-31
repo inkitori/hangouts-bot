@@ -27,10 +27,9 @@ class Handler:
     }
     image_folder = "./images/"
     images = {
-        "llama": "llama.JPG",
+        "alpaca": "alpacas.JPG",
         "ether": "ether.PNG",
-        "penguin": "penguins1.GIF",
-        "penguins": "penguins2.GIF",
+        "penguin": "penguins2.GIF",
         "more_penguins": "penguins3.GIF"
     }
 
@@ -54,6 +53,9 @@ class Handler:
         command = next(commands)
 
         # deals with commands
+        if command == "sudo":
+            command = next(commands)
+
         if command in self.keywords:
             output_text = self.keywords[command]
 
@@ -91,9 +93,17 @@ class Handler:
         else:
             return await bot.rename_conv(new_name, conv)
 
-    async def id_(self, bot, user, conv):
+    async def id_(self, bot, user, conv, commands):
         """get the id of a user"""
         return user.id_[0]
+
+    async def info(self, bot, user, conv, commands):
+        """returns information about the conversation"""
+        return utils.join_items(
+            (utils.default(conv.name, "Conversation"), conv.id_),
+            *[(user.full_name, user.id_[0]) for user in conv.users],
+            description_mode="short"
+        )
 
     def play_game(self, user_id, game_name, commands):
         """plays a game"""
@@ -106,6 +116,7 @@ class Handler:
         """makes the bot quit"""
         if utils.user_in(self.admins, user):
             print("Saber out!")
+            bot.send_message("quitting", conv)
             await bot.quit()
         else:
             return "bro wtf u can't use that"
@@ -114,6 +125,7 @@ class Handler:
         "/rename": rename_conv,
         "/quit": quit_,
         "/id": id_,
+        "/info": info,
     }
     keywords = {
         "ping": "pong",
