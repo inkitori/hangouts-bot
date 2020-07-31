@@ -5,6 +5,7 @@ Pipfile.lock
 
 # for privacy
 **token*.txt
+**ignore*.txt
 **tokens/
 **token.pickle
 **credentials.json

@@ -33,13 +33,11 @@ class Handler:
         "more_penguins": "penguins3.GIF"
     }
 
-    def __init__(self, *, console=False, load_sheets=True):
+    def __init__(self, args, *, console=False):
         self.cooldowns = collections.defaultdict(dict)
         self.console = console
         Handler.game_managers["/rpg"] = RPGManager(
-            load_sheets=utils.default(
-                load_sheets, not console, load_sheets is not None
-            )
+            load_sheets=args.load_sheets
         )
         random.seed(datetime.datetime.now())
 
@@ -54,6 +52,8 @@ class Handler:
 
         # deals with commands
         if command == "sudo":
+            # sudo is a flag for the bot to not ignore itself and has no impact on handler
+            # so it should be skipped
             command = next(commands)
 
         if command in self.keywords:
@@ -116,7 +116,7 @@ class Handler:
         """makes the bot quit"""
         if utils.user_in(self.admins, user):
             print("Saber out!")
-            bot.send_message("quitting", conv)
+            await bot.send_message("quitting", conv)
             await bot.quit()
         else:
             return "bro wtf u can't use that"
