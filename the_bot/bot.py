@@ -99,7 +99,7 @@ class TestBot:
         self.user_id = args.user_id
         self.commands = {
             "eco": (
-                "register testbot",
+                "register testbot", "help",
                 "leaderboard", "shop", "profile",
                 "mine", "mine", "mine", "mine",
                 "buy tin pick", "prestige", "prestige_upgrade", "give 101 1"
@@ -108,10 +108,10 @@ class TestBot:
                 "create testgame", "rename testgame test", "games",
                 "create qwed", "delete qwed", "test u", "<", "v", "l",
                 "confusion", "eleven", "restart", "sggstaer", "modes",
-                "move", "scores", "reserved",
+                "move", "scores", "reserved", "help",
             ),
             "rpg": (
-                "register qwerty", "profile",
+                "register qwerty", "profile", "help",
                 "add starter armor", "add starter weapon",
                 "equip boring starter weapon", "equip boring starter armor",
                 "inventory", "set auto_join_party false",
