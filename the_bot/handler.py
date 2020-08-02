@@ -28,9 +28,7 @@ class Handler:
     image_folder = "./images/"
     images = {
         "alpaca": "alpacas.JPG",
-        "ether": "ether.PNG",
-        "penguin": "penguins2.GIF",
-        "more_penguins": "penguins3.GIF"
+        "/ether": "ether.PNG",
     }
 
     def __init__(self, args, *, console=False):
