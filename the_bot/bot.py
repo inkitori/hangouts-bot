@@ -43,11 +43,10 @@ class Bot:
         user, conv = utils.get_user_and_conv(self._convo_list, event)
         output_text = ""
 
-        if (user.is_self and not event.text.split()[0].lower() == "sudo") or utils.user_in(self.ignore, user):
-            return
-
         # handles messages
         if (isinstance(event, hangups.ChatMessageEvent)):
+            if (user.is_self and not event.text.split()[0].lower() == "sudo") or utils.user_in(self.ignore, user):
+                return
             output_text = await self.handler.handle_message(event, bot=self)
 
         # sends message to hangouts
