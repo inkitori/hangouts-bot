@@ -45,8 +45,9 @@ class Bot:
 
         # handles messages
         if (isinstance(event, hangups.ChatMessageEvent)):
-            if (user.is_self and not event.text.split()[0].lower() == "sudo") or utils.user_in(self.ignore, user):
-                return
+            if user.is_self or utils.user_in(self.ignore, user):
+                if not (user.is_self and event.text.split()[0].lower() == "sudo"):
+                    return
             output_text = await self.handler.handle_message(event, bot=self)
 
         # sends message to hangouts
