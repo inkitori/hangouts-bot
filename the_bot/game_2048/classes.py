@@ -201,7 +201,6 @@ class Game:
         self.name = name
         self.score = 0
         self.mode_name = "normal"
-        self.state = None
         self.has_won = False
         self.board = Board(self.mode())
         for _ in range(2):
@@ -213,15 +212,13 @@ class Game:
     def update(self):
         """returns text based on current state"""
         text = ""
-        if self.state == "won":
+        if self.check_win() and not self.has_won:
+            # check has_won so it doesnt say the player won forever after they win
             self.has_won = True
             text += self.draw_game()
             text += "you won"
-        elif self.state == "lost":
+        elif not self.board.check_can_move():
             text += "you lost, use restart to restart"
-        elif self.state == "restart":
-            self.restart()
-        self.state = None
 
         text += "\n\n"
         text += self.draw_game()
@@ -246,7 +243,6 @@ class Game:
         self.board = Board(self.mode())
         for _ in range(2):
             self.board.make_new_block(self.mode())
-        self.state = None
         self.has_won = False
 
     def move(self, x, positive):
@@ -261,17 +257,10 @@ class Game:
             if old_board_values != [cell.value for cell in self.board.cells]:
                 self.board.make_new_block(self.mode())
 
-        if self.score > self.mode().high_score:
-            self.mode().high_score = self.score
-        if not self.board.check_can_move():
-            self.state = "lost"
-        if self.check_win():
-            self.state = "won"
-
     def check_win(self):
         """checks if the player has won"""
         for block in self.board.cells:
-            if block.value == self.mode().win_value and not self.has_won:
+            if block.value == self.mode().win_value:
                 return True
         return False
 
@@ -292,6 +281,8 @@ class Game:
             direction = direction.value
             if command in direction.commands:
                 self.move(direction.x, direction.positive)
+                if self.score > self.mode().high_score:
+                    self.mode().high_score = self.score
                 break
         else:
             if command in self.modes:
@@ -299,11 +290,10 @@ class Game:
                     self.mode_name = command
                 else:
                     self.restart(command)
-            elif command in self.game_commands and not command.startswith("{"):
-                self.state = command
+            elif command == "restart":
+                self.restart()
             elif command != "":
                 text += "invalid command, use help to see commands\n"
-                self.state = None
 
         text += self.update()
         return utils.newline(text)
