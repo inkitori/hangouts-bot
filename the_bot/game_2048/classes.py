@@ -105,7 +105,8 @@ class Board:
         empty_cell.value = value
 
     def draw_board(self, game):
-        """appends the board to self.text"""
+        """returns text representation of the board"""
+        text = ""
         max_length = 0
         for cell in self.cells:
             cell.length = len(str(game.mode().values[cell.value]))
@@ -114,8 +115,9 @@ class Board:
             for column in range(game.mode().size):
                 cell = game.board.cells[row * game.mode().size + column]
                 spaces = (max_length - cell.length + 1) * " "
-                game.text += spaces * 2 + str(game.mode().values[cell.value])
-            game.text += "\n"
+                text += spaces * 2 + str(game.mode().values[cell.value])
+            text += "\n"
+        return text
 
 
 @enum.unique
@@ -198,7 +200,6 @@ class Game:
     def __init__(self, name):
         self.name = name
         self.score = 0
-        self.text = ""
         self.mode_name = "normal"
         self.state = None
         self.has_won = False
@@ -210,28 +211,31 @@ class Game:
         return self.modes[self.mode_name]
 
     def update(self):
-        """appends text based on current state"""
+        """returns text based on current state"""
+        text = ""
         if self.state == "won":
             self.has_won = True
-            self.draw_game()
-            self.text += "you won"
+            text += self.draw_game()
+            text += "you won"
         elif self.state == "lost":
-            self.text += "you lost, use restart to restart"
+            text += "you lost, use restart to restart"
         elif self.state == "restart":
             self.restart()
         self.state = None
 
-        self.text = utils.newline(self.text, 2)
-        self.draw_game()
+        text += "\n\n"
+        text += self.draw_game()
+        return text
 
     def draw_game(self):
-        """appends board and scores to self.text"""
-        self.text += utils.join_items(
+        """returns string representation of the game"""
+        text = utils.join_items(
             utils.description(self.name, self.mode().name(), newlines=0),
             f"score: {self.score}",
             newlines=2
         )
-        self.board.draw_board(self)
+        text += self.board.draw_board(self)
+        return text
 
     def restart(self, mode=None):
         """Resets the game"""
@@ -261,14 +265,15 @@ class Game:
             self.mode().high_score = self.score
         if not self.board.check_can_move():
             self.state = "lost"
-        if self.state != "won":
-            self.check_win()
+        if self.check_win():
+            self.state = "won"
 
     def check_win(self):
         """checks if the player has won"""
         for block in self.board.cells:
             if block.value == self.mode().win_value and not self.has_won:
-                self.state = "won"
+                return True
+        return False
 
     def setup_confusion(self):
         """shuffled the values for conffusion mode"""
@@ -279,29 +284,26 @@ class Game:
 
     def play_game(self, commands):
         """runs the main game loop once"""
-        self.text = ""
+        text = ""
         command = next(commands)
 
         # check player movement
-        x = None
-        positive = None
         for direction in Directions:
             direction = direction.value
             if command in direction.commands:
                 self.move(direction.x, direction.positive)
                 break
         else:
-            if (x, positive) == (None, None):
-                if command in self.modes:
-                    if self.mode().size == self.modes[command].size:
-                        self.mode_name = command
-                    else:
-                        self.restart(command)
-                elif command in self.game_commands and not command.startswith("{"):
-                    self.state = command
-                elif command != "":
-                    self.text += "invalid command, use help to see commands\n"
-                    self.state = None
+            if command in self.modes:
+                if self.mode().size == self.modes[command].size:
+                    self.mode_name = command
+                else:
+                    self.restart(command)
+            elif command in self.game_commands and not command.startswith("{"):
+                self.state = command
+            elif command != "":
+                text += "invalid command, use help to see commands\n"
+                self.state = None
 
-        self.update()
-        return utils.newline(self.text)
+        text += self.update()
+        return utils.newline(text)
