@@ -57,7 +57,7 @@ class Manager2048:
     )
     # needs to be here because resereved_words is declared first (avoid circular references)
     reserved_words += list(help_texts)
-    games = classes.games
+    games = {CURRENT_GAME: None}
 
     def __init__(self):
         self.load_game()
@@ -74,7 +74,7 @@ class Manager2048:
 
     def create_game(self, game_name):
         """creates a new game in games dict"""
-        self.games[game_name] = classes.Game()
+        self.games[game_name] = classes.Game(game_name)
         return self.games[game_name]
 
     def verify_name(self, *names):
@@ -114,6 +114,7 @@ class Manager2048:
                 return "that game does not exist"
 
             self.games[new_name] = self.games.pop(old_name)
+            self.games[new_name].name = new_name
             play_game_name = new_name
             output_text = f"renamed {old_name} to {new_name}"
 

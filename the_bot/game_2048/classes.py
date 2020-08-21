@@ -195,7 +195,8 @@ class Game:
     }
     game_commands = ["restart", "{direction}"]
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.score = 0
         self.text = ""
         self.mode_name = "normal"
@@ -204,10 +205,6 @@ class Game:
         self.board = Board(self.mode())
         for _ in range(2):
             self.board.make_new_block(self.mode())
-
-    def name(self):
-        """name of the game"""
-        return utils.get_key(games, self, CURRENT_GAME)
 
     def mode(self):
         return self.modes[self.mode_name]
@@ -230,7 +227,7 @@ class Game:
     def draw_game(self):
         """appends board and scores to self.text"""
         self.text += utils.join_items(
-            utils.description(self.name(), self.mode().name(), newlines=0),
+            utils.description(self.name, self.mode().name(), newlines=0),
             f"score: {self.score}",
             newlines=2
         )
@@ -308,6 +305,3 @@ class Game:
 
         self.update()
         return utils.newline(self.text)
-
-
-games = {CURRENT_GAME: None}
