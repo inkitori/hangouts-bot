@@ -4,6 +4,7 @@ manager for 2048 games
 import utils
 import game_2048.classes as classes
 
+CURRENT_GAME = "current game"
 
 class Manager2048:
     """manager for 2048 game"""
@@ -15,7 +16,7 @@ class Manager2048:
         classes.Game.game_commands + list(classes.Game.modes.keys()) +
         [command for direction in classes.Directions for command in direction.value.commands] +
         game_management_commands +
-        ["2048", "/2048"] + [keyword.value for keyword in classes.Keywords]
+        ["2048", "/2048", "current_game", "current game", "won", "lost", "restart"]
     )
     reserved_words = [
         word
@@ -120,7 +121,7 @@ class Manager2048:
             output_text = self.delete_game(commands)
 
         elif command in self.games:
-            self.games[classes.Keywords.CURRENT_GAME] = self.games[command]
+            self.games[CURRENT_GAME] = self.games[command]
 
         elif command == "games":
             output_text += utils.newline(utils.default(utils.join_items(
@@ -128,7 +129,7 @@ class Manager2048:
                     utils.description(
                         game_name, game.mode_name, game.score)
                     for game_name, game in self.games.items()
-                    if game_name != classes.Keywords.CURRENT_GAME
+                    if game_name != CURRENT_GAME
                 ],
             ), "there are no games"), 2)
 
@@ -139,16 +140,15 @@ class Manager2048:
             # moves the generator back one command because the command was not used
             commands.send(-1)
 
-        play_game_name = utils.default(
-            play_game_name, classes.Keywords.CURRENT_GAME)
-        self.games[classes.Keywords.CURRENT_GAME] = self.games[play_game_name]
+        play_game_name = utils.default(play_game_name, CURRENT_GAME)
+        self.games[CURRENT_GAME] = self.games[play_game_name]
 
         if output_text:
             return output_text
 
         # plays game
-        if self.games[classes.Keywords.CURRENT_GAME]:
-            output_text = self.games[classes.Keywords.CURRENT_GAME].play_game(
+        if self.games[CURRENT_GAME]:
+            output_text = self.games[CURRENT_GAME].play_game(
                 commands)
         else:
             output_text = "no game selected"
@@ -160,7 +160,7 @@ class Manager2048:
         """loads games from file"""
         self.games, scores = utils.load("games_2048", "scores_2048")
         for mode_name, mode in classes.Game.modes.items():
-            mode.high_score = scores[mode_name]
+            mode.high_score = scores.get(mode_name, 0)
 
     def save_game(self):
         """saves games to a json file"""
@@ -179,7 +179,7 @@ class Manager2048:
         elif delete_game_name not in self.games.keys():
             return "that game does not exist"
         else:
-            if self.games[classes.Keywords.CURRENT_GAME] == self.games[delete_game_name]:
-                self.games[classes.Keywords.CURRENT_GAME] = None
+            if self.games[CURRENT_GAME] == self.games[delete_game_name]:
+                self.games[CURRENT_GAME] = None
             del self.games[delete_game_name]
             return f"{delete_game_name} deleted"

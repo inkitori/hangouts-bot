@@ -7,14 +7,8 @@ import utils
 import enum
 import collections
 
-
-@enum.unique
-class Keywords(enum.Enum):
-    """this just exists because spelling errors"""
-    CURRENT_GAME = "current game"
-    WON = "won"
-    LOST = "lost"
-    RESTART = "restart"
+# because typos
+CURRENT_GAME = "current game"
 
 
 class Cell:
@@ -213,7 +207,7 @@ class Game:
 
     def name(self):
         """name of the game"""
-        return utils.get_key(games, self, Keywords.CURRENT_GAME)
+        return utils.get_key(games, self, CURRENT_GAME)
 
     def mode(self):
         return self.modes[self.mode_name]
@@ -316,4 +310,4 @@ class Game:
         return utils.newline(self.text)
 
 
-games = {Keywords.CURRENT_GAME: None}
+games = {CURRENT_GAME: None}
