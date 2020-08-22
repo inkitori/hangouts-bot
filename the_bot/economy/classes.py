@@ -61,7 +61,8 @@ class EconomyPlayer:
     prestige_conversion = 100000
     prestige_upgrade_base = 2000
 
-    def __init__(self, name):
+    def __init__(self, id_, name):
+        self.id_ = id_
         self.name = name
         self.balance = 0
         self.lifetime_balance = 0
@@ -187,54 +188,10 @@ class EconomyPlayer:
             f"pick: {self.get_item('pick').name()}",
             f"prestige: {self.prestige}",
             f"prestige level: {self.prestige_upgrade}",
-            f"id: {self.get_id()}",
+            f"id: {self.id_}",
             separator="\n\t"
         )
         return profile_text.title()
-
-    def give(self, commands):
-        """gives money to another player"""
-        # input validation
-        reciveing_player = next(commands)
-        money = next(commands)
-        if not reciveing_player:
-            return "You must specfiy a player or ID"
-        elif not money:
-            return "You must specify an amount"
-        elif not money.isdigit():
-            return "You must give an integer amount of Saber Dollars"
-
-        money = int(money)
-        # get the player
-        for player in players.values():
-            if reciveing_player == player.name:
-                reciveing_player = player
-                break
-        if reciveing_player.isdigit() and int(reciveing_player) in players:
-            reciveing_player = players[int(reciveing_player)]
-
-        # check player is valid
-        if reciveing_player.get_id() not in players:
-            return "That player has not registered!"
-        elif reciveing_player.get_id() == self.get_id():
-            return "That player is you!"
-
-        # check money is valid
-        if money < 0:
-            return "You can't give negative money!"
-        elif self.balance < money:
-            return "You don't have enough money to do that!"
-
-        self.change_balance(-money)
-        reciveing_player.change_balance(money)
-
-        return utils.join_items(
-            f"Successfully given {money} Saber Dollars to {reciveing_player.name}.",
-            f"{reciveing_player.name} now has {reciveing_player.balance} Saber Dollars."
-        )
-
-    def get_id(self):
-        return utils.get_key(players, self)
 
     def get_item(self, type_):
         return shop_items[type_][self.items[type_]]
@@ -244,8 +201,4 @@ class EconomyPlayer:
         "buy": buy,
         "prestige": prestige_action,
         "prestige_upgrade": prestige_upgrade_action,
-        "give": give,
     }
-
-
-players = {}

@@ -170,7 +170,6 @@ class Manager2048:
             for mode_name, mode in classes.Game.modes.items()
         }
         utils.save(games_2048=self.games, scores_2048=scores)
-        classes.games = self.games
 
     def delete_game(self, commands):
         """deletes a game"""
