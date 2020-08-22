@@ -8,20 +8,6 @@ import random
 
 class Item:
     """items"""
-    prices = {
-        "pick": (
-            0, 100, 250, 625, 1565, 3910, 9775, 24440, 61100, 152750, 381875, 954687,
-            2386717, 5966792, 14916980, 37292450, 93231125, 233077812,
-        ),
-    }
-    modifiers = {
-        "pick": (
-            "copper", "tin", "iron", "lead", "silver", "tungsten", "gold", "platinum", "molten",
-            "cobalt", "palladium", "mythril", "orichalcum", "adamantite", "titanium",
-            "chlorophyte", "spectre", "luminite",
-        ),
-    }
-
     def __init__(self, type_, price, modifer="", level=0):
         self.type_ = type_
         self.price = price
@@ -37,40 +23,31 @@ class Item:
     def generate_mining(self, level):
         return (level + 2) ** 2 // 2, (level + 2) ** 2
 
-
-def generate_items(type_):
-    max_possible_items = min(
-        len(Item.modifiers[type_]), len(Item.prices[type_]))
-    return [
-        Item(
-            type_, Item.prices[type_][level],
-            Item.modifiers[type_][level], level
-        )
-        for level in range(max_possible_items)
-    ]
-
-
-shop_items = {
-    "pick": generate_items("pick")
-}
+    @staticmethod
+    def generate_items(type_, modifiers, prices):
+        return [
+            Item(type_, *data, level)
+            for level, data in enumerate(zip(prices, modifiers))
+        ]
 
 
 class EconomyPlayer:
     """class for players in economy"""
 
-    prestige_conversion = 100000
-    prestige_upgrade_base = 2000
+    PRESTIGE_CONVERSION = 100000
+    PRESTIGE_UPGRADE_BASE = 2000
 
-    def __init__(self, id_, name):
+    def __init__(self, id_, name, manager):
         self.id_ = id_
         self.name = name
         self.balance = 0
         self.lifetime_balance = 0
         self.prestige = 0
-        self.items = {"pick": 0}
+        self.items = {"pick": "copper"}
         self.confirmed_prestige = False
         self.confirmed_upgrade = False
         self.prestige_upgrade = 0
+        self.manager = manager
 
     def change_balance(self, money):
         """increases money"""
@@ -98,55 +75,64 @@ class EconomyPlayer:
         """buys a item"""
         modifier = next(commands)
         item_type = next(commands)
+        item = self.manager.get_item(modifier, item_type)
+        if type(item) == str:
+            return item
 
-        if modifier == "top":
-            if item_type not in shop_items:
-                return "That class doesn't exist!"
-
-            possible_items = [
-                item for item in shop_items[item_type]
-                if item.level > self.items[item_type]
-                and item.price <= self.balance
-            ]
-
-            if not possible_items:
-                return "No possible item of that type you can purchase!"
-
-            purchase = possible_items[-1]
-            self.items[item_type] = shop_items[item_type].index(purchase)
-            self.change_balance(- purchase.price)
-
-            return f"Successful purchase of the {purchase.name()}!"
-
-        elif item_type not in shop_items or modifier not in Item.modifiers[item_type]:
-            return "That item doesn't exist!"
-
+        if self.balance < item.price:
+            return "You don't have enough money for that!"
+        elif item.modifer == self.items[item_type]:
+            return "You already have that item!"
+        elif self.get_item(item_type).level > item.level:
+            return "You already have a item better than that!"
         else:
-            item_index = Item.modifiers[item_type].index(modifier)
-            item = shop_items[item_type][item_index]
-            if self.balance < item.price:
-                return "You don't have enough money for that!"
-            elif item_index == self.items[item_type]:
-                return "You already have that item!"
-            elif self.get_item("pick").level > item.level:
-                return "You already have a pick better than that!"
-            else:
-                self.items[item_type] = item_index
-                self.change_balance(- item.price)
+            self.items[item_type] = modifier
+            self.change_balance(- item.price)
+            return "Purchase successful!"
 
-                return "Purchase successful!"
+    def give(self, commands):
+        """gives money to another player"""
+        # input validation
+        receiving_player = next(commands)
+        money = next(commands)
+        if not money:
+            return "You must specify an amount"
+        elif not money.isdigit():
+            return "You must give an integer amount of Saber Dollars"
+
+        money = int(money)
+        # get the player
+        receiving_player = self.manager.get_player(receiving_player)
+        if type(receiving_player) == str:
+            return receiving_player
+        if receiving_player.id_ == self.id_:
+            return "That player is you!"
+
+        # check money is valid
+        if money < 0:
+            return "You can't give negative money!"
+        elif self.balance < money:
+            return "You don't have enough money to do that!"
+
+        self.change_balance(-money)
+        receiving_player.change_balance(money)
+
+        return utils.join_items(
+            f"Successfully given {money} Saber Dollars to {receiving_player.name}.",
+            f"{receiving_player.name} now has {receiving_player.balance} Saber Dollars."
+        )
 
     def prestige_action(self, commands):
         """gives prestige information"""
         output_text = ""
         earned_prestige = math.trunc(
-            self.lifetime_balance / self.prestige_conversion)
+            self.lifetime_balance / EconomyPlayer.PRESTIGE_CONVERSION)
         if self.confirmed_prestige:
             self.balance = 0
             self.lifetime_balance = 0
             self.confirmed_prestige = False
             self.confirmed_upgrade = False
-            self.items = {"pick": 0}
+            self.items = {"pick": "copper"}
             self.prestige += earned_prestige
             output_text = "Successfully prestiged"
         else:
@@ -155,7 +141,7 @@ class EconomyPlayer:
                 f"You currently have {self.prestige} prestige point(s).",
                 f"If you prestige, you will earn {earned_prestige} more prestige point(s), or a " +
                 f"{earned_prestige}% bonus, but will lose all your money and items.",
-                f"Use prestige again if you really do wish to prestige."
+                "Use prestige again if you really do wish to prestige."
             )
         return output_text
 
@@ -163,7 +149,7 @@ class EconomyPlayer:
         """upgrades prestige"""
         output_text = ""
         prestige_upgrade_cost = math.floor(
-            self.prestige_upgrade_base * 2.5 ** self.prestige_upgrade
+            EconomyPlayer.PRESTIGE_UPGRADE_BASE * 2.5 ** self.prestige_upgrade
         )
         if self.confirmed_upgrade:
             if self.prestige < prestige_upgrade_cost:
@@ -193,12 +179,13 @@ class EconomyPlayer:
         )
         return profile_text.title()
 
-    def get_item(self, type_):
-        return shop_items[type_][self.items[type_]]
+    def get_item(self, item_type):
+        return self.manager.get_item(self.items[item_type], item_type)
 
     commands = {
         "mine": mine,
-        "buy": buy,
         "prestige": prestige_action,
         "prestige_upgrade": prestige_upgrade_action,
+        "give": give,
+        "buy": buy,
     }
