@@ -23,6 +23,7 @@ bots_args.add_argument(
     help="tests bot in console",
 )
 
+# changing users
 user_args = parser.add_argument_group("User")
 user_args.add_argument(
     "-i", "--id", dest="user_id", default=101, type=int,
@@ -33,7 +34,7 @@ user_args.add_argument(
     help="hangouts login token",
 )
 
-# data loaing/deleting
+# data loading/deleting
 data_args = parser.add_argument_group("Data")
 data_args.add_argument(
     "-s", "--skip-sheets", dest="load_sheets", action="store_false", default=True,
