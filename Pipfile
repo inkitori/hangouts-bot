@@ -7,10 +7,6 @@ name = "pypi"
 hangups = "*"
 flake8 = "*"
 autopep8 = "*"
-torch = "*"
-pytorch-ignite = "*"
-transformers = "*"
-ftfy = "*"
 
 [dev-packages]
 
